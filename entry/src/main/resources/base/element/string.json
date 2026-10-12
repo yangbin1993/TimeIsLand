@@ -1,0 +1,424 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "业务主入口模块"
+    },
+    {
+      "name": "AppAbility_desc",
+      "value": "应用主界面 Ability"
+    },
+    {
+      "name": "AppAbility_label",
+      "value": "HarmonyOS 架构"
+    },
+    {
+      "name": "permission_reason",
+      "value": "访问网络数据需要网络权限"
+    },
+    {
+      "name": "biometric_permission_reason",
+      "value": "用于提供指纹、人脸识别及多模态安全解锁服务"
+    },
+    {
+      "name": "pasteboard_permission_reason",
+      "value": "读取系统剪贴板内容以提供快速识别与粘贴服务"
+    },
+    {
+      "name": "tab_home",
+      "value": "首页"
+    },
+    {
+      "name": "tab_news",
+      "value": "资讯"
+    },
+    {
+      "name": "tab_mine",
+      "value": "我的"
+    },
+    {
+      "name": "login_title",
+      "value": "用户登录"
+    },
+    {
+      "name": "login_username_label",
+      "value": "用户名:"
+    },
+    {
+      "name": "login_username_placeholder",
+      "value": "请输入用户名"
+    },
+    {
+      "name": "login_password_label",
+      "value": "密码:"
+    },
+    {
+      "name": "login_password_placeholder",
+      "value": "请输入密码"
+    },
+    {
+      "name": "login_button_submit",
+      "value": "立即登录"
+    },
+    {
+      "name": "login_loading",
+      "value": "正在安全登录中..."
+    },
+    {
+      "name": "login_success_toast",
+      "value": "登录成功，欢迎回来！"
+    },
+    {
+      "name": "login_fail_toast",
+      "value": "用户名或密码错误，请重试"
+    },
+    {
+      "name": "login_validation_empty",
+      "value": "用户名和密码均不能为空"
+    },
+    {
+      "name": "login_tip",
+      "value": "提示：用户名支持邮箱格式，密码至少6位"
+    },
+    {
+      "name": "welcome_title",
+      "value": "欢迎来到首页"
+    },
+    {
+      "name": "current_user_prefix",
+      "value": "当前登录用户: "
+    },
+    {
+      "name": "default_visitor",
+      "value": "默认访客"
+    },
+    {
+      "name": "transfer_card_title",
+      "value": "文件传输演示中心 (ohos.request)"
+    },
+    {
+      "name": "transfer_download_title",
+      "value": "文件下载"
+    },
+    {
+      "name": "transfer_upload_title",
+      "value": "文件上传"
+    },
+    {
+      "name": "transfer_btn_download",
+      "value": "发起文件下载任务"
+    },
+    {
+      "name": "transfer_btn_downloading",
+      "value": "正在下载..."
+    },
+    {
+      "name": "transfer_btn_upload",
+      "value": "发起文件上传任务"
+    },
+    {
+      "name": "transfer_btn_uploading",
+      "value": "正在上传..."
+    },
+    {
+      "name": "transfer_status_idle",
+      "value": "待触发"
+    },
+    {
+      "name": "transfer_desc",
+      "value": "基于 ohos.request 的文件传输体系，系统级 Agent 代理、断点续传与防 OOM 流式传输"
+    },
+    {
+      "name": "biometric_card_title",
+      "value": "生物识别与安全解锁 (BiometricHelper)"
+    },
+    {
+      "name": "biometric_card_desc",
+      "value": "基于 UserAuthenticationKit 统一封装，支持人脸、指纹与锁屏密码"
+    },
+    {
+      "name": "biometric_status_label",
+      "value": "当前状态:"
+    },
+    {
+      "name": "biometric_status_idle",
+      "value": "未发起认证"
+    },
+    {
+      "name": "biometric_btn_dual",
+      "value": "发起多模态安全解锁 (生物+锁屏密码)"
+    },
+    {
+      "name": "biometric_btn_bio_only",
+      "value": "仅生物识别验证 (指纹/人脸)"
+    },
+    {
+      "name": "biometric_btn_check",
+      "value": "检测设备生物识别可用性"
+    },
+    {
+      "name": "biometric_btn_authenticating",
+      "value": "认证中..."
+    },
+    {
+      "name": "news_title",
+      "value": "最新资讯"
+    },
+    {
+      "name": "news_item_title",
+      "value": "鸿蒙架构演进实践"
+    },
+    {
+      "name": "news_item_desc",
+      "value": "基于 Navigation 与分层架构的最佳实践探索"
+    },
+    {
+      "name": "news_arkts_title",
+      "value": "ArkTS 状态管理V2精要"
+    },
+    {
+      "name": "news_arkts_desc",
+      "value": "深入理解@ObservedV2与@Trace的响应式原理"
+    },
+    {
+      "name": "mine_title",
+      "value": "个人中心"
+    },
+    {
+      "name": "mine_user_name",
+      "value": "用户名称: "
+    },
+    {
+      "name": "mine_user_email",
+      "value": "电子邮箱: "
+    },
+    {
+      "name": "mine_user_age",
+      "value": "用户年龄: "
+    },
+    {
+      "name": "mine_btn_modify",
+      "value": "修改个人信息"
+    },
+    {
+      "name": "mine_btn_logout",
+      "value": "退出登录"
+    },
+    {
+      "name": "showcase_dialog_entry",
+      "value": "体验通用对话框与端侧行为感知"
+    },
+    {
+      "name": "showcase_dialog_title",
+      "value": "通用对话框体验中心"
+    },
+    {
+      "name": "showcase_toast_section",
+      "value": "1. 轻量级全局浮层 (Toast)"
+    },
+    {
+      "name": "showcase_standard_section",
+      "value": "2. 快捷命令式弹窗 (Alert / Confirm)"
+    },
+    {
+      "name": "showcase_custom_section",
+      "value": "3. 高自由度自定义弹窗 (Input / Loading)"
+    },
+    {
+      "name": "showcase_tracker_section",
+      "value": "4. 端侧智能行为感知实时特征池"
+    },
+    {
+      "name": "nav_title_main",
+      "value": "应用主页"
+    },
+    {
+      "name": "nav_title_dialog_showcase",
+      "value": "对话框展示中心"
+    },
+    {
+      "name": "btn_toast_normal",
+      "value": "弹出普通 Toast (2s)"
+    },
+    {
+      "name": "btn_toast_long",
+      "value": "弹出长时 Toast (3.5s)"
+    },
+    {
+      "name": "btn_alert",
+      "value": "单按钮提示弹窗 (Alert)"
+    },
+    {
+      "name": "btn_confirm",
+      "value": "常规二次确认弹窗 (Confirm)"
+    },
+    {
+      "name": "btn_danger",
+      "value": "危险操作警示弹窗 (isDanger: true)"
+    },
+    {
+      "name": "btn_input_dialog",
+      "value": "唤起 Input 录入弹窗"
+    },
+    {
+      "name": "btn_loading_dialog",
+      "value": "唤起 Loading 加载遮罩"
+    },
+    {
+      "name": "btn_refresh_sequence",
+      "value": "刷新序列"
+    },
+    {
+      "name": "scan_section_title",
+      "value": "5. 系统级扫码与二维码生成 (Scan Kit)"
+    },
+    {
+      "name": "btn_scan_native",
+      "value": "呼起系统原生扫码 (免权限)"
+    },
+    {
+      "name": "btn_generate_qr",
+      "value": "生成演示二维码"
+    },
+    {
+      "name": "qr_generated_hint",
+      "value": "已生成的动态二维码 PixelMap"
+    },
+    {
+      "name": "timeisland_nav_title",
+      "value": "时光岛"
+    },
+    {
+      "name": "timeisland_nav_stats",
+      "value": "心流统计"
+    },
+    {
+      "name": "timeisland_status_idle",
+      "value": "准备就绪"
+    },
+    {
+      "name": "timeisland_status_running",
+      "value": "专注心流中"
+    },
+    {
+      "name": "timeisland_status_paused",
+      "value": "已暂停"
+    },
+    {
+      "name": "timeisland_btn_start",
+      "value": "开始专注"
+    },
+    {
+      "name": "timeisland_btn_pause",
+      "value": "暂停"
+    },
+    {
+      "name": "timeisland_btn_resume",
+      "value": "继续"
+    },
+    {
+      "name": "timeisland_btn_give_up",
+      "value": "放弃"
+    },
+    {
+      "name": "timeisland_btn_complete",
+      "value": "达成完成"
+    },
+    {
+      "name": "timeisland_today_focused",
+      "value": "今日专注"
+    },
+    {
+      "name": "timeisland_today_pomodoro",
+      "value": "今日番茄数"
+    },
+    {
+      "name": "timeisland_unit_minutes",
+      "value": "分钟"
+    },
+    {
+      "name": "timeisland_unit_count",
+      "value": "个"
+    },
+    {
+      "name": "timeisland_tag_title",
+      "value": "选择专注场景"
+    },
+    {
+      "name": "timeisland_duration_title",
+      "value": "设定时长"
+    },
+    {
+      "name": "timeisland_whitenoise_title",
+      "value": "白噪音"
+    },
+    {
+      "name": "timeisland_whitenoise_forest",
+      "value": "林间清风"
+    },
+    {
+      "name": "timeisland_whitenoise_rain",
+      "value": "屋檐雨声"
+    },
+    {
+      "name": "timeisland_whitenoise_cafe",
+      "value": "午后咖啡馆"
+    },
+    {
+      "name": "timeisland_whitenoise_waves",
+      "value": "潮汐海浪"
+    },
+    {
+      "name": "timeisland_toast_focus_completed",
+      "value": "太棒了！本次专注目标达成！"
+    },
+    {
+      "name": "timeisland_toast_give_up",
+      "value": "本次专注已提前结束"
+    },
+    {
+      "name": "timeisland_toast_cannot_change_duration",
+      "value": "专注进行中无法修改设定时长"
+    },
+    {
+      "name": "timeisland_stats_all_time",
+      "value": "历史累计专注"
+    },
+    {
+      "name": "timeisland_stats_streak",
+      "value": "连续坚持"
+    },
+    {
+      "name": "timeisland_stats_unit_days",
+      "value": "天"
+    },
+    {
+      "name": "timeisland_stats_7days_trend",
+      "value": "最近7天趋势"
+    },
+    {
+      "name": "timeisland_stats_tag_distribution",
+      "value": "场景分布占比"
+    },
+    {
+      "name": "timeisland_stats_recent_history",
+      "value": "近期专注流水"
+    },
+    {
+      "name": "timeisland_stats_empty",
+      "value": "暂无专注记录，快去开启第一个番茄钟吧！"
+    },
+    {
+      "name": "timeisland_entry_title",
+      "value": "时光岛 · 沉浸专注空间"
+    },
+    {
+      "name": "timeisland_entry_desc",
+      "value": "基于心流理论的专注番茄钟与时间块管家，原生 TaskPool 并发统计与 RDB 本地加密"
+    },
+    {
+      "name": "timeisland_entry_btn",
+      "value": "进入时光岛专注"
+    }
+  ]
+}

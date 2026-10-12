@@ -1,0 +1,76 @@
+{
+  "module": {
+    "name": "entry",//模块名称
+    "type": "entry",//模块类型
+    "srcEntry": "./ets/CustomerStage.ts",
+    "description": "$string:module_desc",//字符串资源
+    "mainElement": "AppAbility",//模块的主entryAbility
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",//引用 profile 文件中定义的页面列表，main->resources->profile->profile.json
+    "abilities": [
+      {
+        "name": "AppAbility",//入口ability名称
+        "srcEntry": "./ets/AppAbility.ets",//源码地址
+        "description": "$string:AppAbility_desc",
+        "icon": "$media:layered_image",
+        "label": "$string:AppAbility_label",
+        "startWindowIcon": "$media:startIcon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,//是否可以被其他组件访问= 可见性
+        "launchType": "standard",//启动模式
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          }
+        ]
+      }
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:permission_reason"
+      },
+      {
+        "name": "ohos.permission.GET_NETWORK_INFO"
+      },
+      {
+        "name": "ohos.permission.ACCESS_BIOMETRIC",
+        "reason": "$string:biometric_permission_reason"
+      },
+      {
+        "name": "ohos.permission.READ_PASTEBOARD",
+        "reason": "$string:pasteboard_permission_reason",
+        "usedScene": {
+          "abilities": [
+            "AppAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "AppBackupAbility",
+        "srcEntry": "./ets/backup/AppBackupAbility.ets",
+        "type": "backup",
+        "exported": true,
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ]
+      }
+    ]
+  }
+}

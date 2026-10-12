@@ -1,0 +1,9 @@
+{
+  "name": "@app/common",
+  "version": "1.0.0",
+  "description": "Core infrastructure library for HarmonyOS application",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

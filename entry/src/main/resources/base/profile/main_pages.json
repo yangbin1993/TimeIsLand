@@ -1,0 +1,6 @@
+{
+  "src": [
+    "pages/TimeIslandHomePage",
+    "pages/FocusStatsPage"
+  ]
+}
