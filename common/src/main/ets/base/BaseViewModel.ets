@@ -23,17 +23,16 @@ export enum UIState {
  * 2. 状态驱动：通过统一的 uiState 枚举管理视图的生命周期状态（加载中/成功/空数据/错误）
  * 3. 资源收口：提供规范的 onCleared() 生命周期钩子，在对应宿主页面销毁时安全释放定时器或网络监听
  */
-@ObservedV2
 export class BaseViewModel {
   /**
    * 当前 ViewModel 绑定的统一 UI 状态
    */
-  @Trace public uiState: UIState = UIState.IDLE;
+  public uiState: UIState = UIState.IDLE;
 
   /**
    * 当前处于 ERROR 状态时的错误描述文案
    */
-  @Trace public errorMessage: string = '';
+  public errorMessage: string = '';
 
   constructor() {
     hilog.info(DOMAIN, TAG, `${this.constructor.name} created`);

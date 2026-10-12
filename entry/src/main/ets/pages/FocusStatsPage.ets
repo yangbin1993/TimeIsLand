@@ -1,6 +1,6 @@
-﻿import { router } from '@kit.ArkUI';
+import { router } from '@kit.ArkUI';
 import { FocusStatsViewModel } from '../viewmodel/FocusStatsViewModel';
-import { DayFocusSummary, TagFocusSummary, FocusRecordEntity, FocusState } from '../model/FocusTypes';
+import { DayFocusSummary, TagFocusSummary, FocusRecordEntity, FocusState, FocusOverviewStat } from '../model/FocusTypes';
 
 /**
  * 统计页面路由分发器 Builder 声明
@@ -11,45 +11,58 @@ export function FocusStatsPageBuilder() {
 }
 
 /**
- * 时光岛 - 心流统计与历史流水页面
+ * 时光岛 - 心流统计与历史流水页面 (暗夜深空流光设计风格)
  */
 @Entry
 @Component
-export struct FocusStatsPage {
-  @State private vm: FocusStatsViewModel = new FocusStatsViewModel();
+struct FocusStatsPage {
+  @StorageProp('statusBarHeight') statusBarHeight: number = 0;
+  @StorageProp('bottomNavHeight') bottomNavHeight: number = 0;
+  private vm: FocusStatsViewModel = new FocusStatsViewModel();
+  @State private stats: FocusOverviewStat | null = null;
+  @State private recentRecords: FocusRecordEntity[] = [];
+  @State private isLoading: boolean = false;
 
   aboutToAppear(): void {
-    this.vm.loadStats();
+    this.loadData();
+  }
+
+  private async loadData(): Promise<void> {
+    this.isLoading = true;
+    await this.vm.loadStats();
+    this.stats = this.vm.state.stats;
+    this.recentRecords = this.vm.state.recentRecords;
+    this.isLoading = false;
   }
 
   build() {
-    NavDestination() {
-      Column() {
-        // 顶部导航条
-        Row() {
-          Button({ type: ButtonType.Normal }) {
-            Text('←')
-              .fontSize(20)
-              .fontWeight(FontWeight.Bold)
-              .fontColor('#1F2329')
-          }
-          .backgroundColor('#00000000')
-          .width(40)
-          .height(40)
-          .onClick(() => {
-            router.back();
-          })
-
-          Text($r('app.string.timeisland_nav_stats'))
-            .fontSize(18)
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#1F2329')
-            .margin({ left: 8 })
-
-          Blank()
+    Column() {
+      // 顶部导航条 (动态避让状态栏)
+      Row() {
+        Button({ type: ButtonType.Circle }) {
+          Image($r('app.media.ic_arrow_back'))
+            .width(18)
+            .height(18)
+            .fillColor($r('app.color.timeisland_text_primary'))
         }
-        .width('100%')
-        .padding({ left: 12, right: 16, top: 12, bottom: 8 })
+        .backgroundColor($r('app.color.timeisland_surface_low'))
+        .border({ width: 1, color: $r('app.color.timeisland_border_subtle') })
+        .width(36)
+        .height(36)
+        .onClick(() => {
+          router.back();
+        })
+
+        Text($r('app.string.timeisland_nav_stats'))
+          .fontSize(18)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.timeisland_text_primary'))
+          .margin({ left: 12 })
+
+        Blank()
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16, top: this.statusBarHeight > 0 ? this.statusBarHeight : 12, bottom: 12 })
 
         Scroll() {
           Column({ space: 16 }) {
@@ -57,77 +70,77 @@ export struct FocusStatsPage {
             Row({ space: 12 }) {
               Column({ space: 6 }) {
                 Text($r('app.string.timeisland_stats_all_time'))
-                  .fontSize(12)
-                  .fontColor('#8F959E')
+                  .fontSize(11)
+                  .fontColor($r('app.color.timeisland_text_secondary'))
                 Row({ space: 4 }) {
-                  Text(this.vm.state.stats ? this.vm.state.stats.allTimeMinutes.toString() : '0')
-                    .fontSize(24)
+                  Text(this.stats ? this.stats.allTimeMinutes.toString() : '0')
+                    .fontSize(26)
                     .fontWeight(FontWeight.Bold)
-                    .fontColor('#4A90E2')
+                    .fontColor($r('app.color.timeisland_lake_blue_light'))
                   Text($r('app.string.timeisland_unit_minutes'))
                     .fontSize(12)
-                    .fontColor('#8F959E')
-                    .margin({ bottom: 3 })
+                    .fontColor($r('app.color.timeisland_text_muted'))
+                    .margin({ bottom: 4 })
                 }
                 .alignItems(VerticalAlign.Bottom)
               }
               .layoutWeight(1)
               .alignItems(HorizontalAlign.Start)
               .padding(16)
-              .backgroundColor('#FFFFFF')
-              .borderRadius(12)
-              .shadow({ radius: 8, color: '#0A000000', offsetY: 2 })
+              .backgroundColor($r('app.color.timeisland_surface_card'))
+              .borderRadius(16)
+              .border({ width: 1, color: $r('app.color.timeisland_border_card') })
 
               Column({ space: 6 }) {
                 Text($r('app.string.timeisland_stats_streak'))
-                  .fontSize(12)
-                  .fontColor('#8F959E')
+                  .fontSize(11)
+                  .fontColor($r('app.color.timeisland_text_secondary'))
                 Row({ space: 4 }) {
-                  Text(this.vm.state.stats ? this.vm.state.stats.streakDays.toString() : '0')
-                    .fontSize(24)
+                  Text(this.stats ? this.stats.streakDays.toString() : '0')
+                    .fontSize(26)
                     .fontWeight(FontWeight.Bold)
-                    .fontColor('#52C41A')
+                    .fontColor($r('app.color.timeisland_emerald'))
                   Text($r('app.string.timeisland_stats_unit_days'))
                     .fontSize(12)
-                    .fontColor('#8F959E')
-                    .margin({ bottom: 3 })
+                    .fontColor($r('app.color.timeisland_text_muted'))
+                    .margin({ bottom: 4 })
                 }
                 .alignItems(VerticalAlign.Bottom)
               }
               .layoutWeight(1)
               .alignItems(HorizontalAlign.Start)
               .padding(16)
-              .backgroundColor('#FFFFFF')
-              .borderRadius(12)
-              .shadow({ radius: 8, color: '#0A000000', offsetY: 2 })
+              .backgroundColor($r('app.color.timeisland_surface_card'))
+              .borderRadius(16)
+              .border({ width: 1, color: $r('app.color.timeisland_border_card') })
             }
             .width('100%')
 
             // 最近 7 天趋势条
             Column({ space: 12 }) {
               Text($r('app.string.timeisland_stats_7days_trend'))
-                .fontSize(15)
+                .fontSize(14)
                 .fontWeight(FontWeight.Bold)
-                .fontColor('#1F2329')
+                .fontColor($r('app.color.timeisland_text_primary'))
 
-              if (this.vm.state.stats && this.vm.state.stats.recentDailyStats.length > 0) {
+              if (this.stats && this.stats.recentDailyStats.length > 0) {
                 Row({ space: 6 }) {
-                  ForEach(this.vm.state.stats.recentDailyStats, (day: DayFocusSummary) => {
+                  ForEach(this.stats.recentDailyStats, (day: DayFocusSummary) => {
                     Column({ space: 6 }) {
                       Text(`${day.totalMinutes}m`)
                         .fontSize(10)
-                        .fontColor('#8F959E')
+                        .fontColor($r('app.color.timeisland_text_secondary'))
 
                       // 柱状指示条
                       Column()
-                        .width(18)
+                        .width(16)
                         .height(Math.min(100, Math.max(10, day.totalMinutes * 1.5)))
-                        .backgroundColor(day.totalMinutes > 0 ? '#4A90E2' : '#E5E6EB')
+                        .backgroundColor(day.totalMinutes > 0 ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_border_subtle'))
                         .borderRadius(4)
 
                       Text(day.dateString.substring(5))
                         .fontSize(10)
-                        .fontColor('#666666')
+                        .fontColor($r('app.color.timeisland_text_muted'))
                     }
                     .layoutWeight(1)
                     .alignItems(HorizontalAlign.Center)
@@ -140,104 +153,109 @@ export struct FocusStatsPage {
             }
             .width('100%')
             .padding(16)
-            .backgroundColor('#FFFFFF')
-            .borderRadius(12)
-            .shadow({ radius: 8, color: '#0A000000', offsetY: 2 })
+            .backgroundColor($r('app.color.timeisland_surface_card'))
+            .borderRadius(16)
+            .border({ width: 1, color: $r('app.color.timeisland_border_card') })
 
             // 场景分布
-            if (this.vm.state.stats && this.vm.state.stats.tagDistributions.length > 0) {
+            if (this.stats && this.stats.tagDistributions.length > 0) {
               Column({ space: 12 }) {
                 Text($r('app.string.timeisland_stats_tag_distribution'))
-                  .fontSize(15)
+                  .fontSize(14)
                   .fontWeight(FontWeight.Bold)
-                  .fontColor('#1F2329')
+                  .fontColor($r('app.color.timeisland_text_primary'))
 
-                ForEach(this.vm.state.stats.tagDistributions, (item: TagFocusSummary) => {
+                ForEach(this.stats.tagDistributions, (item: TagFocusSummary) => {
                   Column({ space: 6 }) {
                     Row() {
                       Row({ space: 6 }) {
-                        Circle().width(8).height(8).fill(item.colorHex)
-                        Text(item.tagName).fontSize(13).fontColor('#333333')
+                        Circle().width(6).height(6).fill(item.colorHex)
+                        Text(item.tagName).fontSize(12).fontColor($r('app.color.timeisland_text_primary'))
                       }
                       Blank()
                       Text(`${item.totalMinutes}m (${item.percentage}%)`)
-                        .fontSize(12)
-                        .fontColor('#8F959E')
+                        .fontSize(11)
+                        .fontColor($r('app.color.timeisland_text_secondary'))
                     }
                     .width('100%')
 
                     Progress({ value: item.percentage, total: 100, type: ProgressType.Linear })
                       .color(item.colorHex)
-                      .backgroundColor('#F2F4F7')
-                      .style({ strokeWidth: 6 })
+                      .backgroundColor($r('app.color.timeisland_border_subtle'))
+                      .style({ strokeWidth: 5 })
                   }
                   .width('100%')
                 }, (item: TagFocusSummary) => item.tagId.toString())
               }
               .width('100%')
               .padding(16)
-              .backgroundColor('#FFFFFF')
-              .borderRadius(12)
-              .shadow({ radius: 8, color: '#0A000000', offsetY: 2 })
+              .backgroundColor($r('app.color.timeisland_surface_card'))
+              .borderRadius(16)
+              .border({ width: 1, color: $r('app.color.timeisland_border_card') })
             }
 
             // 近期专注流水记录
             Column({ space: 12 }) {
               Text($r('app.string.timeisland_stats_recent_history'))
-                .fontSize(15)
+                .fontSize(14)
                 .fontWeight(FontWeight.Bold)
-                .fontColor('#1F2329')
+                .fontColor($r('app.color.timeisland_text_primary'))
 
-              if (this.vm.state.recentRecords.length === 0) {
+              if (this.recentRecords.length === 0) {
                 Text($r('app.string.timeisland_stats_empty'))
-                  .fontSize(13)
-                  .fontColor('#999999')
+                  .fontSize(12)
+                  .fontColor($r('app.color.timeisland_text_muted'))
                   .padding(24)
               } else {
-                ForEach(this.vm.state.recentRecords, (rec: FocusRecordEntity) => {
+                ForEach(this.recentRecords, (rec: FocusRecordEntity) => {
                   Row() {
                     Column({ space: 4 }) {
                       Text(this.formatRecordDate(rec.startTime))
-                        .fontSize(12)
-                        .fontColor('#8F959E')
-                      Text(`${Math.floor(rec.actualSeconds / 60)} 分钟专注`)
-                        .fontSize(14)
-                        .fontWeight(FontWeight.Medium)
-                        .fontColor('#1F2329')
+                        .fontSize(11)
+                        .fontColor($r('app.color.timeisland_text_muted'))
+                      Row({ space: 2 }) {
+                        Text(Math.floor(rec.actualSeconds / 60).toString())
+                          .fontSize(14)
+                          .fontWeight(FontWeight.Medium)
+                          .fontColor($r('app.color.timeisland_text_primary'))
+                        Text($r('app.string.timeisland_record_minutes_focus'))
+                          .fontSize(12)
+                          .fontColor($r('app.color.timeisland_text_secondary'))
+                      }
                     }
                     .alignItems(HorizontalAlign.Start)
 
                     Blank()
 
-                    Text(rec.state === FocusState.COMPLETED ? '已达成' : '提前结束')
-                      .fontSize(12)
-                      .fontColor(rec.state === FocusState.COMPLETED ? '#52C41A' : '#FF4D4F')
+                    Text(rec.state === FocusState.COMPLETED ? $r('app.string.timeisland_record_completed') : $r('app.string.timeisland_record_canceled'))
+                      .fontSize(11)
+                      .fontColor(rec.state === FocusState.COMPLETED ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_haven_amber'))
                       .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-                      .backgroundColor(rec.state === FocusState.COMPLETED ? '#F6FFED' : '#FFF1F0')
-                      .borderRadius(4)
+                      .backgroundColor(rec.state === FocusState.COMPLETED ? $r('app.color.timeisland_flow_bg') : $r('app.color.timeisland_haven_amber_bg'))
+                      .borderRadius(10)
+                      .border({ width: 1, color: rec.state === FocusState.COMPLETED ? $r('app.color.timeisland_emerald_border') : $r('app.color.timeisland_haven_amber_border') })
                   }
                   .width('100%')
                   .padding({ top: 8, bottom: 8 })
-                  .border({ width: { bottom: 1 }, color: '#F2F4F7' })
+                  .border({ width: { bottom: 1 }, color: $r('app.color.timeisland_surface_indigo') })
                 }, (rec: FocusRecordEntity) => (rec.id ? rec.id.toString() : rec.startTime.toString()))
               }
             }
             .width('100%')
             .padding(16)
-            .backgroundColor('#FFFFFF')
-            .borderRadius(12)
-            .shadow({ radius: 8, color: '#0A000000', offsetY: 2 })
+            .backgroundColor($r('app.color.timeisland_surface_card'))
+            .borderRadius(16)
+            .border({ width: 1, color: $r('app.color.timeisland_border_card') })
           }
-          .padding({ left: 16, right: 16, bottom: 24 })
+          .padding({ left: 16, right: 16, bottom: 24 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0) })
         }
         .layoutWeight(1)
         .edgeEffect(EdgeEffect.Spring)
       }
       .width('100%')
       .height('100%')
-      .backgroundColor('#FAFAFC')
-    }
-    .hideTitleBar(true)
+      .backgroundColor($r('app.color.timeisland_bg_canvas'))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 
   private formatRecordDate(timestamp: number): string {
@@ -247,5 +265,16 @@ export struct FocusStatsPage {
     const h = d.getHours().toString().padStart(2, '0');
     const min = d.getMinutes().toString().padStart(2, '0');
     return `${m}-${day} ${h}:${min}`;
+  }
+}
+
+/**
+ * 统计页面独立预览组件
+ */
+@Preview
+@Component
+struct FocusStatsPagePreview {
+  build() {
+    FocusStatsPage()
   }
 }

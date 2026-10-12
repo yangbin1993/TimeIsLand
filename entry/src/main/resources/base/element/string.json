@@ -306,7 +306,7 @@
     },
     {
       "name": "timeisland_btn_start",
-      "value": "开始专注"
+      "value": "启航心流"
     },
     {
       "name": "timeisland_btn_pause",
@@ -346,7 +346,7 @@
     },
     {
       "name": "timeisland_duration_title",
-      "value": "设定时长"
+      "value": "专注刻度"
     },
     {
       "name": "timeisland_whitenoise_title",
@@ -419,6 +419,174 @@
     {
       "name": "timeisland_entry_btn",
       "value": "进入时光岛专注"
+    },
+    {
+      "name": "timeisland_status_flow_drift",
+      "value": "深潜心流态 · Flow Drift"
+    },
+    {
+      "name": "timeisland_status_grace_haven",
+      "value": "120s 避风港守护生效"
+    },
+    {
+      "name": "timeisland_focus_purity_note",
+      "value": "能量汇聚中 · 纯度 99%"
+    },
+    {
+      "name": "timeisland_drift_subnote",
+      "value": "无界延展模式已就绪 · 计时归零将温柔漫游"
+    },
+    {
+      "name": "timeisland_duration_cycle",
+      "value": "自适应呼吸周期"
+    },
+    {
+      "name": "timeisland_duration_custom",
+      "value": "自定"
+    },
+    {
+      "name": "timeisland_energy_field_title",
+      "value": "心流场域与气韵"
+    },
+    {
+      "name": "timeisland_sound_tide",
+      "value": "海潮晚风"
+    },
+    {
+      "name": "timeisland_sound_moss_rain",
+      "value": "雨落青苔"
+    },
+    {
+      "name": "timeisland_sound_forest_spring",
+      "value": "林涧清泉"
+    },
+    {
+      "name": "timeisland_btn_dock",
+      "value": "停靠息心"
+    },
+    {
+      "name": "timeisland_zen_flip",
+      "value": "翻转勿扰"
+    },
+    {
+      "name": "timeisland_live_view_title",
+      "value": "实况窗生态联动"
+    },
+    {
+      "name": "timeisland_live_view_tag",
+      "value": "NEXT 原生"
+    },
+    {
+      "name": "timeisland_live_view_desc",
+      "value": "状态栏水滴胶囊 & 息屏 AOD 已静默就绪"
+    },
+    {
+      "name": "timeisland_tab_focus",
+      "value": "专注"
+    },
+    {
+      "name": "timeisland_tab_biome",
+      "value": "生态"
+    },
+    {
+      "name": "timeisland_tab_stats",
+      "value": "气韵"
+    },
+    {
+      "name": "timeisland_tab_nearlink",
+      "value": "星闪"
+    },
+    {
+      "name": "timeisland_record_minutes_focus",
+      "value": "分钟专注"
+    },
+    {
+      "name": "timeisland_record_completed",
+      "value": "已达成"
+    },
+    {
+      "name": "timeisland_record_canceled",
+      "value": "提前结束"
+    },
+    {
+      "name": "timeisland_tab_biome_toast",
+      "value": "时光群岛地貌演化中..."
+    },
+    {
+      "name": "timeisland_tab_nearlink_toast",
+      "value": "星闪双子岛近场感应中..."
+    },
+    {
+      "name": "timeisland_app_brand_en",
+      "value": "TIMEISLAND"
+    },
+    {
+      "name": "timeisland_tag_coding",
+      "value": "💻 深度编码"
+    },
+    {
+      "name": "timeisland_tag_reading",
+      "value": "📖 哲学阅读"
+    },
+    {
+      "name": "timeisland_tag_meditation",
+      "value": "🧘 呼吸冥想"
+    },
+    {
+      "name": "timeisland_tag_design",
+      "value": "🎨 界面创作"
+    },
+    {
+      "name": "timeisland_tag_writing",
+      "value": "✍️ 论文构思"
+    },
+    {
+      "name": "timeisland_theme_title",
+      "value": "生境气韵主题"
+    },
+    {
+      "name": "timeisland_theme_mode_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "timeisland_theme_mode_system_desc",
+      "value": "根据系统深浅色模式自动流转"
+    },
+    {
+      "name": "timeisland_theme_mode_dark",
+      "value": "深潜暗夜"
+    },
+    {
+      "name": "timeisland_theme_mode_dark_desc",
+      "value": "深海极夜，碧绿流光与深蓝罗盘"
+    },
+    {
+      "name": "timeisland_theme_mode_gold",
+      "value": "晨曦浅金"
+    },
+    {
+      "name": "timeisland_theme_mode_gold_desc",
+      "value": "暖阳初升，和煦微光拂照时光岛"
+    },
+    {
+      "name": "timeisland_theme_mode_moss",
+      "value": "青苔雨林"
+    },
+    {
+      "name": "timeisland_theme_mode_moss_desc",
+      "value": "幽静林涧，苍翠雨露浸润心流"
+    },
+    {
+      "name": "timeisland_theme_mode_light",
+      "value": "纯净晨曦"
+    },
+    {
+      "name": "timeisland_theme_mode_light_desc",
+      "value": "极简浅白，清透空灵的禅意思境"
+    },
+    {
+      "name": "timeisland_theme_switched_toast",
+      "value": "已启用意境主题："
     }
   ]
 }

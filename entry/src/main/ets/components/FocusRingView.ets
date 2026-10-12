@@ -1,84 +1,125 @@
 import { FocusState } from '../model/FocusTypes';
 
 /**
- * 环形专注计时核心动效组件
+ * 时光岛 - 环形心流罗盘核心组件 (FocusRingView)
+ * 深度复刻 Stitch 设计稿: 暗夜心流流光发光球体 + 天球同心刻度环
  */
 @Component
 export struct FocusRingView {
   @Prop progress: number = 0.0;
   @Prop timeText: string = '25:00';
   @Prop state: FocusState = FocusState.IDLE;
-  @Prop tagColor: string = '#4A90E2';
+  @Prop tagColor: ResourceColor = $r('app.color.timeisland_emerald');
   @Prop tagName: string = '';
-
-  private getStatusLabel(): Resource {
-    switch (this.state) {
-      case FocusState.RUNNING:
-        return $r('app.string.timeisland_status_running');
-      case FocusState.PAUSED:
-        return $r('app.string.timeisland_status_paused');
-      default:
-        return $r('app.string.timeisland_status_idle');
-    }
-  }
 
   build() {
     Stack({ alignContent: Alignment.Center }) {
-      // 底层呼吸光晕背景
-      Circle()
-        .width(260)
-        .height(260)
-        .fill(this.state === FocusState.RUNNING ? this.tagColor : '#00000000')
-        .opacity(this.state === FocusState.RUNNING ? 0.08 : 0)
-        .animation({ duration: 1200, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate })
+      // 1. 底层环境泛光光晕 (在充足的 100% 容器内自然柔和发散，绝无切边)
+      Circle({ width: 210, height: 210 })
+        .fill($r('app.color.timeisland_lake_blue_deep'))
+        .opacity(this.state === FocusState.RUNNING ? 0.28 : 0.12)
+        .blur(32)
+        .animation({ duration: 1500, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate })
 
-      // 外圈静态底轨
+      // 2. 外圈天球罗盘精密虚线刻度环 (Outer Celestial Dashed Ring)
+      Circle({ width: 250, height: 250 })
+        .fill(Color.Transparent)
+        .stroke($r('app.color.timeisland_lake_blue'))
+        .strokeWidth(1.5)
+        .strokeDashArray([4, 12])
+        .opacity(0.45)
+
+      // 3. 次圈破晓碧绿心流点阵刻度环 (Inner Emerald Flow Ticks)
+      Circle({ width: 238, height: 238 })
+        .fill(Color.Transparent)
+        .stroke($r('app.color.timeisland_emerald'))
+        .strokeWidth(1)
+        .strokeDashArray([2, 14])
+        .opacity(0.38)
+
+      // 4. 外圈同心刻度轨道底环
       Progress({ value: 100, total: 100, type: ProgressType.Ring })
-        .width(240)
-        .height(240)
-        .color('#F0F2F5')
-        .style({ strokeWidth: 12 })
+        .width(226)
+        .height(226)
+        .color($r('app.color.timeisland_compass_ring_track'))
+        .style({ strokeWidth: 4 })
 
-      // 动态高光进度环
+      // 5. 动态高光进度环 (湖蓝至破晓碧绿渐变感)
       Progress({ value: Math.round(this.progress * 100), total: 100, type: ProgressType.Ring })
-        .width(240)
-        .height(240)
-        .color(this.tagColor)
-        .style({ strokeWidth: 12 })
+        .width(226)
+        .height(226)
+        .color(this.state === FocusState.RUNNING ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_lake_blue'))
+        .style({ strokeWidth: 5 })
         .animation({ duration: 500, curve: Curve.FastOutSlowIn })
 
-      // 环内时间与状态核心内容
-      Column({ space: 10 }) {
-        if (this.tagName) {
-          Row({ space: 6 }) {
-            Circle()
-              .width(8)
-              .height(8)
-              .fill(this.tagColor)
-            Text(this.tagName)
-              .fontSize(14)
-              .fontColor('#666666')
+      // 6. 中心深蓝靛黑玻璃微透核心球体 (Center Glow Glass Sphere)
+      Stack({ alignContent: Alignment.Center }) {
+        Column({ space: 6 }) {
+          // 指南针微小定位发光点
+          Circle({ width: 6, height: 6 })
+            .fill(this.state === FocusState.RUNNING ? this.tagColor : $r('app.color.timeisland_lake_blue'))
+            .shadow({ radius: 8, color: this.tagColor, offsetY: 0 })
+
+          // 巨幅数字计时展示
+          Text(this.timeText)
+            .fontSize(50)
+            .fontWeight(FontWeight.Lighter)
+            .fontColor($r('app.color.timeisland_text_primary'))
+            .fontFamily('HarmonyOS Sans')
+            .shadow({ radius: 16, color: $r('app.color.timeisland_glow_text'), offsetY: 2 })
+
+          // 能量汇聚与心流纯度胶囊
+          Row({ space: 5 }) {
+            Image($r('app.media.ic_water_drop'))
+              .width(13)
+              .height(13)
+              .fillColor($r('app.color.timeisland_emerald'))
+            Text($r('app.string.timeisland_focus_purity_note'))
+              .fontSize(11)
+              .fontColor($r('app.color.timeisland_text_secondary'))
               .fontWeight(FontWeight.Medium)
           }
           .padding({ left: 10, right: 10, top: 4, bottom: 4 })
-          .backgroundColor('#F7F8FA')
-          .borderRadius(12)
+          .backgroundColor($r('app.color.timeisland_surface_low'))
+          .borderRadius(10)
+
+          // 禅意温和说明
+          Text($r('app.string.timeisland_drift_subnote'))
+            .fontSize(10)
+            .fontColor($r('app.color.timeisland_text_muted'))
+            .textAlign(TextAlign.Center)
+            .margin({ top: 2 })
+            .width(160)
         }
-
-        Text(this.timeText)
-          .fontSize(52)
-          .fontWeight(FontWeight.Bold)
-          .fontColor('#1F2329')
-          .fontFamily('HarmonyOS Sans')
-
-        Text(this.getStatusLabel())
-          .fontSize(13)
-          .fontColor(this.state === FocusState.RUNNING ? this.tagColor : '#999999')
-          .fontWeight(FontWeight.Regular)
+        .alignItems(HorizontalAlign.Center)
+        .justifyContent(FlexAlign.Center)
       }
+      .width(194)
+      .height(194)
+      .borderRadius(97)
+      .backgroundColor($r('app.color.timeisland_sphere_bg'))
+      .border({ width: 1, color: $r('app.color.timeisland_border_subtle') })
+      .shadow({ radius: 24, color: $r('app.color.timeisland_shadow_elevated'), offsetY: 8 })
     }
-    .width(280)
-    .height(280)
-    .margin({ top: 16, bottom: 16 })
+    .width('100%')
+    .height(272)
+    .margin({ top: 4, bottom: 4 })
+  }
+}
+
+/**
+ * 环形心流罗盘独立预览组件
+ */
+@Preview
+@Component
+struct FocusRingViewPreview {
+  build() {
+    FocusRingView({
+      progress: 0.65,
+      timeText: '16:15',
+      state: FocusState.RUNNING,
+      tagColor: $r('app.color.timeisland_emerald'),
+      tagName: '深度编码'
+    })
   }
 }

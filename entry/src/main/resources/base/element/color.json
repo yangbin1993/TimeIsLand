@@ -2,7 +2,167 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#FFFFFF"
+      "value": "#0F131C"
+    },
+    {
+      "name": "timeisland_bg_canvas",
+      "value": "#0F131C"
+    },
+    {
+      "name": "timeisland_bg_nav",
+      "value": "#0F131C"
+    },
+    {
+      "name": "timeisland_surface_low",
+      "value": "#181B25"
+    },
+    {
+      "name": "timeisland_surface_card",
+      "value": "#141824"
+    },
+    {
+      "name": "timeisland_surface_indigo",
+      "value": "#1C2541"
+    },
+    {
+      "name": "timeisland_surface_lowest",
+      "value": "#0D111A"
+    },
+    {
+      "name": "timeisland_sphere_bg",
+      "value": "#101524"
+    },
+    {
+      "name": "timeisland_emerald",
+      "value": "#4EDEA3"
+    },
+    {
+      "name": "timeisland_emerald_bg",
+      "value": "#102E24"
+    },
+    {
+      "name": "timeisland_emerald_border",
+      "value": "#164E3E"
+    },
+    {
+      "name": "timeisland_lake_blue",
+      "value": "#4A8FFC"
+    },
+    {
+      "name": "timeisland_lake_blue_deep",
+      "value": "#1D4ED8"
+    },
+    {
+      "name": "timeisland_lake_blue_light",
+      "value": "#60A5FA"
+    },
+    {
+      "name": "timeisland_haven_amber",
+      "value": "#FBBF24"
+    },
+    {
+      "name": "timeisland_haven_amber_bg",
+      "value": "#221B10"
+    },
+    {
+      "name": "timeisland_haven_amber_border",
+      "value": "#4E3A16"
+    },
+    {
+      "name": "timeisland_compass_ring_track",
+      "value": "#222838"
+    },
+    {
+      "name": "timeisland_text_primary",
+      "value": "#F8FAFC"
+    },
+    {
+      "name": "timeisland_text_secondary",
+      "value": "#94A3B8"
+    },
+    {
+      "name": "timeisland_text_muted",
+      "value": "#64748B"
+    },
+    {
+      "name": "timeisland_text_inverse",
+      "value": "#090D16"
+    },
+    {
+      "name": "timeisland_border_subtle",
+      "value": "#262A34"
+    },
+    {
+      "name": "timeisland_border_card",
+      "value": "#1F2538"
+    },
+    {
+      "name": "timeisland_border_drawer",
+      "value": "#1E2433"
+    },
+    {
+      "name": "timeisland_tab_active_bg",
+      "value": "#181F2E"
+    },
+    {
+      "name": "timeisland_emerald_glow",
+      "value": "#6FFBBE"
+    },
+    {
+      "name": "timeisland_lake_blue_border",
+      "value": "#3A82EE"
+    },
+    {
+      "name": "timeisland_flow_bg",
+      "value": "#102220"
+    },
+    {
+      "name": "timeisland_live_icon_bg",
+      "value": "#16223D"
+    },
+    {
+      "name": "timeisland_drawer_item_border",
+      "value": "#222838"
+    },
+    {
+      "name": "timeisland_shadow_subtle",
+      "value": "#20000000"
+    },
+    {
+      "name": "timeisland_shadow_floating",
+      "value": "#30000000"
+    },
+    {
+      "name": "timeisland_shadow_card",
+      "value": "#40000000"
+    },
+    {
+      "name": "timeisland_shadow_elevated",
+      "value": "#50000000"
+    },
+    {
+      "name": "timeisland_shadow_modal",
+      "value": "#80000000"
+    },
+    {
+      "name": "timeisland_glow_emerald",
+      "value": "#504EDEA3"
+    },
+    {
+      "name": "timeisland_glow_lake_blue",
+      "value": "#403A82EE"
+    },
+    {
+      "name": "timeisland_glow_blue_pill",
+      "value": "#401D4ED8"
+    },
+    {
+      "name": "timeisland_glow_amber",
+      "value": "#50FBBF24"
+    },
+    {
+      "name": "timeisland_glow_text",
+      "value": "#30FFFFFF"
     }
   ]
 }

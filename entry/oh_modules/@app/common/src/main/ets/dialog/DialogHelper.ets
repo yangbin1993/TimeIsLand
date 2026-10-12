@@ -79,14 +79,15 @@ export class DialogHelper {
    * @param duration 持续显示时长 (毫秒，默认为 2000ms)
    * @param context 可选显式传入目标组件的 UIContext (若不传则使用全局注入的 UIContext)
    */
-  public static showToast(message: string, duration: number = 2000, context?: UIContext): void {
+  public static showToast(message: string | Resource, duration: number = 2000, context?: UIContext): void {
     const now = Date.now();
+    const messageKey: string = typeof message === 'string' ? message : JSON.stringify(message);
     // 工业级防刷与去重：1200ms 内弹出完全相同的 Toast 则予以合并抑制
-    if (message === DialogHelper.lastToastMessage && now - DialogHelper.lastToastTimestamp < 1200) {
-      hilog.info(DOMAIN, TAG, `Toast suppressed due to deduplication debounce: ${message}`);
+    if (messageKey === DialogHelper.lastToastMessage && now - DialogHelper.lastToastTimestamp < 1200) {
+      hilog.info(DOMAIN, TAG, 'Toast suppressed due to deduplication debounce');
       return;
     }
-    DialogHelper.lastToastMessage = message;
+    DialogHelper.lastToastMessage = messageKey;
     DialogHelper.lastToastTimestamp = now;
 
     try {
@@ -96,10 +97,10 @@ export class DialogHelper {
           message: message,
           duration: duration
         });
-        hilog.info(DOMAIN, TAG, `Toast shown via active UIContext: ${message}`);
+        hilog.info(DOMAIN, TAG, 'Toast shown via active UIContext');
         return;
       }
-      hilog.warn(DOMAIN, TAG, `No active UIContext registered into DialogHelper. Toast suppressed: ${message}`);
+      hilog.warn(DOMAIN, TAG, 'No active UIContext registered into DialogHelper. Toast suppressed');
     } catch (err) {
       hilog.error(DOMAIN, TAG, `UIContext showToast failed: ${JSON.stringify(err)}`);
     }
