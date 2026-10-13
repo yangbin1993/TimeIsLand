@@ -1,6 +1,7 @@
 {
   "src": [
     "pages/TimeIslandHomePage",
-    "pages/FocusStatsPage"
+    "pages/FocusStatsPage",
+    "pages/TimeIslandSettingsPage"
   ]
 }

@@ -421,18 +421,18 @@ struct RouteNotFoundView {
           .fontWeight(FontWeight.Bold)
           .fontColor('#FF3B30')
 
-        Text('页面路由未找到')
+        Text('Route Not Found')
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .fontColor('#333333')
 
-        Text(`当前目标路由 [${this.routeName}] 未绑定任何页面构建器，请检查路由注册中心。`)
+        Text(`Target route [${this.routeName}] is not bound to any builder.`)
           .fontSize(14)
           .fontColor('#888888')
           .textAlign(TextAlign.Center)
           .padding({ left: 32, right: 32 })
 
-        Button('返回上一页')
+        Button('Go Back')
           .height(42)
           .width(140)
           .fontSize(15)

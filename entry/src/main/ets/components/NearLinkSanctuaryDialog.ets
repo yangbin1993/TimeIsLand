@@ -1,0 +1,289 @@
+import { nearLinkSanctuaryManager, NearLinkSanctuaryState, PartnerIslandInfo } from '../utils/NearLinkSanctuaryManager';
+import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
+import { ThemePalette } from '../theme/ThemeTypes';
+
+/**
+ * 时光岛 - 星闪近场双子岛伴读弹窗
+ */
+@Component
+export struct NearLinkSanctuaryDialog {
+  @Prop theme: ThemePalette;
+  @Link isOpen: boolean;
+
+  @State private sanctuaryState: NearLinkSanctuaryState = NearLinkSanctuaryState.IDLE;
+  @State private partnerInfo: PartnerIslandInfo | null = null;
+  @State private rippleAnimScale: number = 1.0;
+  @State private rippleNotice: ResourceStr = '';
+
+  aboutToAppear(): void {
+    this.sanctuaryState = nearLinkSanctuaryManager.getState();
+    this.partnerInfo = nearLinkSanctuaryManager.getPartner();
+
+    nearLinkSanctuaryManager.addStateListener((state: NearLinkSanctuaryState, partner: PartnerIslandInfo | null): void => {
+      this.sanctuaryState = state;
+      this.partnerInfo = partner;
+    });
+
+    nearLinkSanctuaryManager.addRippleListener((fromName: string): void => {
+      soundEffectManager.play(SoundEffectType.BUBBLE);
+      this.rippleNotice = $r('app.string.nearlink_ripple_sent');
+      this.rippleAnimScale = 1.25;
+      setTimeout(() => {
+        this.rippleAnimScale = 1.0;
+      }, 500);
+      setTimeout(() => {
+        this.rippleNotice = '';
+      }, 3500);
+    });
+  }
+
+  aboutToDisappear(): void {
+    // 组件销毁
+  }
+
+  private triggerTouchSearch(): void {
+    soundEffectManager.play(SoundEffectType.PEN_CLICK);
+    nearLinkSanctuaryManager.startTouchAndSanctuary('StreamIsland', 'DeepFocus');
+  }
+
+  private sendBreeze(): void {
+    soundEffectManager.play(SoundEffectType.BUBBLE);
+    nearLinkSanctuaryManager.sendRippleToPartner();
+    this.rippleNotice = $r('app.string.nearlink_notice_breeze_sent');
+    setTimeout(() => {
+      this.rippleNotice = '';
+    }, 2500);
+  }
+
+  private disconnect(): void {
+    soundEffectManager.play(SoundEffectType.SWITCH_CLOSE);
+    nearLinkSanctuaryManager.disconnectSanctuary();
+  }
+
+  build() {
+    Column() {
+      // 1. 顶部 Header
+      Row() {
+        Row({ space: 8 }) {
+          Image($r('app.media.ic_nearlink'))
+            .width(22)
+            .height(22)
+            .fillColor(this.theme.primaryAccent)
+
+          Text($r('app.string.nearlink_title'))
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.theme.textPrimary)
+        }
+
+        Blank()
+
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          Image($r('app.media.ic_close'))
+            .width(16)
+            .height(16)
+            .fillColor(this.theme.textMuted)
+        }
+        .width(28)
+        .height(28)
+        .backgroundColor(this.theme.surfaceLow)
+        .onClick(() => {
+          this.isOpen = false;
+        })
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16, top: 16, bottom: 8 })
+
+      // 2. 硬件引擎状态胶囊
+      Row({ space: 6 }) {
+        Circle()
+          .width(6)
+          .height(6)
+          .fill(nearLinkSanctuaryManager.isHardwareSupported() ? '#4EDEA3' : '#FBBF24')
+
+        Text(nearLinkSanctuaryManager.isHardwareSupported() ? $r('app.string.nearlink_hw_ready') : $r('app.string.nearlink_sandbox_mode'))
+          .fontSize(11)
+          .fontColor(this.theme.textSecondary)
+      }
+      .padding({ left: 12, right: 12, top: 4, bottom: 4 })
+      .backgroundColor(this.theme.surfaceLow)
+      .borderRadius(12)
+      .margin({ top: 4, bottom: 16 })
+
+      // 3. 中间交互视窗
+      if (this.sanctuaryState === NearLinkSanctuaryState.IDLE) {
+        Column({ space: 14 }) {
+          Image($r('app.media.ic_nearlink'))
+            .width(64)
+            .height(64)
+            .fillColor(this.theme.primaryAccent)
+            .opacity(0.85)
+
+          Text($r('app.string.nearlink_desc'))
+            .fontSize(13)
+            .fontColor(this.theme.textMuted)
+            .textAlign(TextAlign.Center)
+            .padding({ left: 24, right: 24 })
+
+          Button({ type: ButtonType.Capsule, stateEffect: true }) {
+            Row({ space: 6 }) {
+              Image($r('app.media.ic_nearlink'))
+                .width(16)
+                .height(16)
+                .fillColor('#0A1520')
+              Text($r('app.string.nearlink_btn_touch_start'))
+                .fontSize(13)
+                .fontWeight(FontWeight.Bold)
+                .fontColor('#0A1520')
+            }
+            .padding({ left: 18, right: 18, top: 10, bottom: 10 })
+          }
+          .backgroundColor(this.theme.primaryAccent)
+          .onClick(() => {
+            this.triggerTouchSearch();
+          })
+          .margin({ top: 8 })
+        }
+        .width('100%')
+        .padding(20)
+        .alignItems(HorizontalAlign.Center)
+      } else if (this.sanctuaryState === NearLinkSanctuaryState.SCANNING) {
+        Column({ space: 16 }) {
+          Stack({ alignContent: Alignment.Center }) {
+            Circle()
+              .width(90)
+              .height(90)
+              .fill(this.theme.primaryAccent)
+              .opacity(0.15)
+              .scale({ x: this.rippleAnimScale, y: this.rippleAnimScale })
+
+            Circle()
+              .width(60)
+              .height(60)
+              .fill(this.theme.primaryAccent)
+              .opacity(0.25)
+
+            Image($r('app.media.ic_nearlink'))
+              .width(32)
+              .height(32)
+              .fillColor(this.theme.primaryAccent)
+          }
+
+          Text($r('app.string.nearlink_scanning'))
+            .fontSize(13)
+            .fontColor(this.theme.textSecondary)
+        }
+        .width('100%')
+        .padding(28)
+        .alignItems(HorizontalAlign.Center)
+      } else {
+        // CONNECTED or SIMULATED 态
+        Column({ space: 14 }) {
+          // 双子岛对照视图
+          Row({ space: 16 }) {
+            // 本机岛
+            Column({ space: 6 }) {
+              Text('🏝️')
+                .fontSize(36)
+              Text($r('app.string.nearlink_my_island'))
+                .fontSize(12)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.theme.textPrimary)
+              Text($r('app.string.nearlink_status_focusing'))
+                .fontSize(10)
+                .fontColor('#4EDEA3')
+            }
+            .padding(12)
+            .backgroundColor(this.theme.surfaceLow)
+            .borderRadius(14)
+            .layoutWeight(1)
+
+            // 中间星闪脉冲
+            Column({ space: 2 }) {
+              Image($r('app.media.ic_nearlink'))
+                .width(24)
+                .height(24)
+                .fillColor(this.theme.primaryAccent)
+              Text($r('app.string.nearlink_status_resonating'))
+                .fontSize(10)
+                .fontColor(this.theme.textMuted)
+            }
+
+            // 伴读岛
+            Column({ space: 6 }) {
+              Text('🏝️')
+                .fontSize(36)
+              Text(this.partnerInfo?.islandName ? this.partnerInfo.islandName : $r('app.string.nearlink_partner_default_name'))
+                .fontSize(12)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.theme.textPrimary)
+              Row({ space: 2 }) {
+                Text(this.partnerInfo?.currentTag ? this.partnerInfo.currentTag : $r('app.string.timeisland_tag_read'))
+                  .fontSize(10)
+                  .fontColor(this.theme.primaryAccent)
+                Text(` · ${this.partnerInfo?.partnerFocusMinutes || 25}m`)
+                  .fontSize(10)
+                  .fontColor(this.theme.primaryAccent)
+              }
+            }
+            .padding(12)
+            .backgroundColor(this.theme.surfaceLow)
+            .borderRadius(14)
+            .layoutWeight(1)
+          }
+          .width('100%')
+          .padding({ left: 16, right: 16 })
+
+          // 微风提示条
+          if (this.rippleNotice) {
+            Text(this.rippleNotice)
+              .fontSize(11)
+              .fontColor(this.theme.primaryAccent)
+              .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+              .backgroundColor(this.theme.surfaceLow)
+              .borderRadius(10)
+          }
+
+          // 互动按钮条
+          Row({ space: 12 }) {
+            Button({ type: ButtonType.Capsule, stateEffect: true }) {
+              Row({ space: 4 }) {
+                Image($r('app.media.ic_air'))
+                  .width(14)
+                  .height(14)
+                  .fillColor(this.theme.textPrimary)
+                Text($r('app.string.nearlink_send_ripple'))
+                  .fontSize(12)
+                  .fontColor(this.theme.textPrimary)
+              }
+              .padding({ left: 14, right: 14, top: 8, bottom: 8 })
+            }
+            .backgroundColor(this.theme.surfaceLow)
+            .onClick(() => {
+              this.sendBreeze();
+            })
+
+            Button({ type: ButtonType.Capsule, stateEffect: true }) {
+              Text($r('app.string.nearlink_btn_disconnect'))
+                .fontSize(12)
+                .fontColor('#F87171')
+                .padding({ left: 14, right: 14, top: 8, bottom: 8 })
+            }
+            .backgroundColor('#1AF87171')
+            .onClick(() => {
+              this.disconnect();
+            })
+          }
+          .margin({ top: 8 })
+        }
+        .width('100%')
+        .padding(14)
+        .alignItems(HorizontalAlign.Center)
+      }
+    }
+    .width('100%')
+    .backgroundColor(this.theme.surfaceCard)
+    .borderRadius({ topLeft: 24, topRight: 24 })
+    .padding({ bottom: 24 })
+  }
+}

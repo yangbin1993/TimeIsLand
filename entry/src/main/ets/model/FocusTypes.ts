@@ -19,6 +19,10 @@ export enum FocusState {
    */
   RESTING = 'RESTING',
   /**
+   * 无界心流延展漫游态 (倒计时归零后正向累加思维惯性)
+   */
+  FLOW_DRIFT = 'FLOW_DRIFT',
+  /**
    * 已完成专注
    */
   COMPLETED = 'COMPLETED',
@@ -36,6 +40,10 @@ export interface FocusTag {
    * 标签唯一标识 (主键自增或唯一ID)
    */
   id: number;
+  /**
+   * 归属用户 ID (华为账号 openID 或 'guest_local')
+   */
+  userId?: string;
   /**
    * 标签英文唯一键或名称
    */
@@ -62,6 +70,10 @@ export interface FocusRecordEntity {
    * 自增主键 ID
    */
   id?: number;
+  /**
+   * 归属用户 ID (华为账号 openID 或 'guest_local')
+   */
+  userId?: string;
   /**
    * 关联的标签 ID
    */
@@ -94,6 +106,22 @@ export interface FocusRecordEntity {
    * 自评分数 1 ~ 5 星
    */
   rating?: number;
+  /**
+   * 是否发生心流延展漫游
+   */
+  isFlowDrift?: boolean;
+  /**
+   * 心流延展增量秒数
+   */
+  driftSeconds?: number;
+  /**
+   * 本次专注是否在心流避风港缓冲保护下恢复
+   */
+  isGracePeriodUsed?: boolean;
+  /**
+   * 是否因避风港超时而优雅安全归档
+   */
+  graceOvertimeDocked?: boolean;
 }
 
 /**

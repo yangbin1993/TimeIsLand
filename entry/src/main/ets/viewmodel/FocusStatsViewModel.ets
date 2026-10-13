@@ -50,8 +50,8 @@ export class FocusStatsViewModel extends BaseViewModel {
         { dateString: '2026-10-12', totalMinutes: 50, completedSessions: 2 }
       ];
       const defaultTags: TagFocusSummary[] = [
-        { tagId: 1, tagName: '深度编码', colorHex: '#4EDEA3', totalMinutes: 150, percentage: 62 },
-        { tagId: 2, tagName: '哲学阅读', colorHex: '#60A5FA', totalMinutes: 90, percentage: 38 }
+        { tagId: 1, tagName: 'Coding', colorHex: '#4EDEA3', totalMinutes: 150, percentage: 62 },
+        { tagId: 2, tagName: 'Reading', colorHex: '#60A5FA', totalMinutes: 90, percentage: 38 }
       ];
       this.state.stats = {
         todayMinutes: 50,

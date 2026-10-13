@@ -134,4 +134,13 @@ export { RdbConfig, Migration, RdbPageRequest, RdbPageResponse, ColumnType, Colu
 export { TaskDispatcher, taskDispatcher } from './src/main/ets/concurrent/TaskDispatcher';
 export { TaskPriority, TaskExecutionOptions, TaskItem, TaskPair, TaskTriple } from './src/main/ets/concurrent/TaskTypes';
 
+// 鸿蒙全场景多屏尺寸与折叠屏自适应感知管理器 (对标 Android WindowManager/FoldableState)
+export {
+  DisplayAdaptiveManager,
+  displayAdaptiveManager,
+  BreakpointType,
+  FoldStatusType,
+  BreakpointConstants
+} from './src/main/ets/device/BreakpointSystem';
+
 

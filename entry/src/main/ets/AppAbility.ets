@@ -5,11 +5,18 @@ import {
   RdbManager,
   DialogHelper,
   CrashHandler,
-  AppLifecycleManager
+  AppLifecycleManager,
+  displayAdaptiveManager
 } from '@app/common';
 import { focusTagDao } from './data/FocusTagDao';
 import { focusRecordDao } from './data/FocusRecordDao';
 import { themeManager } from './theme/ThemeManager';
+import { settingsManager } from './data/SettingsManager';
+import { soundEffectManager } from './utils/SoundEffectManager';
+import { whiteNoiseManager } from './utils/WhiteNoiseManager';
+import { liveViewHelper } from './utils/LiveViewHelper';
+import { apmsManager } from './utils/ApmsManager';
+import { accountManager } from './utils/AccountManager';
 
 const DOMAIN = 0x0000;
 const TAG = 'TimeIslandAppAbility';
@@ -20,13 +27,30 @@ const TAG = 'TimeIslandAppAbility';
 export default class AppAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(DOMAIN, TAG, 'TimeIsland AppAbility onCreate');
+    this.handleCardQuickStart(want);
     this.initInfrastructure();
+  }
+
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    hilog.info(DOMAIN, TAG, 'TimeIsland AppAbility onNewWant');
+    this.handleCardQuickStart(want);
+  }
+
+  private handleCardQuickStart(want: Want): void {
+    if (want?.parameters?.quickStartMinutes) {
+      const minutes = Number(want.parameters.quickStartMinutes);
+      hilog.info(DOMAIN, TAG, 'Quick start requested from desktop card: %{public}d min', minutes);
+      AppStorage.setOrCreate('cardQuickStartMinutes', minutes);
+    }
   }
 
   onDestroy(): void {
     hilog.info(DOMAIN, TAG, 'TimeIsland AppAbility onDestroy');
+    displayAdaptiveManager.destroy();
     CrashHandler.getInstance().unregister();
     AppLifecycleManager.getInstance().destroy();
+    soundEffectManager.release();
+    whiteNoiseManager.release();
     RdbManager.getInstance().close().catch(() => {});
   }
 
@@ -38,10 +62,28 @@ export default class AppAbility extends UIAbility {
       const uiContext = mainWindow.getUIContext();
       DialogHelper.setUIContext(uiContext);
 
+      // 0. 初始化多屏与折叠屏响应式断点感知体系
+      displayAdaptiveManager.init(windowStage);
+
       // 1. 初始化并应用生境主题管理器 (自动接管窗口色调与系统栏反色)
       await themeManager.init(this.context, mainWindow);
 
-      // 2. 开启 Edge-to-Edge 全屏沉浸式窗口
+      // 2. 初始化用户偏好配置项 (实况窗、星闪、避风港守护等)
+      await settingsManager.init(this.context);
+
+      // 2.1 初始化用户账号中枢 (加载当前活跃账号态)
+      await accountManager.init(this.context);
+
+      // 3. 初始化触感按键微拟物音效池
+      await soundEffectManager.init(this.context);
+
+      // 4. 初始化白噪音自然声景播放引擎
+      await whiteNoiseManager.init(this.context);
+
+      // 5. 初始化实况窗本地化资源解析器
+      liveViewHelper.init(this.context);
+
+      // 6. 开启 Edge-to-Edge 全屏沉浸式窗口
       mainWindow.setWindowLayoutFullScreen(true);
 
       // 3. 读取初始状态栏与底部手势导航条避让高度 (px 转 vp)
@@ -106,7 +148,7 @@ export default class AppAbility extends UIAbility {
     // 初始化生命周期管理器
     AppLifecycleManager.getInstance().initialize(this.context);
 
-    // 初始化 SQLite RDB 本地数据库并注册表结构
+    // 初始化 SQLite RDB 本地数据库并注册表结构 (全新开发直接一次性就绪最新表结构)
     RdbManager.getInstance().initialize(
       this.context,
       {
@@ -119,6 +161,9 @@ export default class AppAbility extends UIAbility {
         focusRecordDao.getSchema()
       ]
     );
+
+    // 启动华为 AGC APMS 性能与质量监控服务
+    apmsManager.init(this.context);
 
     hilog.info(DOMAIN, TAG, 'TimeIsland infrastructure initialized.');
   }

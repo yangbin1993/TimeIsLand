@@ -21,8 +21,8 @@
       "value": "用于提供指纹、人脸识别及多模态安全解锁服务"
     },
     {
-      "name": "pasteboard_permission_reason",
-      "value": "读取系统剪贴板内容以提供快速识别与粘贴服务"
+      "name": "nearlink_permission_reason",
+      "value": "用于发现近场星闪伴读设备，开启双子岛心流共鸣"
     },
     {
       "name": "tab_home",
@@ -465,6 +465,26 @@
       "value": "停靠息心"
     },
     {
+      "name": "timeisland_toast_flow_drift_started",
+      "value": "目标已达成，正在进入无界心流延展"
+    },
+    {
+      "name": "timeisland_drift_capsule_active",
+      "value": "心流微漾 · 正向累加"
+    },
+    {
+      "name": "timeisland_drift_active_subnote",
+      "value": "思维惯性延展中 · 随时可停靠收官"
+    },
+    {
+      "name": "timeisland_btn_dock_drift",
+      "value": "停靠收官"
+    },
+    {
+      "name": "timeisland_theme_flow_drifting",
+      "value": "心流充沛 · 点击结算"
+    },
+    {
       "name": "timeisland_zen_flip",
       "value": "翻转勿扰"
     },
@@ -546,47 +566,715 @@
     },
     {
       "name": "timeisland_theme_mode_system",
-      "value": "跟随系统"
+      "value": "跟随系统 · 律动"
     },
     {
       "name": "timeisland_theme_mode_system_desc",
-      "value": "根据系统深浅色模式自动流转"
+      "value": "随鸿蒙深浅色与晨昏动态流转"
     },
     {
       "name": "timeisland_theme_mode_dark",
-      "value": "深潜暗夜"
+      "value": "深渊潮汐 · 青澜"
     },
     {
       "name": "timeisland_theme_mode_dark_desc",
-      "value": "深海极夜，碧绿流光与深蓝罗盘"
+      "value": "高纯度深潜 · 荧光海心流"
     },
     {
       "name": "timeisland_theme_mode_gold",
-      "value": "晨曦浅金"
+      "value": "晨曦露珠 · 暖琥"
     },
     {
       "name": "timeisland_theme_mode_gold_desc",
-      "value": "暖阳初升，和煦微光拂照时光岛"
+      "value": "拂晓破定 · 柔金白昼唤醒"
     },
     {
       "name": "timeisland_theme_mode_moss",
-      "value": "青苔雨林"
+      "value": "竹海微雨 · 碧翡"
     },
     {
       "name": "timeisland_theme_mode_moss_desc",
-      "value": "幽静林涧，苍翠雨露浸润心流"
+      "value": "雨后空灵 · 生机沉静滋养"
     },
     {
       "name": "timeisland_theme_mode_light",
-      "value": "纯净晨曦"
+      "value": "纯净晨曦 · 明澈"
     },
     {
       "name": "timeisland_theme_mode_light_desc",
-      "value": "极简浅白，清透空灵的禅意思境"
+      "value": "极简清浅 · 空灵透彻心境"
     },
     {
       "name": "timeisland_theme_switched_toast",
       "value": "已启用意境主题："
+    },
+    {
+      "name": "timeisland_settings_title",
+      "value": "偏好与生态设置"
+    },
+    {
+      "name": "timeisland_settings_group_ecosystem",
+      "value": "HarmonyOS NEXT 生态联动"
+    },
+    {
+      "name": "timeisland_settings_live_view",
+      "value": "实况窗水滴胶囊与 AOD"
+    },
+    {
+      "name": "timeisland_settings_live_view_desc",
+      "value": "状态栏水滴微胶囊与息屏微光常显，实时感知心流进度"
+    },
+    {
+      "name": "timeisland_settings_nearlink",
+      "value": "NearLink 星闪双子岛近场感应"
+    },
+    {
+      "name": "timeisland_settings_nearlink_desc",
+      "value": "附近鸿蒙多设备低时延微感知与同频共振专注"
+    },
+    {
+      "name": "timeisland_settings_group_focus",
+      "value": "心流专注体验"
+    },
+    {
+      "name": "timeisland_settings_grace_haven",
+      "value": "避风港守护"
+    },
+    {
+      "name": "timeisland_settings_grace_haven_desc",
+      "value": "短暂切出或误触应用时提供缓冲宽限，守护专注不中断"
+    },
+    {
+      "name": "timeisland_settings_grace_haven_duration",
+      "value": "避风港缓冲时长"
+    },
+    {
+      "name": "timeisland_settings_zen_flip",
+      "value": "翻转勿扰自动感应"
+    },
+    {
+      "name": "timeisland_settings_zen_flip_desc",
+      "value": "息屏反扣设备于桌面时自动屏蔽干扰，沉浸心流"
+    },
+    {
+      "name": "timeisland_settings_group_feedback",
+      "value": "触感与声音反馈"
+    },
+    {
+      "name": "timeisland_settings_haptic",
+      "value": "触觉线性马达振感"
+    },
+    {
+      "name": "timeisland_settings_haptic_desc",
+      "value": "启航、停靠与周期刻度节点提供细腻触觉振动反馈"
+    },
+    {
+      "name": "timeisland_settings_bell",
+      "value": "禅意编钟落音提醒"
+    },
+    {
+      "name": "timeisland_settings_bell_desc",
+      "value": "专注达标心流停靠时播放轻柔温润的磬钟音"
+    },
+    {
+      "name": "timeisland_settings_group_theme",
+      "value": "生境外观"
+    },
+    {
+      "name": "timeisland_settings_current_theme",
+      "value": "生境主题风格"
+    },
+    {
+      "name": "timeisland_settings_group_about",
+      "value": "关于时光岛"
+    },
+    {
+      "name": "timeisland_settings_version",
+      "value": "版本"
+    },
+    {
+      "name": "timeisland_settings_app_desc",
+      "value": "极简心流罗盘 · 原生鸿蒙分布式专注生境"
+    },
+    {
+      "name": "timeisland_theme_swatches_label",
+      "value": "按键质感"
+    },
+    {
+      "name": "timeisland_theme_preview_subtitle",
+      "value": "选择深度影响按键发光、微风声学与心流地貌呈现"
+    },
+    {
+      "name": "timeisland_theme_flow_ready",
+      "value": "无界潮汐延展 · 避风港就绪"
+    },
+    {
+      "name": "timeisland_theme_touch_chip",
+      "value": "TOUCH"
+    },
+    {
+      "name": "timeisland_duration_15_label",
+      "value": "清心"
+    },
+    {
+      "name": "timeisland_duration_25_label",
+      "value": "经典"
+    },
+    {
+      "name": "timeisland_duration_45_label",
+      "value": "深潜"
+    },
+    {
+      "name": "timeisland_duration_60_label",
+      "value": "入定"
+    },
+    {
+      "name": "timeisland_settings_group_security",
+      "value": "心流守护与安全凭据"
+    },
+    {
+      "name": "timeisland_settings_biometric_lock",
+      "value": "生物特征心流锁"
+    },
+    {
+      "name": "timeisland_settings_biometric_lock_desc",
+      "value": "支持指纹、人脸识别或锁屏密码，在防破防与私密数据访问时守护专注结界"
+    },
+    {
+      "name": "timeisland_settings_biometric_details",
+      "value": "生物安全凭据就绪详情"
+    },
+    {
+      "name": "timeisland_settings_biometric_fingerprint",
+      "value": "指纹识别"
+    },
+    {
+      "name": "timeisland_settings_biometric_face",
+      "value": "面容识别"
+    },
+    {
+      "name": "timeisland_settings_biometric_pin",
+      "value": "锁屏凭据"
+    },
+    {
+      "name": "timeisland_settings_biometric_status_supported",
+      "value": "就绪"
+    },
+    {
+      "name": "timeisland_settings_biometric_status_unsupported",
+      "value": "未录入"
+    },
+    {
+      "name": "timeisland_settings_biometric_verify_title",
+      "value": "时光岛 - 验证身份以开启心流安全锁"
+    },
+    {
+      "name": "timeisland_settings_biometric_verify_close_title",
+      "value": "时光岛 - 验证身份以关闭心流安全锁"
+    },
+    {
+      "name": "timeisland_toast_biometric_enabled",
+      "value": "生物特征心流锁已成功启用"
+    },
+    {
+      "name": "timeisland_toast_biometric_disabled",
+      "value": "生物特征心流锁已停用"
+    },
+    {
+      "name": "timeisland_toast_biometric_failed",
+      "value": "身份验证未通过，操作已取消"
+    },
+    {
+      "name": "timeisland_toast_biometric_no_credentials",
+      "value": "当前设备未录入指纹或面容凭据，请先在系统设置中录入"
+    },
+    {
+      "name": "timeisland_settings_biometric_scope_title",
+      "value": "安全防护场景"
+    },
+    {
+      "name": "timeisland_settings_biometric_scope_quit",
+      "value": "提前放弃沉浸专注时防破防鉴权"
+    },
+    {
+      "name": "timeisland_settings_biometric_scope_stats",
+      "value": "气韵历史私密时间数据防窥视"
+    },
+    {
+      "name": "timeisland_status_grace_haven_idle",
+      "value": "避风港守护待命"
+    },
+    {
+      "name": "timeisland_status_grace_haven_active",
+      "value": "微雾避风港守护中"
+    },
+    {
+      "name": "timeisland_status_grace_haven_disabled",
+      "value": "避风港未开启"
+    },
+    {
+      "name": "timeisland_toast_grace_haven_returned",
+      "value": "已安然返回时光岛，心流守护不断档"
+    },
+    {
+      "name": "timeisland_toast_grace_haven_timeout",
+      "value": "离开避风港超时，已为您安全归档已专注时光"
+    },
+    {
+      "name": "timeisland_grace_haven_remaining_sec",
+      "value": "s 避风港守护"
+    },
+    {
+      "name": "timeisland_dialog_quit_confirm_title",
+      "value": "确定提前息心？"
+    },
+    {
+      "name": "timeisland_dialog_quit_confirm_msg",
+      "value": "当前心流正如潮汐般凝聚，提前退出将中止本次专注。"
+    },
+    {
+      "name": "timeisland_dialog_quit_btn_cancel",
+      "value": "继续专注"
+    },
+    {
+      "name": "timeisland_dialog_quit_btn_confirm",
+      "value": "确认结束"
+    },
+    {
+      "name": "timeisland_biome_title",
+      "value": "时光群岛微缩生境"
+    },
+    {
+      "name": "timeisland_biome_subtitle",
+      "value": "随自然晨昏与专注能量生长的数字绿洲"
+    },
+    {
+      "name": "timeisland_biome_slot_dawn",
+      "value": "晨曦 · 露华"
+    },
+    {
+      "name": "timeisland_biome_slot_day",
+      "value": "白昼 · 晴屿"
+    },
+    {
+      "name": "timeisland_biome_slot_dusk",
+      "value": "黄昏 · 晚霞"
+    },
+    {
+      "name": "timeisland_biome_slot_night",
+      "value": "子夜 · 极星"
+    },
+    {
+      "name": "timeisland_biome_stat_lake",
+      "value": "心流湖储水"
+    },
+    {
+      "name": "timeisland_biome_stat_vegetation",
+      "value": "生境繁茂度"
+    },
+    {
+      "name": "timeisland_biome_stat_purity",
+      "value": "心流纯度"
+    },
+    {
+      "name": "timeisland_biome_touch_hint",
+      "value": "轻触滑动可体验 2.5D 重力微视差"
+    },
+    {
+      "name": "timeisland_biome_auto_time",
+      "value": "现实时间"
+    },
+    {
+      "name": "timeisland_settings_feedback_title",
+      "value": "意见与灵感反馈"
+    },
+    {
+      "name": "timeisland_settings_feedback_desc",
+      "value": "支持系统邮件直投或免权限邮箱复制，倾听每一位专注者的心声"
+    },
+    {
+      "name": "timeisland_feedback_mail_subject",
+      "value": "【时光岛体验反馈】"
+    },
+    {
+      "name": "timeisland_feedback_mail_copied_toast",
+      "value": "已复制开发者反馈邮箱至剪贴板，随时欢迎您的灵感建议！"
+    },
+    {
+      "name": "timeisland_feedback_open_mail_toast",
+      "value": "正在拉起邮件客户端..."
+    },
+    {
+      "name": "timeisland_feedback_email_addr",
+      "value": "timeisland_feedback@163.com"
+    },
+    {
+      "name": "timeisland_liveview_title_focusing",
+      "value": "专注心流中"
+    },
+    {
+      "name": "timeisland_liveview_title_drift",
+      "value": "心流漫游中"
+    },
+    {
+      "name": "timeisland_liveview_title_paused",
+      "value": "心流暂歇"
+    },
+    {
+      "name": "timeisland_liveview_content_breathing",
+      "value": "沉浸于静谧，时光如水流淌"
+    },
+    {
+      "name": "widget_flow_card_name",
+      "value": "时光岛心流"
+    },
+    {
+      "name": "widget_flow_card_desc",
+      "value": "桌面透视时光岛晨昏微气候，一键启航沉浸专注"
+    },
+    {
+      "name": "widget_start_15m",
+      "value": "启航 15m"
+    },
+    {
+      "name": "widget_start_25m",
+      "value": "启航 25m"
+    },
+    {
+      "name": "widget_today_flow",
+      "value": "今日心流"
+    },
+    {
+      "name": "widget_lake_storage",
+      "value": "湖泊储水"
+    },
+    {
+      "name": "widget_minutes_unit",
+      "value": "分钟"
+    },
+    {
+      "name": "nearlink_title",
+      "value": "星闪近场双子岛"
+    },
+    {
+      "name": "nearlink_desc",
+      "value": "两部手机背靠背“碰一碰”，近场连接为无声陪伴自习室"
+    },
+    {
+      "name": "nearlink_scanning",
+      "value": "正在感应周围的同频时光岛..."
+    },
+    {
+      "name": "nearlink_broadcasting",
+      "value": "正在广播时光岛共鸣信标"
+    },
+    {
+      "name": "nearlink_connected",
+      "value": "已建立双子岛近场共鸣"
+    },
+    {
+      "name": "nearlink_partner_focusing",
+      "value": "伴读岛屿正在专注"
+    },
+    {
+      "name": "nearlink_send_ripple",
+      "value": "送一阵微风"
+    },
+    {
+      "name": "nearlink_ripple_sent",
+      "value": "微风已掠过对方岛屿"
+    },
+    {
+      "name": "nearlink_unsupported",
+      "value": "当前设备未搭载星闪芯片，已启动沙盒仿真模式"
+    },
+    {
+      "name": "foldable_badge_deck",
+      "value": "折叠双栏心流大画布"
+    },
+    {
+      "name": "foldable_tag_sub",
+      "value": "8-Column Zen Deck"
+    },
+    {
+      "name": "foldable_left_canvas_title",
+      "value": "沉浸心流与 2.5D 生境"
+    },
+    {
+      "name": "foldable_right_deck_title",
+      "value": "心流中枢控制台"
+    },
+    {
+      "name": "foldable_stat_today",
+      "value": "今日心流专注"
+    },
+    {
+      "name": "foldable_stat_lake",
+      "value": "心流湖蓄水容量"
+    },
+    {
+      "name": "foldable_stat_streak",
+      "value": "连续心流"
+    },
+    {
+      "name": "foldable_stat_streak_unit",
+      "value": "天"
+    },
+    {
+      "name": "foldable_stat_lake_unit",
+      "value": "mL"
+    },
+    {
+      "name": "foldable_nearlink_companion",
+      "value": "星闪近场共鸣伙伴"
+    },
+    {
+      "name": "foldable_nearlink_companion_sub",
+      "value": "伴读岛屿微光共振 · 默契无声陪伴"
+    },
+    {
+      "name": "foldable_mode_switch_compass",
+      "value": "心流罗盘"
+    },
+    {
+      "name": "foldable_mode_switch_biome",
+      "value": "微缩群岛"
+    },
+    {
+      "name": "timeisland_duration_minute",
+      "value": "分钟"
+    },
+    {
+      "name": "timeisland_tag_read",
+      "value": "研读"
+    },
+    {
+      "name": "biome_dawn_title",
+      "value": "晨曦 · 金粉薄雾"
+    },
+    {
+      "name": "biome_day_title",
+      "value": "白昼 · 澄澈碧海"
+    },
+    {
+      "name": "biome_dusk_title",
+      "value": "黄昏 · 熔金落霞"
+    },
+    {
+      "name": "biome_night_title",
+      "value": "子夜 · 幽蓝星汉"
+    },
+    {
+      "name": "tag_name_deep_focus",
+      "value": "深度专注"
+    },
+    {
+      "name": "tag_name_code",
+      "value": "深度编码"
+    },
+    {
+      "name": "tag_name_read",
+      "value": "哲学阅读"
+    },
+    {
+      "name": "tag_name_meditate",
+      "value": "呼吸冥想"
+    },
+    {
+      "name": "tag_name_create",
+      "value": "界面创作"
+    },
+    {
+      "name": "tag_name_work",
+      "value": "工作"
+    },
+    {
+      "name": "tag_name_study",
+      "value": "学习"
+    },
+    {
+      "name": "tag_name_think",
+      "value": "思考"
+    },
+    {
+      "name": "tag_name_sport",
+      "value": "运动"
+    },
+    {
+      "name": "widget_lake_storage_text",
+      "value": "心流湖水位"
+    },
+    {
+      "name": "nearlink_hw_ready",
+      "value": "华为星闪 NearLink 硬件已就绪"
+    },
+    {
+      "name": "nearlink_sandbox_mode",
+      "value": "星闪沙盒仿真模式 (全平台自适应)"
+    },
+    {
+      "name": "nearlink_btn_touch_start",
+      "value": "碰一碰 · 开启近场双子岛"
+    },
+    {
+      "name": "nearlink_my_island",
+      "value": "我的时光岛"
+    },
+    {
+      "name": "nearlink_status_focusing",
+      "value": "专注中"
+    },
+    {
+      "name": "nearlink_status_resonating",
+      "value": "共鸣中"
+    },
+    {
+      "name": "nearlink_partner_default_name",
+      "value": "伴读岛屿"
+    },
+    {
+      "name": "nearlink_btn_disconnect",
+      "value": "断开连接"
+    },
+    {
+      "name": "nearlink_partner_island_pine",
+      "value": "林间听松岛"
+    },
+    {
+      "name": "nearlink_partner_island_tide",
+      "value": "月隐听潮岛"
+    },
+    {
+      "name": "nearlink_my_island_stream",
+      "value": "时光流溪岛"
+    },
+    {
+      "name": "nearlink_device_broadcast_name",
+      "value": "时光岛"
+    },
+    {
+      "name": "nearlink_notice_breeze_sent",
+      "value": "已向对方岛屿送出一阵微风 🍃"
+    },
+    {
+      "name": "liveview_default_tag",
+      "value": "心流专注"
+    },
+    {
+      "name": "liveview_calm_desc",
+      "value": "沉浸于静谧，时光如水流淌"
+    },
+    {
+      "name": "liveview_pause_desc",
+      "value": "心流暂歇，等待归队"
+    },
+    {
+      "name": "liveview_drift_desc",
+      "value": "无界心流漫游中，正向能量累加"
+    },
+    {
+      "name": "liveview_drift_suffix",
+      "value": "心流漫游"
+    },
+    {
+      "name": "liveview_completed_title",
+      "value": "已完成"
+    },
+    {
+      "name": "liveview_completed_desc",
+      "value": "本次心流已圆满停靠"
+    },
+    {
+      "name": "biome_stage_suffix",
+      "value": "阶"
+    },
+    {
+      "name": "biome_flow_drift_extended",
+      "value": "99% (延展)"
+    },
+    {
+      "name": "feedback_email_subject",
+      "value": "【时光岛】体验反馈与功能灵感"
+    },
+    {
+      "name": "feedback_email_template",
+      "value": "--- 请在下方输入您的宝贵建议与心流体验 ---\n\n\n\n------------------------------\n应用版本: v1.0.0 (HarmonyOS NEXT)\n设备平台: 纯端本地高保真心流罗盘"
+    },
+    {
+      "name": "timeisland_settings_group_account",
+      "value": "账号与数据归属"
+    },
+    {
+      "name": "settings_account_guest_title",
+      "value": "未登录 (本地访客)"
+    },
+    {
+      "name": "settings_account_guest_desc",
+      "value": "专注数据仅存储于本机沙箱，关联华为账号支持数据安全归属"
+    },
+    {
+      "name": "settings_account_logged_title",
+      "value": "华为账号已关联"
+    },
+    {
+      "name": "settings_account_logged_desc",
+      "value": "心流专注记录已绑定至当前华为账号"
+    },
+    {
+      "name": "settings_account_btn_login",
+      "value": "关联华为账号"
+    },
+    {
+      "name": "settings_account_btn_logout",
+      "value": "退出登录"
+    },
+    {
+      "name": "settings_account_login_success",
+      "value": "华为账号关联成功"
+    },
+    {
+      "name": "settings_account_logout_success",
+      "value": "已切回本地访客模式"
+    },
+    {
+      "name": "settings_account_login_failed",
+      "value": "华为账号登录取消或未完成"
+    },
+    {
+      "name": "settings_account_merge_title",
+      "value": "合并本地访客数据"
+    },
+    {
+      "name": "settings_account_merge_message",
+      "value": "检测到本地有未归属的访客心流记录，是否一键合并至当前华为账号？"
+    },
+    {
+      "name": "settings_account_merge_confirm",
+      "value": "立即合并"
+    },
+    {
+      "name": "settings_account_merge_skip",
+      "value": "暂不合并"
+    },
+    {
+      "name": "settings_account_merge_success",
+      "value": "本地数据已成功合并至华为账号"
+    },
+    {
+      "name": "settings_account_uid_prefix",
+      "value": "账号标识: "
+    },
+    {
+      "name": "settings_account_guest_name",
+      "value": "访客探索者"
+    },
+    {
+      "name": "settings_account_status_guest",
+      "value": "访客模式"
+    },
+    {
+      "name": "settings_account_status_linked",
+      "value": "已绑定"
     }
   ]
 }

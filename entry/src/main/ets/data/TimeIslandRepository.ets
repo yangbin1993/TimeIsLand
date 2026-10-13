@@ -161,26 +161,52 @@ export class TimeIslandRepository extends BaseRepository {
    * 保存完成或中止的专注记录
    */
   public async saveFocusRecord(record: FocusRecordEntity): Promise<number> {
-    hilog.info(DOMAIN, TAG, `Saving focus record: actualSeconds=${record.actualSeconds}, state=${record.state}`);
+    const currentUserId = AppStorage.get<string>('currentUserId') || 'guest_local';
+    if (!record.userId) {
+      record.userId = currentUserId;
+    }
+    hilog.info(DOMAIN, TAG, `Saving focus record: user=${record.userId}, actualSeconds=${record.actualSeconds}, state=${record.state}`);
     return this.recordDao.insert(record);
   }
 
   /**
    * 查询最近专注流水记录
    */
-  public async getRecentRecords(limit: number = 20): Promise<FocusRecordEntity[]> {
-    return this.recordDao.queryRecent(limit);
+  public async getRecentRecords(limit: number = 20, userId?: string): Promise<FocusRecordEntity[]> {
+    const targetUser = userId || AppStorage.get<string>('currentUserId') || 'guest_local';
+    return this.recordDao.queryRecent(limit, targetUser);
+  }
+
+  /**
+   * 统计待合并的本地访客记录数
+   */
+  public async countGuestRecords(): Promise<number> {
+    return this.recordDao.countGuestRecords();
+  }
+
+  /**
+   * 将本地访客数据一键合并归属至当前登录的华为账号
+   */
+  public async migrateGuestDataToUser(targetUserId: string): Promise<number> {
+    hilog.info(DOMAIN, TAG, `Migrating guest records to target user: ${targetUserId}`);
+    const updatedCount = await this.recordDao.consolidateGuestRecords(targetUserId);
+    await this.tagDao.consolidateGuestTags(targetUserId);
+    return updatedCount;
   }
 
   /**
    * 调度后台 TaskDispatcher 并行计算全局统计概览
    */
   public async computeOverviewStats(): Promise<FocusOverviewStat> {
+    const currentUserId = AppStorage.get<string>('currentUserId') || 'guest_local';
     const tags = await this.tagDao.findAll();
     const records = await this.recordDao.findAll('start_time', false);
 
+    // 优先聚合当前用户与系统共享标签的记录
+    const userRecords = records.filter(r => !r.userId || r.userId === currentUserId || r.userId === 'guest_local');
+
     const payload: ComputeStatPayload = {
-      records: records,
+      records: userRecords,
       tags: tags
     };
 

@@ -7,5 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@app/common": "file:../common"
-  }
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
 }

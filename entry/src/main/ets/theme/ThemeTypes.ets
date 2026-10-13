@@ -47,7 +47,7 @@ export interface ThemePalette {
 }
 
 /**
- * 主题菜单项选择器元数据
+ * 主题菜单项选择器元数据 (支持 Stitch 触感按键质感矩阵)
  */
 export interface ThemeOption {
   mode: ThemeMode;
@@ -55,4 +55,9 @@ export interface ThemeOption {
   descRes: Resource;
   primaryPreviewColor: string;
   canvasPreviewColor: string;
+  secondaryPreviewColor: string;
+  swatchGradientStart: string;
+  swatchGradientEnd: string;
+  dialDiscBorder: string;
+  coreToneColor: string;
 }

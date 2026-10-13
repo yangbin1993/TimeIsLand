@@ -87,36 +87,61 @@ export class ThemeManager {
         mode: ThemeMode.DARK,
         nameRes: $r('app.string.timeisland_theme_mode_dark'),
         descRes: $r('app.string.timeisland_theme_mode_dark_desc'),
-        primaryPreviewColor: '#4EDEA3',
-        canvasPreviewColor: '#0F131C'
+        primaryPreviewColor: '#25E2D0',
+        secondaryPreviewColor: '#3A82EE',
+        canvasPreviewColor: '#070A12',
+        swatchGradientStart: '#25E2D0',
+        swatchGradientEnd: '#3A82EE',
+        dialDiscBorder: '#25E2D0',
+        coreToneColor: '#5FF5E6'
       },
       {
         mode: ThemeMode.GOLD,
         nameRes: $r('app.string.timeisland_theme_mode_gold'),
         descRes: $r('app.string.timeisland_theme_mode_gold_desc'),
-        primaryPreviewColor: '#F59E0B',
-        canvasPreviewColor: '#14120E'
+        primaryPreviewColor: '#F6B756',
+        secondaryPreviewColor: '#E68A20',
+        canvasPreviewColor: '#14120E',
+        swatchGradientStart: '#F6B756',
+        swatchGradientEnd: '#E68A20',
+        dialDiscBorder: '#F6B756',
+        coreToneColor: '#FFE3A0'
       },
       {
         mode: ThemeMode.MOSS,
         nameRes: $r('app.string.timeisland_theme_mode_moss'),
         descRes: $r('app.string.timeisland_theme_mode_moss_desc'),
         primaryPreviewColor: '#10B981',
-        canvasPreviewColor: '#0D1714'
+        secondaryPreviewColor: '#065F46',
+        canvasPreviewColor: '#091511',
+        swatchGradientStart: '#10B981',
+        swatchGradientEnd: '#047857',
+        dialDiscBorder: '#10B981',
+        coreToneColor: '#6EE7B7'
       },
       {
         mode: ThemeMode.LIGHT,
         nameRes: $r('app.string.timeisland_theme_mode_light'),
         descRes: $r('app.string.timeisland_theme_mode_light_desc'),
         primaryPreviewColor: '#059669',
-        canvasPreviewColor: '#F8FAFC'
+        secondaryPreviewColor: '#38BDF8',
+        canvasPreviewColor: '#F8FAFC',
+        swatchGradientStart: '#059669',
+        swatchGradientEnd: '#10B981',
+        dialDiscBorder: '#059669',
+        coreToneColor: '#D1FAE5'
       },
       {
         mode: ThemeMode.SYSTEM,
         nameRes: $r('app.string.timeisland_theme_mode_system'),
         descRes: $r('app.string.timeisland_theme_mode_system_desc'),
-        primaryPreviewColor: '#4A8FFC',
-        canvasPreviewColor: '#181B25'
+        primaryPreviewColor: '#3A82EE',
+        secondaryPreviewColor: '#25E2D0',
+        canvasPreviewColor: '#0E1322',
+        swatchGradientStart: '#3A82EE',
+        swatchGradientEnd: '#25E2D0',
+        dialDiscBorder: '#3A82EE',
+        coreToneColor: '#93C5FD'
       }
     ];
   }

@@ -45,11 +45,20 @@
       },
       {
         "name": "ohos.permission.ACCESS_BIOMETRIC",
-        "reason": "$string:biometric_permission_reason"
+        "reason": "$string:biometric_permission_reason",
+        "usedScene": {
+          "abilities": [
+            "AppAbility"
+          ],
+          "when": "inuse"
+        }
       },
       {
-        "name": "ohos.permission.READ_PASTEBOARD",
-        "reason": "$string:pasteboard_permission_reason",
+        "name": "ohos.permission.GET_BUNDLE_INFO"
+      },
+      {
+        "name": "ohos.permission.ACCESS_NEARLINK",
+        "reason": "$string:nearlink_permission_reason",
         "usedScene": {
           "abilities": [
             "AppAbility"
@@ -68,6 +77,19 @@
           {
             "name": "ohos.extension.backup",
             "resource": "$profile:backup_config"
+          }
+        ]
+      },
+      {
+        "name": "EntryFormAbility",
+        "srcEntry": "./ets/entryformability/EntryFormAbility.ets",
+        "label": "$string:widget_flow_card_name",
+        "description": "$string:widget_flow_card_desc",
+        "type": "form",
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
           }
         ]
       }
