@@ -1,4 +1,4 @@
-import { DialogHelper, BreakpointType } from '@app/common';
+import { DialogHelper, BreakpointType, DialogType } from '@app/common';
 import { FocusState, FocusTag } from '../model/FocusTypes';
 import { FocusTimerViewModel, FocusTimerIntent, FocusTimerEffect, FocusTimerState } from '../viewmodel/FocusTimerViewModel';
 import { FocusRingView } from '../components/FocusRingView';
@@ -6,7 +6,8 @@ import { IslandBiomeView } from '../components/IslandBiomeView';
 import { TagSelectorView } from '../components/TagSelectorView';
 import { TimeDurationSelector } from '../components/TimeDurationSelector';
 import { ThemeSelectorDialog } from '../components/ThemeSelectorDialog';
-import { NearLinkSanctuaryDialog } from '../components/NearLinkSanctuaryDialog';
+import { NearLinkSanctuaryView } from '../components/NearLinkSanctuaryDialog';
+import { FocusStatsView } from '../components/FocusStatsView';
 import { nearLinkSanctuaryManager, NearLinkSanctuaryState, PartnerIslandInfo } from '../utils/NearLinkSanctuaryManager';
 import { ThemePalette, ThemeMode } from '../theme/ThemeTypes';
 import { themeManager } from '../theme/ThemeManager';
@@ -14,6 +15,9 @@ import { router } from '@kit.ArkUI';
 import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
 import { whiteNoiseManager, WhiteNoiseType } from '../utils/WhiteNoiseManager';
 import { widgetSyncManager } from '../utils/WidgetSyncManager';
+import { hapticFeedbackHelper } from '../utils/HapticFeedbackHelper';
+import { zenFlipSensorManager, ZenFlipState, ZenFlipListener } from '../utils/ZenFlipSensorManager';
+import { BiometricAuthManager } from '../utils/BiometricAuthManager';
 
 /**
  * 路由分发器 Builder 声明
@@ -39,11 +43,21 @@ struct TimeIslandHomePage {
   @StorageProp('isLiveViewEnabled') isLiveViewEnabled: boolean = true;
   @StorageProp('isGraceHavenEnabled') isGraceHavenEnabled: boolean = true;
   @StorageProp('graceHavenSeconds') graceHavenSeconds: number = 120;
+  @StorageProp('isNearlinkEnabled') @Watch('onNearlinkConfigChanged') isNearlinkEnabled: boolean = true;
+  @StorageProp('isHapticFeedbackEnabled') isHapticFeedbackEnabled: boolean = true;
+  @StorageProp('isZenFlipEnabled') isZenFlipEnabled: boolean = true;
+  @StorageProp('isBiometricEnabled') isBiometricEnabled: boolean = false;
+  @State private zenFlipState: ZenFlipState = ZenFlipState.IDLE;
   @State private activeTab: string = 'focus';
+
+  private onNearlinkConfigChanged(): void {
+    if (!this.isNearlinkEnabled && this.activeTab === 'nearlink') {
+      this.activeTab = 'focus';
+    }
+  }
   @State private isSoundDrawerOpen: boolean = false;
   @State private currentSoundId: string = 'tide';
   @State private isThemeDialogOpen: boolean = false;
-  @State private isNearLinkDialogOpen: boolean = false;
   @State private partnerInfo: PartnerIslandInfo | null = null;
   @State private dualPaneMode: string = 'compass';
 
@@ -55,6 +69,30 @@ struct TimeIslandHomePage {
     }
     return $r('app.string.timeisland_sound_tide');
   }
+
+  private zenFlipListener: ZenFlipListener = (flipState: ZenFlipState): void => {
+    this.zenFlipState = flipState;
+    if (flipState === ZenFlipState.SCREEN_DOWN) {
+      if (this.state.status === FocusState.IDLE) {
+        this.vm.dispatch(FocusTimerIntent.startTimer());
+        whiteNoiseManager.playSound(this.currentSoundId);
+        hapticFeedbackHelper.trigger('complete');
+        DialogHelper.showToast($r('app.string.zen_flip_toast_armed'));
+      } else if (this.state.status === FocusState.PAUSED) {
+        this.vm.dispatch(FocusTimerIntent.resumeTimer());
+        whiteNoiseManager.resume();
+        hapticFeedbackHelper.trigger('tick');
+        DialogHelper.showToast($r('app.string.zen_flip_toast_resumed'));
+      }
+    } else if (flipState === ZenFlipState.SCREEN_UP) {
+      if (this.state.status === FocusState.RUNNING) {
+        this.vm.dispatch(FocusTimerIntent.pauseTimer());
+        whiteNoiseManager.pause();
+        hapticFeedbackHelper.trigger('warning');
+        DialogHelper.showToast($r('app.string.zen_flip_toast_interrupted'));
+      }
+    }
+  };
 
   aboutToAppear(): void {
     // 监听 MVI 副作用流
@@ -69,6 +107,10 @@ struct TimeIslandHomePage {
     nearLinkSanctuaryManager.addStateListener((state: NearLinkSanctuaryState, partner: PartnerIslandInfo | null): void => {
       this.partnerInfo = partner;
     });
+
+    // 注册翻转静心真机传感器监听
+    zenFlipSensorManager.addListener(this.zenFlipListener);
+    this.zenFlipState = zenFlipSensorManager.getState();
   }
 
   onPageShow(): void {
@@ -83,7 +125,68 @@ struct TimeIslandHomePage {
   }
 
   aboutToDisappear(): void {
+    zenFlipSensorManager.removeListener(this.zenFlipListener);
+    zenFlipSensorManager.disarmZenFlip();
     this.vm.onCleared();
+  }
+
+  private async confirmAbandonFocus(): Promise<void> {
+    whiteNoiseManager.pause();
+    let titleStr = '';
+    let msgStr = '';
+    let confirmStr = '';
+    let cancelStr = '';
+
+    try {
+      const rm = getContext(this).resourceManager;
+      titleStr = rm.getStringSync($r('app.string.focus_dialog_abandon_title').id);
+      msgStr = rm.getStringSync($r('app.string.focus_dialog_abandon_content').id);
+      confirmStr = rm.getStringSync($r('app.string.focus_dialog_abandon_confirm').id);
+      cancelStr = rm.getStringSync($r('app.string.focus_dialog_abandon_cancel').id);
+    } catch (_err) {
+      titleStr = 'Stop Focus';
+      msgStr = 'Are you sure to abandon current flow?';
+      confirmStr = 'Confirm';
+      cancelStr = 'Cancel';
+    }
+
+    const result = await DialogHelper.showDialog({
+      type: DialogType.CONFIRM,
+      title: titleStr,
+      message: msgStr,
+      confirmText: confirmStr,
+      cancelText: cancelStr,
+      isDanger: true
+    });
+
+    if (!result.isConfirmed) {
+      if (this.state.status === FocusState.RUNNING) {
+        whiteNoiseManager.resume();
+      }
+      return;
+    }
+
+    if (this.isBiometricEnabled) {
+      let promptStr = '';
+      try {
+        promptStr = getContext(this).resourceManager.getStringSync($r('app.string.focus_auth_prompt').id);
+      } catch (_e) {
+        promptStr = 'Verify identity to abandon flow';
+      }
+
+      const passed = await BiometricAuthManager.getInstance().authenticate(promptStr);
+      if (!passed) {
+        DialogHelper.showToast($r('app.string.focus_auth_failed'));
+        if (this.state.status === FocusState.RUNNING) {
+          whiteNoiseManager.resume();
+        }
+        return;
+      }
+    }
+
+    hapticFeedbackHelper.trigger('warning');
+    zenFlipSensorManager.disarmZenFlip();
+    this.vm.dispatch(FocusTimerIntent.giveUpTimer());
   }
 
   private handleEffect(effect: FocusTimerEffect): void {
@@ -120,68 +223,57 @@ struct TimeIslandHomePage {
     } else if (effect.type === 'GRACE_HAVEN_TIMEOUT_DOCKED') {
       whiteNoiseManager.pause();
       soundEffectManager.play(SoundEffectType.SWITCH_CLOSE);
+    } else if (effect.type === 'TRIGGER_HAPTIC') {
+      const pattern = (effect.pattern as ('tick' | 'complete' | 'warning')) ?? 'tick';
+      hapticFeedbackHelper.trigger(pattern);
     }
   }
 
   build() {
-    Stack({ alignContent: Alignment.Bottom }) {
-      // 主内容滚动视窗
-      Scroll() {
-        Column({ space: 14 }) {
-          // 1. 顶部 Header 与品牌标识
-          this.buildTopHeader()
+    Column() {
+      // 1. 顶部 Header 与品牌标识 (提升为外部固定顶栏，无论切换哪个Tab均绝对居于同一位置)
+      this.buildTopHeader()
 
-          if (this.isFoldExpanded || this.currentBreakpoint !== 'sm') {
-            // 折叠屏展开态 / 平板大屏：8 列双栏自适应心流大画布 (Stitch 1:1 还原)
-            this.buildDualPaneLayout()
-          } else {
-            // 常规手机与折叠屏外屏：单列纵向沉浸流线
-            this.buildSinglePaneLayout()
+      // 2. 主内容滚动视窗与底部常驻导航
+      Stack({ alignContent: Alignment.Bottom }) {
+        Scroll() {
+          Column({ space: 14 }) {
+            if (this.isFoldExpanded || this.currentBreakpoint !== 'sm') {
+              // 折叠屏展开态 / 平板大屏：8 列双栏自适应心流大画布 (Stitch 1:1 还原)
+              this.buildDualPaneLayout()
+            } else {
+              // 常规手机与折叠屏外屏：单列纵向沉浸流线
+              this.buildSinglePaneLayout()
+            }
+
+            // 占位垫底，避免被底部导航遮挡 (动态避让手势安全区)
+            Blank().height(80 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0))
           }
-
-          // 占位垫底，避免被底部导航遮挡 (动态避让手势安全区)
-          Blank().height(80 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0))
-        }
-        .width('100%')
-        .padding({
-          left: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
-          right: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
-          top: 12,
-          bottom: 20
-        })
-      }
-      .scrollBar(BarState.Off)
-      .width('100%')
-      .height('100%')
-
-      // 9. 底部常驻禅意导航栏
-      this.buildBottomNavBar()
-
-      // 10. 生境主题流转切换弹窗
-      ThemeSelectorDialog({
-        visible: this.isThemeDialogOpen,
-        onClose: () => {
-          this.isThemeDialogOpen = false;
-        }
-      })
-
-      // 11. 星闪近场双子岛伴读弹窗
-      if (this.isNearLinkDialogOpen) {
-        Column() {
-          Blank()
-            .onClick(() => {
-              this.isNearLinkDialogOpen = false;
-            })
-          NearLinkSanctuaryDialog({
-            theme: this.theme,
-            isOpen: $isNearLinkDialogOpen
+          .width('100%')
+          .padding({
+            left: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
+            right: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
+            top: 8,
+            bottom: 20
           })
         }
+        .scrollBar(BarState.Off)
         .width('100%')
         .height('100%')
-        .backgroundColor('#66000000')
-        .zIndex(99)
+
+        // 9. 底部常驻禅意导航栏
+        this.buildBottomNavBar()
+
+        // 10. 生境主题流转切换弹窗
+        ThemeSelectorDialog({
+          visible: this.isThemeDialogOpen,
+          onClose: () => {
+            this.isThemeDialogOpen = false;
+          }
+        })
       }
+      .width('100%')
+      .layoutWeight(1)
     }
     .width('100%')
     .height('100%')
@@ -202,6 +294,14 @@ struct TimeIslandHomePage {
           focusState: this.state.status,
           isFlowDrift: this.state.status === FocusState.FLOW_DRIFT
         })
+      } else if (this.activeTab === 'stats') {
+        // 气韵 Tab: 心流数据统计与时间能量看板
+        FocusStatsView()
+      } else if (this.activeTab === 'nearlink') {
+        // 星闪 Tab: 星闪双子岛近场陪伴中枢
+        NearLinkSanctuaryView({
+          theme: this.theme
+        })
       } else {
         // 专注 Tab: 核心罗盘与计时控制
         // 2. 状态微胶囊 (Flow Drift & 避风港守护)
@@ -215,6 +315,15 @@ struct TimeIslandHomePage {
           tagColor: this.state.currentTag ? this.state.currentTag.colorHex : this.theme.primaryAccent,
           tagName: this.state.currentTag ? this.state.currentTag.name : ''
         })
+        .gesture(
+          LongPressGesture({ repeat: false, duration: 800 })
+            .onAction(() => {
+              if (this.state.status === FocusState.RUNNING || this.state.status === FocusState.PAUSED) {
+                hapticFeedbackHelper.trigger('tick');
+                this.confirmAbandonFocus();
+              }
+            })
+        )
 
         // 4. 时长选择胶囊
         TimeDurationSelector({
@@ -251,9 +360,39 @@ struct TimeIslandHomePage {
    */
   @Builder
   private buildDualPaneLayout() {
-    Row({ space: 16 }) {
-      // === 左侧大画布 (Left Canvas: 沉浸心流与 2.5D 生境) ===
-      Column({ space: 12 }) {
+    if (this.activeTab === 'stats') {
+      // 气韵 Tab: 双栏大画布展示心流统计
+      FocusStatsView()
+    } else if (this.activeTab === 'nearlink') {
+      // 星闪 Tab: 左侧伴读生境 + 右侧星闪双子岛中枢
+      Row({ space: 16 }) {
+        Column({ space: 12 }) {
+          IslandBiomeView({
+            todayMinutes: this.state.todayTotalMinutes,
+            focusState: this.state.status,
+            isFlowDrift: this.state.status === FocusState.FLOW_DRIFT
+          })
+          this.buildNearLinkCompanionCard()
+        }
+        .layoutWeight(1)
+        .padding(14)
+        .backgroundColor(this.theme.surfaceLow)
+        .borderRadius(20)
+        .border({ width: 1, color: this.theme.borderSubtle })
+
+        Column() {
+          NearLinkSanctuaryView({
+            theme: this.theme
+          })
+        }
+        .layoutWeight(1)
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Top)
+    } else {
+      Row({ space: 16 }) {
+        // === 左侧大画布 (Left Canvas: 沉浸心流与 2.5D 生境) ===
+        Column({ space: 12 }) {
         // 左栏顶栏：模式切换微胶囊 (心流罗盘 / 微缩群岛) 与状态气泡
         Row() {
           Row({ space: 4 }) {
@@ -310,6 +449,15 @@ struct TimeIslandHomePage {
               tagColor: this.state.currentTag ? this.state.currentTag.colorHex : this.theme.primaryAccent,
               tagName: this.state.currentTag ? this.state.currentTag.name : ''
             })
+            .gesture(
+              LongPressGesture({ repeat: false, duration: 800 })
+                .onAction(() => {
+                  if (this.state.status === FocusState.RUNNING || this.state.status === FocusState.PAUSED) {
+                    hapticFeedbackHelper.trigger('tick');
+                    this.confirmAbandonFocus();
+                  }
+                })
+            )
           }
           .width('100%')
           .justifyContent(FlexAlign.Center)
@@ -362,6 +510,7 @@ struct TimeIslandHomePage {
     }
     .width('100%')
     .alignItems(VerticalAlign.Top)
+    }
   }
 
   /**
@@ -414,7 +563,8 @@ struct TimeIslandHomePage {
           nearLinkSanctuaryManager.sendRippleToPartner();
           DialogHelper.showToast($r('app.string.nearlink_ripple_sent'));
         } else {
-          this.isNearLinkDialogOpen = true;
+          soundEffectManager.play(SoundEffectType.BUBBLE);
+          this.activeTab = 'nearlink';
         }
       })
     }
@@ -530,8 +680,11 @@ struct TimeIslandHomePage {
 
         if (this.isFoldExpanded || this.currentBreakpoint !== 'sm') {
           Row({ space: 4 }) {
-            Circle({ width: 5, height: 5 })
-              .fill(this.theme.primaryAccent)
+            Row()
+              .width(5)
+              .height(5)
+              .borderRadius(2.5)
+              .backgroundColor(this.theme.primaryAccent)
             Text($r('app.string.foldable_badge_deck'))
               .fontSize(10)
               .fontWeight(FontWeight.Medium)
@@ -546,73 +699,36 @@ struct TimeIslandHomePage {
 
       Blank()
 
-      Row({ space: 8 }) {
-        // 星闪近场双子岛入口
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          Image($r('app.media.ic_nearlink'))
-            .width(18)
-            .height(18)
-            .fillColor(this.theme.primaryAccent)
-        }
-        .width(32)
-        .height(32)
-        .backgroundColor(this.theme.surfaceLow)
-        .border({ width: 1, color: this.theme.borderSubtle })
-        .onClick(() => {
-          soundEffectManager.play(SoundEffectType.PEN_CLICK);
-          this.isNearLinkDialogOpen = true;
-        })
-
-        // 生境主题切换入口
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          Image($r('app.media.ic_palette'))
-            .width(18)
-            .height(18)
-            .fillColor(this.theme.primaryAccent)
-        }
-        .width(32)
-        .height(32)
-        .backgroundColor(this.theme.surfaceLow)
-        .border({ width: 1, color: this.theme.borderSubtle })
-        .onClick(() => {
-          this.isThemeDialogOpen = true;
-        })
-
-        // 系统生态偏好设置入口
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
+      // 右侧：仅保留设置入口 (生境设置已移动至设置模块，星闪由底部专注生态导航直达)
+      Button({ type: ButtonType.Normal, stateEffect: true }) {
+        Row({ space: 5 }) {
           Image($r('app.media.ic_settings'))
-            .width(18)
-            .height(18)
-            .fillColor(this.theme.textSecondary)
+            .width(16)
+            .height(16)
+            .fillColor(this.theme.textPrimary)
+          Text($r('app.string.timeisland_top_btn_settings'))
+            .fontSize(12)
+            .fontColor(this.theme.textPrimary)
+            .fontWeight(FontWeight.Medium)
         }
-        .width(32)
-        .height(32)
-        .backgroundColor(this.theme.surfaceLow)
-        .border({ width: 1, color: this.theme.borderSubtle })
-        .onClick(() => {
-          router.pushUrl({ url: 'pages/TimeIslandSettingsPage' });
-        })
-
-        // 右侧气韵历史入口
-        Button({ type: ButtonType.Normal, stateEffect: true }) {
-          Row({ space: 4 }) {
-            Text($r('app.string.timeisland_tab_stats'))
-              .fontSize(12)
-              .fontColor(this.theme.textSecondary)
-              .fontWeight(FontWeight.Medium)
-          }
-          .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-        }
-        .backgroundColor(this.theme.surfaceLow)
-        .borderRadius(16)
-        .border({ width: 1, color: this.theme.borderSubtle })
-        .onClick(() => {
-          router.pushUrl({ url: 'pages/FocusStatsPage' });
-        })
+        .padding({ left: 10, right: 12, top: 6, bottom: 6 })
       }
+      .backgroundColor('rgba(28, 37, 65, 0.45)')
+      .borderRadius(16)
+      .border({ width: 1, color: 'rgba(255, 255, 255, 0.08)' })
+      .backdropBlur(20)
+      .onClick(() => {
+        soundEffectManager.play(SoundEffectType.BUBBLE);
+        router.pushUrl({ url: 'pages/TimeIslandSettingsPage' });
+      })
     }
     .width('100%')
-    .padding({ top: this.statusBarHeight > 0 ? this.statusBarHeight : 8, bottom: 4 })
+    .padding({
+      left: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
+      right: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
+      top: this.statusBarHeight > 0 ? this.statusBarHeight : 8,
+      bottom: 6
+    })
   }
 
   /**
@@ -818,41 +934,80 @@ struct TimeIslandHomePage {
         }
       })
 
-      // 3. 右侧双同心圆盘翻转勿扰按钮
-      Column({ space: 4 }) {
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          Stack({ alignContent: Alignment.Top }) {
-            // LED 待命小微孔
-            Row()
-              .width(5)
-              .height(5)
-              .borderRadius(2.5)
-              .backgroundColor('#475569')
-              .margin({ top: 5 })
-
-            Image($r('app.media.ic_screen_rotation'))
-              .width(22)
-              .height(22)
-              .fillColor(this.theme.textSecondary)
-              .margin({ top: 12 })
+      // 3. 右侧控制按钮：专注态为息心止浪(防误触鉴权)，空闲态为翻转静心
+      if (this.state.status === FocusState.RUNNING || this.state.status === FocusState.PAUSED) {
+        Column({ space: 4 }) {
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
+            Stack({ alignContent: Alignment.Center }) {
+              Image($r('app.media.ic_close'))
+                .width(20)
+                .height(20)
+                .fillColor(this.theme.havenAmber)
+            }
+            .width('100%')
+            .height('100%')
           }
-          .width('100%')
-          .height('100%')
-        }
-        .width(50)
-        .height(50)
-        .backgroundColor(this.theme.surfaceCard)
-        .border({ width: 1, color: this.theme.borderSubtle })
-        .shadow({ radius: 10, color: this.theme.shadowFloating, offsetY: 2 })
-        .onClick(() => {
-          soundEffectManager.play(SoundEffectType.SWITCH_OPEN);
-          DialogHelper.showToast($r('app.string.timeisland_zen_flip'));
-        })
+          .width(50)
+          .height(50)
+          .backgroundColor(this.theme.surfaceCard)
+          .border({ width: 1, color: this.theme.havenAmberBorder })
+          .shadow({ radius: 10, color: this.theme.shadowFloating, offsetY: 2 })
+          .onClick(() => {
+            soundEffectManager.play(SoundEffectType.PEN_CLICK);
+            this.confirmAbandonFocus();
+          })
 
-        Text($r('app.string.timeisland_zen_flip'))
-          .fontSize(10)
-          .fontColor(this.theme.textSecondary)
-          .fontWeight(FontWeight.Medium)
+          Text($r('app.string.timeisland_btn_give_up'))
+            .fontSize(10)
+            .fontColor(this.theme.havenAmber)
+            .fontWeight(FontWeight.Medium)
+        }
+      } else {
+        Column({ space: 4 }) {
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
+            Stack({ alignContent: Alignment.Top }) {
+              // LED 待命小微孔 (就绪时呈现翡翠绿辉光)
+              Row()
+                .width(5)
+                .height(5)
+                .borderRadius(2.5)
+                .backgroundColor(this.zenFlipState === ZenFlipState.ARMED ? this.theme.primaryAccent : '#475569')
+                .shadow(this.zenFlipState === ZenFlipState.ARMED ? { radius: 6, color: this.theme.primaryGlow, offsetY: 0 } : { radius: 0, color: Color.Transparent })
+                .margin({ top: 5 })
+
+              Image($r('app.media.ic_screen_rotation'))
+                .width(22)
+                .height(22)
+                .fillColor(this.zenFlipState === ZenFlipState.ARMED ? this.theme.primaryAccent : this.theme.textSecondary)
+                .margin({ top: 12 })
+            }
+            .width('100%')
+            .height('100%')
+          }
+          .width(50)
+          .height(50)
+          .backgroundColor(this.theme.surfaceCard)
+          .border({ width: 1, color: this.zenFlipState === ZenFlipState.ARMED ? this.theme.primaryAccent : this.theme.borderSubtle })
+          .shadow({ radius: 10, color: this.zenFlipState === ZenFlipState.ARMED ? this.theme.primaryGlow : this.theme.shadowFloating, offsetY: 2 })
+          .onClick(() => {
+            if (this.zenFlipState === ZenFlipState.ARMED) {
+              soundEffectManager.play(SoundEffectType.SWITCH_CLOSE);
+              zenFlipSensorManager.disarmZenFlip();
+            } else {
+              soundEffectManager.play(SoundEffectType.SWITCH_OPEN);
+              const armed = zenFlipSensorManager.armZenFlip();
+              if (armed) {
+                hapticFeedbackHelper.trigger('tick');
+                DialogHelper.showToast($r('app.string.zen_flip_toast_armed'));
+              }
+            }
+          })
+
+          Text(this.zenFlipState === ZenFlipState.ARMED ? $r('app.string.zen_flip_status_armed') : $r('app.string.timeisland_zen_flip'))
+            .fontSize(10)
+            .fontColor(this.zenFlipState === ZenFlipState.ARMED ? this.theme.primaryAccent : this.theme.textSecondary)
+            .fontWeight(FontWeight.Medium)
+        }
       }
     }
     .width('100%')
@@ -867,29 +1022,45 @@ struct TimeIslandHomePage {
   private buildWhiteNoiseDrawer() {
     Row({ space: 10 }) {
       // 1. 海潮晚风
+      // 1. 海潮晚风艺术卡片
       Button({ type: ButtonType.Normal, stateEffect: true }) {
-        Column({ space: 4 }) {
-          Image($r('app.media.ic_water'))
-            .width(20)
-            .height(20)
-            .fillColor(this.currentSoundId === 'tide' ? this.theme.primaryAccent : this.theme.textMuted)
-          Text($r('app.string.timeisland_sound_tide'))
-            .fontSize(11)
-            .fontColor(this.currentSoundId === 'tide' ? this.theme.primaryAccent : this.theme.textMuted)
-            .fontWeight(this.currentSoundId === 'tide' ? FontWeight.Bold : FontWeight.Normal)
+        Stack({ alignContent: Alignment.Center }) {
+          // 高清艺术封面底图
+          Image($r('app.media.bg_sound_tide'))
+            .width('100%')
+            .height(68)
+            .objectFit(ImageFit.Cover)
+            .borderRadius(14)
+          // 磨砂暗色渐变蒙层
+          Column()
+            .width('100%')
+            .height(68)
+            .borderRadius(14)
+            .backgroundColor(this.currentSoundId === 'tide' ? 'rgba(10, 25, 47, 0.50)' : 'rgba(15, 19, 28, 0.72)')
+
+          Column({ space: 4 }) {
+            Image($r('app.media.ic_water_drop'))
+              .width(20)
+              .height(20)
+              .fillColor(this.currentSoundId === 'tide' ? '#4EDEA3' : '#F8FAFC')
+            Text($r('app.string.timeisland_sound_tide'))
+              .fontSize(11)
+              .fontColor('#F8FAFC')
+              .fontWeight(this.currentSoundId === 'tide' ? FontWeight.Bold : FontWeight.Medium)
+              .shadow({ radius: 4, color: 'rgba(0,0,0,0.8)', offsetY: 1 })
+          }
         }
-        .padding({ top: 8, bottom: 8 })
       }
       .layoutWeight(1)
-      .backgroundColor(this.currentSoundId === 'tide' ? this.theme.surfaceIndigo : this.theme.surfaceCard)
+      .height(68)
       .borderRadius(14)
       .border({
-        width: 1,
-        color: this.currentSoundId === 'tide' ? this.theme.primaryAccent : this.theme.borderSubtle
+        width: this.currentSoundId === 'tide' ? 2 : 1,
+        color: this.currentSoundId === 'tide' ? '#4EDEA3' : 'rgba(255, 255, 255, 0.12)'
       })
       .shadow(this.currentSoundId === 'tide' ? {
-        radius: 10,
-        color: this.theme.primaryGlow,
+        radius: 12,
+        color: 'rgba(78, 222, 163, 0.45)',
         offsetY: 2
       } : { radius: 0, color: Color.Transparent })
       .onClick(() => {
@@ -901,30 +1072,45 @@ struct TimeIslandHomePage {
         DialogHelper.showToast($r('app.string.timeisland_sound_tide'));
       })
 
-      // 2. 雨落青苔
+      // 2. 雨落青苔艺术卡片
       Button({ type: ButtonType.Normal, stateEffect: true }) {
-        Column({ space: 4 }) {
-          Image($r('app.media.ic_rain'))
-            .width(20)
-            .height(20)
-            .fillColor(this.currentSoundId === 'moss_rain' ? this.theme.primaryAccent : this.theme.textMuted)
-          Text($r('app.string.timeisland_sound_moss_rain'))
-            .fontSize(11)
-            .fontColor(this.currentSoundId === 'moss_rain' ? this.theme.primaryAccent : this.theme.textMuted)
-            .fontWeight(this.currentSoundId === 'moss_rain' ? FontWeight.Bold : FontWeight.Normal)
+        Stack({ alignContent: Alignment.Center }) {
+          // 高清艺术封面底图
+          Image($r('app.media.bg_sound_rain'))
+            .width('100%')
+            .height(68)
+            .objectFit(ImageFit.Cover)
+            .borderRadius(14)
+          // 磨砂暗色渐变蒙层
+          Column()
+            .width('100%')
+            .height(68)
+            .borderRadius(14)
+            .backgroundColor(this.currentSoundId === 'moss_rain' ? 'rgba(6, 40, 30, 0.50)' : 'rgba(15, 19, 28, 0.72)')
+
+          Column({ space: 4 }) {
+            Image($r('app.media.ic_rain'))
+              .width(20)
+              .height(20)
+              .fillColor(this.currentSoundId === 'moss_rain' ? '#4EDEA3' : '#F8FAFC')
+            Text($r('app.string.timeisland_sound_moss_rain'))
+              .fontSize(11)
+              .fontColor('#F8FAFC')
+              .fontWeight(this.currentSoundId === 'moss_rain' ? FontWeight.Bold : FontWeight.Medium)
+              .shadow({ radius: 4, color: 'rgba(0,0,0,0.8)', offsetY: 1 })
+          }
         }
-        .padding({ top: 8, bottom: 8 })
       }
       .layoutWeight(1)
-      .backgroundColor(this.currentSoundId === 'moss_rain' ? this.theme.surfaceIndigo : this.theme.surfaceCard)
+      .height(68)
       .borderRadius(14)
       .border({
-        width: 1,
-        color: this.currentSoundId === 'moss_rain' ? this.theme.primaryAccent : this.theme.borderSubtle
+        width: this.currentSoundId === 'moss_rain' ? 2 : 1,
+        color: this.currentSoundId === 'moss_rain' ? '#4EDEA3' : 'rgba(255, 255, 255, 0.12)'
       })
       .shadow(this.currentSoundId === 'moss_rain' ? {
-        radius: 10,
-        color: this.theme.primaryGlow,
+        radius: 12,
+        color: 'rgba(78, 222, 163, 0.45)',
         offsetY: 2
       } : { radius: 0, color: Color.Transparent })
       .onClick(() => {
@@ -936,30 +1122,45 @@ struct TimeIslandHomePage {
         DialogHelper.showToast($r('app.string.timeisland_sound_moss_rain'));
       })
 
-      // 3. 林涧清泉
+      // 3. 林涧清泉艺术卡片
       Button({ type: ButtonType.Normal, stateEffect: true }) {
-        Column({ space: 4 }) {
-          Image($r('app.media.ic_forest'))
-            .width(20)
-            .height(20)
-            .fillColor(this.currentSoundId === 'forest_spring' ? this.theme.primaryAccent : this.theme.textMuted)
-          Text($r('app.string.timeisland_sound_forest_spring'))
-            .fontSize(11)
-            .fontColor(this.currentSoundId === 'forest_spring' ? this.theme.primaryAccent : this.theme.textMuted)
-            .fontWeight(this.currentSoundId === 'forest_spring' ? FontWeight.Bold : FontWeight.Normal)
+        Stack({ alignContent: Alignment.Center }) {
+          // 高清艺术封面底图
+          Image($r('app.media.bg_sound_spring'))
+            .width('100%')
+            .height(68)
+            .objectFit(ImageFit.Cover)
+            .borderRadius(14)
+          // 磨砂暗色渐变蒙层
+          Column()
+            .width('100%')
+            .height(68)
+            .borderRadius(14)
+            .backgroundColor(this.currentSoundId === 'forest_spring' ? 'rgba(10, 35, 25, 0.50)' : 'rgba(15, 19, 28, 0.72)')
+
+          Column({ space: 4 }) {
+            Image($r('app.media.ic_forest'))
+              .width(20)
+              .height(20)
+              .fillColor(this.currentSoundId === 'forest_spring' ? '#4EDEA3' : '#F8FAFC')
+            Text($r('app.string.timeisland_sound_forest_spring'))
+              .fontSize(11)
+              .fontColor('#F8FAFC')
+              .fontWeight(this.currentSoundId === 'forest_spring' ? FontWeight.Bold : FontWeight.Normal)
+              .shadow({ radius: 4, color: 'rgba(0,0,0,0.8)', offsetY: 1 })
+          }
         }
-        .padding({ top: 8, bottom: 8 })
       }
       .layoutWeight(1)
-      .backgroundColor(this.currentSoundId === 'forest_spring' ? this.theme.surfaceIndigo : this.theme.surfaceCard)
+      .height(68)
       .borderRadius(14)
       .border({
-        width: 1,
-        color: this.currentSoundId === 'forest_spring' ? this.theme.primaryAccent : this.theme.borderSubtle
+        width: this.currentSoundId === 'forest_spring' ? 2 : 1,
+        color: this.currentSoundId === 'forest_spring' ? '#4EDEA3' : 'rgba(255, 255, 255, 0.12)'
       })
       .shadow(this.currentSoundId === 'forest_spring' ? {
-        radius: 10,
-        color: this.theme.primaryGlow,
+        radius: 12,
+        color: 'rgba(78, 222, 163, 0.45)',
         offsetY: 2
       } : { radius: 0, color: Color.Transparent })
       .onClick(() => {
@@ -1044,29 +1245,32 @@ struct TimeIslandHomePage {
       .backgroundColor(this.activeTab === 'stats' ? $r('app.color.timeisland_tab_active_bg') : '#00000000')
       .borderRadius(18)
       .onClick(() => {
-        router.pushUrl({ url: 'pages/FocusStatsPage' });
+        soundEffectManager.play(SoundEffectType.BUBBLE);
+        this.activeTab = 'stats';
       })
 
-      // 4. 星闪 Tab
-      Button({ type: ButtonType.Normal, stateEffect: true }) {
-        Column({ space: 3 }) {
-          Image($r('app.media.ic_nearlink'))
-            .width(22)
-            .height(22)
-            .fillColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_text_muted'))
-          Text($r('app.string.timeisland_tab_nearlink'))
-            .fontSize(11)
-            .fontColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_text_muted'))
-            .fontWeight(FontWeight.Medium)
+      // 4. 星闪 Tab (由设置中心 isNearlinkEnabled 联动控制)
+      if (this.isNearlinkEnabled) {
+        Button({ type: ButtonType.Normal, stateEffect: true }) {
+          Column({ space: 3 }) {
+            Image($r('app.media.ic_nearlink'))
+              .width(22)
+              .height(22)
+              .fillColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_text_muted'))
+            Text($r('app.string.timeisland_tab_nearlink'))
+              .fontSize(11)
+              .fontColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_text_muted'))
+              .fontWeight(FontWeight.Medium)
+          }
+          .padding({ left: 16, right: 16, top: 6, bottom: 6 })
         }
-        .padding({ left: 16, right: 16, top: 6, bottom: 6 })
+        .backgroundColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_tab_active_bg') : '#00000000')
+        .borderRadius(18)
+        .onClick(() => {
+          soundEffectManager.play(SoundEffectType.BUBBLE);
+          this.activeTab = 'nearlink';
+        })
       }
-      .backgroundColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_tab_active_bg') : '#00000000')
-      .borderRadius(18)
-      .onClick(() => {
-        soundEffectManager.play(SoundEffectType.PEN_CLICK);
-        this.isNearLinkDialogOpen = true;
-      })
     }
     .width('100%')
     .height(68 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0))

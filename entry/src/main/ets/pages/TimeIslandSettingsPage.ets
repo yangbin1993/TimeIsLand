@@ -71,20 +71,20 @@ struct TimeIslandSettingsPage {
             // 分组零: 账号与数据归属中心 (华为账号 / 访客数据绑定)
             this.buildAccountGroup()
 
-            // 分组一: HarmonyOS NEXT 生态联动
+            // 分组一: 生境外观与心流气韵 (主页生境入口深度整合归集)
+            this.buildThemeGroup()
+
+            // 分组二: HarmonyOS NEXT 生态联动
             this.buildEcosystemGroup()
 
-            // 分组二: 心流专注体验
+            // 分组三: 心流专注体验
             this.buildFocusExperienceGroup()
 
-            // 分组三: 心流守护与安全凭据
+            // 分组四: 心流守护与安全凭据
             this.buildSecurityGroup()
 
-            // 分组四: 触感与声音反馈
+            // 分组五: 触感与声音反馈
             this.buildFeedbackGroup()
-
-            // 分组五: 生境外观与主题
-            this.buildThemeGroup()
 
             // 分组六: 关于时光岛
             this.buildAboutGroup()
@@ -170,8 +170,11 @@ struct TimeIslandSettingsPage {
         Row() {
           // 用户头像微视窗
           Stack() {
-            Circle({ width: 44, height: 44 })
-              .fill(this.isLoggedIn ? this.theme.primaryAccent : this.theme.surfaceLow)
+            Row()
+              .width(44)
+              .height(44)
+              .borderRadius(22)
+              .backgroundColor(this.isLoggedIn ? this.theme.primaryAccent : this.theme.surfaceLow)
             Image($r('app.media.ic_account'))
               .width(22)
               .height(22)
@@ -684,12 +687,22 @@ struct TimeIslandSettingsPage {
         .margin({ left: 4 })
 
       Row() {
-        Column({ space: 3 }) {
-          Text($r('app.string.timeisland_settings_current_theme'))
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(this.theme.textPrimary)
-          Text($r('app.string.timeisland_theme_title'))
+        Column({ space: 4 }) {
+          Row({ space: 6 }) {
+            Text($r('app.string.timeisland_settings_current_theme'))
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.theme.textPrimary)
+
+            Text($r('app.string.timeisland_theme_badge'))
+              .fontSize(10)
+              .fontColor(this.theme.primaryAccent)
+              .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+              .backgroundColor(this.theme.primaryAccentBg)
+              .borderRadius(6)
+          }
+
+          Text($r('app.string.timeisland_theme_preview_subtitle'))
             .fontSize(11)
             .fontColor(this.theme.textMuted)
         }
@@ -697,17 +710,28 @@ struct TimeIslandSettingsPage {
 
         Blank()
 
-        Row({ space: 6 }) {
-          Circle()
-            .width(14)
-            .height(14)
-            .fill(this.theme.primaryAccent)
-            .shadow({ radius: 6, color: this.theme.primaryGlow, offsetY: 0 })
+        Row({ space: 8 }) {
+          // 四色生境微晶色彩原石
+          Row({ space: 4 }) {
+            Row().width(8).height(8).borderRadius(4).backgroundColor('#10B981')
+            Row().width(8).height(8).borderRadius(4).backgroundColor('#38BDF8')
+            Row().width(8).height(8).borderRadius(4).backgroundColor('#F59E0B')
+            Row().width(8).height(8).borderRadius(4).backgroundColor('#A855F7')
+          }
+          .padding({ left: 6, right: 6, top: 4, bottom: 4 })
+          .backgroundColor(this.theme.surfaceLowest)
+          .borderRadius(10)
 
           Image($r('app.media.ic_palette'))
-            .width(18)
-            .height(18)
+            .width(20)
+            .height(20)
             .fillColor(this.theme.primaryAccent)
+
+          Image($r('app.media.ic_arrow_back'))
+            .width(14)
+            .height(14)
+            .fillColor(this.theme.textMuted)
+            .rotate({ angle: 180 })
         }
       }
       .width('100%')
@@ -717,6 +741,7 @@ struct TimeIslandSettingsPage {
       .border({ width: 1, color: this.theme.borderCard })
       .shadow({ radius: 12, color: this.theme.shadowCard, offsetY: 2 })
       .onClick(() => {
+        soundEffectManager.play(SoundEffectType.BUBBLE);
         this.isThemeDialogOpen = true;
       })
     }

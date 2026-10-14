@@ -6,11 +6,15 @@
     },
     {
       "name": "AppAbility_desc",
-      "value": "应用主界面 Ability"
+      "value": "应用主界面"
     },
     {
       "name": "AppAbility_label",
-      "value": "HarmonyOS 架构"
+      "value": "时光岛"
+    },
+    {
+      "name": "app_name",
+      "value": "时光岛"
     },
     {
       "name": "permission_reason",
@@ -94,7 +98,7 @@
     },
     {
       "name": "transfer_card_title",
-      "value": "文件传输演示中心 (ohos.request)"
+      "value": "文件传输中心"
     },
     {
       "name": "transfer_download_title",
@@ -126,15 +130,15 @@
     },
     {
       "name": "transfer_desc",
-      "value": "基于 ohos.request 的文件传输体系，系统级 Agent 代理、断点续传与防 OOM 流式传输"
+      "value": "基于系统级传输框架，支持后台代理、断点续传与防内存溢出流式传输"
     },
     {
       "name": "biometric_card_title",
-      "value": "生物识别与安全解锁 (BiometricHelper)"
+      "value": "生物识别与安全解锁"
     },
     {
       "name": "biometric_card_desc",
-      "value": "基于 UserAuthenticationKit 统一封装，支持人脸、指纹与锁屏密码"
+      "value": "支持人脸、指纹与锁屏密码多模态认证"
     },
     {
       "name": "biometric_status_label",
@@ -170,15 +174,15 @@
     },
     {
       "name": "news_item_desc",
-      "value": "基于 Navigation 与分层架构的最佳实践探索"
+      "value": "基于路由导航与分层架构的最佳实践探索"
     },
     {
       "name": "news_arkts_title",
-      "value": "ArkTS 状态管理V2精要"
+      "value": "响应式状态管理精要"
     },
     {
       "name": "news_arkts_desc",
-      "value": "深入理解@ObservedV2与@Trace的响应式原理"
+      "value": "深入理解状态管理双向绑定响应式原理"
     },
     {
       "name": "mine_title",
@@ -214,15 +218,15 @@
     },
     {
       "name": "showcase_toast_section",
-      "value": "1. 轻量级全局浮层 (Toast)"
+      "value": "1. 轻量级轻提示"
     },
     {
       "name": "showcase_standard_section",
-      "value": "2. 快捷命令式弹窗 (Alert / Confirm)"
+      "value": "2. 快捷确认提示弹窗"
     },
     {
       "name": "showcase_custom_section",
-      "value": "3. 高自由度自定义弹窗 (Input / Loading)"
+      "value": "3. 自定义输入与加载遮罩"
     },
     {
       "name": "showcase_tracker_section",
@@ -238,31 +242,31 @@
     },
     {
       "name": "btn_toast_normal",
-      "value": "弹出普通 Toast (2s)"
+      "value": "弹出普通轻提示 (2秒)"
     },
     {
       "name": "btn_toast_long",
-      "value": "弹出长时 Toast (3.5s)"
+      "value": "弹出长时轻提示 (3.5秒)"
     },
     {
       "name": "btn_alert",
-      "value": "单按钮提示弹窗 (Alert)"
+      "value": "单按钮提示弹窗"
     },
     {
       "name": "btn_confirm",
-      "value": "常规二次确认弹窗 (Confirm)"
+      "value": "常规二次确认弹窗"
     },
     {
       "name": "btn_danger",
-      "value": "危险操作警示弹窗 (isDanger: true)"
+      "value": "危险操作警示弹窗"
     },
     {
       "name": "btn_input_dialog",
-      "value": "唤起 Input 录入弹窗"
+      "value": "唤起文本录入弹窗"
     },
     {
       "name": "btn_loading_dialog",
-      "value": "唤起 Loading 加载遮罩"
+      "value": "唤起加载中遮罩"
     },
     {
       "name": "btn_refresh_sequence",
@@ -270,7 +274,7 @@
     },
     {
       "name": "scan_section_title",
-      "value": "5. 系统级扫码与二维码生成 (Scan Kit)"
+      "value": "5. 系统级扫码与二维码生成"
     },
     {
       "name": "btn_scan_native",
@@ -282,7 +286,7 @@
     },
     {
       "name": "qr_generated_hint",
-      "value": "已生成的动态二维码 PixelMap"
+      "value": "已生成的动态二维码图像"
     },
     {
       "name": "timeisland_nav_title",
@@ -414,7 +418,7 @@
     },
     {
       "name": "timeisland_entry_desc",
-      "value": "基于心流理论的专注番茄钟与时间块管家，原生 TaskPool 并发统计与 RDB 本地加密"
+      "value": "基于心流理论的专注番茄钟与时间块管家，原生多线程并发统计与数据库本地加密"
     },
     {
       "name": "timeisland_entry_btn",
@@ -422,7 +426,7 @@
     },
     {
       "name": "timeisland_status_flow_drift",
-      "value": "深潜心流态 · Flow Drift"
+      "value": "深潜心流态"
     },
     {
       "name": "timeisland_status_grace_haven",
@@ -494,11 +498,11 @@
     },
     {
       "name": "timeisland_live_view_tag",
-      "value": "NEXT 原生"
+      "value": "鸿蒙原生"
     },
     {
       "name": "timeisland_live_view_desc",
-      "value": "状态栏水滴胶囊 & 息屏 AOD 已静默就绪"
+      "value": "状态栏水滴胶囊与熄屏微光已就绪"
     },
     {
       "name": "timeisland_tab_focus",
@@ -538,7 +542,7 @@
     },
     {
       "name": "timeisland_app_brand_en",
-      "value": "TIMEISLAND"
+      "value": "静水流深 · 专注当下"
     },
     {
       "name": "timeisland_tag_coding",
@@ -614,11 +618,11 @@
     },
     {
       "name": "timeisland_settings_group_ecosystem",
-      "value": "HarmonyOS NEXT 生态联动"
+      "value": "鸿蒙全场景生态联动"
     },
     {
       "name": "timeisland_settings_live_view",
-      "value": "实况窗水滴胶囊与 AOD"
+      "value": "实况窗胶囊与熄屏微光"
     },
     {
       "name": "timeisland_settings_live_view_desc",
@@ -626,7 +630,7 @@
     },
     {
       "name": "timeisland_settings_nearlink",
-      "value": "NearLink 星闪双子岛近场感应"
+      "value": "星闪双子岛近场感应"
     },
     {
       "name": "timeisland_settings_nearlink_desc",
@@ -710,7 +714,7 @@
     },
     {
       "name": "timeisland_theme_touch_chip",
-      "value": "TOUCH"
+      "value": "触控换肤"
     },
     {
       "name": "timeisland_duration_15_label",
@@ -994,7 +998,7 @@
     },
     {
       "name": "foldable_tag_sub",
-      "value": "8-Column Zen Deck"
+      "value": "折叠宽屏心流台"
     },
     {
       "name": "foldable_left_canvas_title",
@@ -1106,7 +1110,7 @@
     },
     {
       "name": "nearlink_hw_ready",
-      "value": "华为星闪 NearLink 硬件已就绪"
+      "value": "华为星闪近场连接已就绪"
     },
     {
       "name": "nearlink_sandbox_mode",
@@ -1153,8 +1157,16 @@
       "value": "时光岛"
     },
     {
+      "name": "nearlink_service_uuid",
+      "value": "37B72000-0000-1000-8000-00805F9B34FB"
+    },
+    {
       "name": "nearlink_notice_breeze_sent",
       "value": "已向对方岛屿送出一阵微风 🍃"
+    },
+    {
+      "name": "nearlink_notice_breeze_received",
+      "value": "收到伴读微风掠过岛屿 🍃"
     },
     {
       "name": "liveview_default_tag",
@@ -1198,7 +1210,7 @@
     },
     {
       "name": "feedback_email_template",
-      "value": "--- 请在下方输入您的宝贵建议与心流体验 ---\n\n\n\n------------------------------\n应用版本: v1.0.0 (HarmonyOS NEXT)\n设备平台: 纯端本地高保真心流罗盘"
+      "value": "--- 请在下方输入您的宝贵建议与心流体验 ---\n\n\n\n------------------------------\n应用版本: v1.0.0 (鸿蒙原生)\n设备平台: 纯端本地高保真心流罗盘"
     },
     {
       "name": "timeisland_settings_group_account",
@@ -1275,6 +1287,74 @@
     {
       "name": "settings_account_status_linked",
       "value": "已绑定"
+    },
+    {
+      "name": "timeisland_toast_nearlink_disabled",
+      "value": "星闪伴读功能已在设置中关闭"
+    },
+    {
+      "name": "zen_flip_toast_armed",
+      "value": "翻转静心已就绪：请将手机屏幕朝下扣放于桌面"
+    },
+    {
+      "name": "zen_flip_toast_interrupted",
+      "value": "检测到手机被翻起，已为您保留心流现场"
+    },
+    {
+      "name": "zen_flip_toast_resumed",
+      "value": "手机重新扣放，心流继续流淌"
+    },
+    {
+      "name": "zen_flip_status_armed",
+      "value": "翻转静心待命"
+    },
+    {
+      "name": "zen_flip_status_screen_down",
+      "value": "翻转专注中"
+    },
+    {
+      "name": "zen_flip_status_screen_up",
+      "value": "翻起已暂停"
+    },
+    {
+      "name": "focus_dialog_abandon_title",
+      "value": "息心止浪"
+    },
+    {
+      "name": "focus_dialog_abandon_content",
+      "value": "确定要提前结束当前心流吗？未达标的专注时长将不会计入完整岛屿生境。"
+    },
+    {
+      "name": "focus_dialog_abandon_confirm",
+      "value": "确认息心"
+    },
+    {
+      "name": "focus_dialog_abandon_cancel",
+      "value": "继续专注"
+    },
+    {
+      "name": "focus_auth_prompt",
+      "value": "请验证身份以确认放弃当前心流"
+    },
+    {
+      "name": "focus_auth_failed",
+      "value": "身份验证未通过，心流继续保持"
+    },
+    {
+      "name": "timeisland_theme_badge",
+      "value": "气韵秘境"
+    },
+    {
+      "name": "timeisland_top_btn_biome",
+      "value": "生境"
+    },
+    {
+      "name": "timeisland_top_btn_settings",
+      "value": "设置"
+    },
+    {
+      "name": "timeisland_top_btn_nearlink",
+      "value": "星闪"
     }
   ]
 }

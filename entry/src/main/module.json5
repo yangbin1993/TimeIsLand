@@ -18,8 +18,8 @@
         "srcEntry": "./ets/AppAbility.ets",//源码地址
         "description": "$string:AppAbility_desc",
         "icon": "$media:layered_image",
-        "label": "$string:AppAbility_label",
-        "startWindowIcon": "$media:startIcon",
+        "label": "$string:app_name",
+        "startWindowIcon": "$media:start_window_empty",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,//是否可以被其他组件访问= 可见性
         "launchType": "standard",//启动模式
@@ -65,6 +65,12 @@
           ],
           "when": "inuse"
         }
+      },
+      {
+        "name": "ohos.permission.VIBRATE"
+      },
+      {
+        "name": "ohos.permission.ACCELEROMETER"
       }
     ],
     "extensionAbilities": [

@@ -17,6 +17,7 @@ import { whiteNoiseManager } from './utils/WhiteNoiseManager';
 import { liveViewHelper } from './utils/LiveViewHelper';
 import { apmsManager } from './utils/ApmsManager';
 import { accountManager } from './utils/AccountManager';
+import { NearLinkConfig } from './utils/NearLinkConfig';
 
 const DOMAIN = 0x0000;
 const TAG = 'TimeIslandAppAbility';
@@ -27,6 +28,7 @@ const TAG = 'TimeIslandAppAbility';
 export default class AppAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(DOMAIN, TAG, 'TimeIsland AppAbility onCreate');
+    apmsManager.startTrace('AppStartup');
     this.handleCardQuickStart(want);
     this.initInfrastructure();
   }
@@ -117,6 +119,7 @@ export default class AppAbility extends UIAbility {
         return;
       }
       hilog.info(DOMAIN, TAG, 'Succeeded in loading TimeIslandHomePage.');
+      apmsManager.stopTrace('AppStartup');
     });
   }
 
@@ -164,6 +167,9 @@ export default class AppAbility extends UIAbility {
 
     // 启动华为 AGC APMS 性能与质量监控服务
     apmsManager.init(this.context);
+
+    // 加载星闪近场专属配置 (Service UUID 等)
+    NearLinkConfig.init(this.context);
 
     hilog.info(DOMAIN, TAG, 'TimeIsland infrastructure initialized.');
   }

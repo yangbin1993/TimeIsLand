@@ -205,10 +205,13 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
       // 预览器环境优雅降级：注入默认展示数据，避免Node服务崩溃
       if (this.state.tags.length === 0) {
         const defaultTags: FocusTag[] = [
-          { id: 1, name: 'Coding', colorHex: '#4EDEA3', iconName: 'code', isSystem: true },
-          { id: 2, name: 'Reading', colorHex: '#60A5FA', iconName: 'book', isSystem: true },
-          { id: 3, name: 'Meditation', colorHex: '#FBBF24', iconName: 'spa', isSystem: true },
-          { id: 4, name: 'Creative', colorHex: '#ACC7FF', iconName: 'brush', isSystem: true }
+          { id: 1, name: '工作', colorHex: '#4EDEA3', iconName: 'code', isSystem: true },
+          { id: 2, name: '学习', colorHex: '#50E3C2', iconName: 'book', isSystem: true },
+          { id: 3, name: '阅读', colorHex: '#60A5FA', iconName: 'reader', isSystem: true },
+          { id: 4, name: '思考', colorHex: '#9013FE', iconName: 'brain', isSystem: true },
+          { id: 5, name: '运动', colorHex: '#7ED321', iconName: 'sport', isSystem: true },
+          { id: 6, name: '冥想', colorHex: '#FBBF24', iconName: 'spa', isSystem: true },
+          { id: 7, name: '创作', colorHex: '#ACC7FF', iconName: 'brush', isSystem: true }
         ];
         this.state.tags = defaultTags;
         this.state.currentTag = defaultTags[0];
@@ -255,7 +258,7 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
     this.state.remainingSeconds = this.state.selectedMinutes * 60;
 
     this.emitEffect(new FocusTimerEffect('TRIGGER_HAPTIC', undefined, 'tick'));
-    liveViewHelper.startLiveView(this.state.currentTag?.name || '', this.state.selectedMinutes * 60, this.state.remainingSeconds);
+    liveViewHelper.startLiveView(this.state.currentTag?.name || '', this.state.remainingSeconds);
     this.runTickLoop();
   }
 

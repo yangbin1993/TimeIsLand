@@ -1,5 +1,5 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { BaseRepository, TaskDispatcher, TaskItem } from '@app/common';
+import { BaseRepository, TaskDispatcher } from '@app/common';
 import { FocusTag, FocusRecordEntity, FocusOverviewStat, DayFocusSummary, TagFocusSummary, FocusState } from '../model/FocusTypes';
 import { focusTagDao, FocusTagDao } from './FocusTagDao';
 import { focusRecordDao, FocusRecordDao } from './FocusRecordDao';

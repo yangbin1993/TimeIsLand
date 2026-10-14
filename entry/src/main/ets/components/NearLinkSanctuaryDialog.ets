@@ -1,49 +1,58 @@
-import { nearLinkSanctuaryManager, NearLinkSanctuaryState, PartnerIslandInfo } from '../utils/NearLinkSanctuaryManager';
+import { nearLinkSanctuaryManager, NearLinkSanctuaryState, PartnerIslandInfo, SanctuaryStateListener, RippleReceivedListener } from '../utils/NearLinkSanctuaryManager';
 import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
 import { ThemePalette } from '../theme/ThemeTypes';
+import { DialogHelper } from '@app/common';
 
 /**
- * 时光岛 - 星闪近场双子岛伴读弹窗
+ * 时光岛 - 星闪近场双子岛伴读视图 (主页顶级常驻 Tab 页面)
  */
 @Component
-export struct NearLinkSanctuaryDialog {
+export struct NearLinkSanctuaryView {
   @Prop theme: ThemePalette;
-  @Link isOpen: boolean;
 
   @State private sanctuaryState: NearLinkSanctuaryState = NearLinkSanctuaryState.IDLE;
   @State private partnerInfo: PartnerIslandInfo | null = null;
   @State private rippleAnimScale: number = 1.0;
   @State private rippleNotice: ResourceStr = '';
 
+  private stateListener: SanctuaryStateListener = (state: NearLinkSanctuaryState, partner: PartnerIslandInfo | null): void => {
+    this.sanctuaryState = state;
+    this.partnerInfo = partner;
+  };
+
+  private rippleListener: RippleReceivedListener = (_fromName: string): void => {
+    soundEffectManager.play(SoundEffectType.BUBBLE);
+    this.rippleNotice = $r('app.string.nearlink_notice_breeze_received');
+    this.rippleAnimScale = 1.25;
+    setTimeout(() => {
+      this.rippleAnimScale = 1.0;
+    }, 500);
+    setTimeout(() => {
+      this.rippleNotice = '';
+    }, 3500);
+  };
+
   aboutToAppear(): void {
     this.sanctuaryState = nearLinkSanctuaryManager.getState();
     this.partnerInfo = nearLinkSanctuaryManager.getPartner();
 
-    nearLinkSanctuaryManager.addStateListener((state: NearLinkSanctuaryState, partner: PartnerIslandInfo | null): void => {
-      this.sanctuaryState = state;
-      this.partnerInfo = partner;
-    });
-
-    nearLinkSanctuaryManager.addRippleListener((fromName: string): void => {
-      soundEffectManager.play(SoundEffectType.BUBBLE);
-      this.rippleNotice = $r('app.string.nearlink_ripple_sent');
-      this.rippleAnimScale = 1.25;
-      setTimeout(() => {
-        this.rippleAnimScale = 1.0;
-      }, 500);
-      setTimeout(() => {
-        this.rippleNotice = '';
-      }, 3500);
-    });
+    nearLinkSanctuaryManager.addStateListener(this.stateListener);
+    nearLinkSanctuaryManager.addRippleListener(this.rippleListener);
   }
 
   aboutToDisappear(): void {
-    // 组件销毁
+    nearLinkSanctuaryManager.removeStateListener(this.stateListener);
+    nearLinkSanctuaryManager.removeRippleListener(this.rippleListener);
   }
 
   private triggerTouchSearch(): void {
+    const isEnabled = AppStorage.get<boolean>('isNearlinkEnabled') ?? true;
+    if (!isEnabled) {
+      DialogHelper.showToast($r('app.string.timeisland_toast_nearlink_disabled'));
+      return;
+    }
     soundEffectManager.play(SoundEffectType.PEN_CLICK);
-    nearLinkSanctuaryManager.startTouchAndSanctuary('StreamIsland', 'DeepFocus');
+    nearLinkSanctuaryManager.startTouchAndSanctuary();
   }
 
   private sendBreeze(): void {
@@ -62,44 +71,13 @@ export struct NearLinkSanctuaryDialog {
 
   build() {
     Column() {
-      // 1. 顶部 Header
-      Row() {
-        Row({ space: 8 }) {
-          Image($r('app.media.ic_nearlink'))
-            .width(22)
-            .height(22)
-            .fillColor(this.theme.primaryAccent)
-
-          Text($r('app.string.nearlink_title'))
-            .fontSize(16)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.theme.textPrimary)
-        }
-
-        Blank()
-
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          Image($r('app.media.ic_close'))
-            .width(16)
-            .height(16)
-            .fillColor(this.theme.textMuted)
-        }
-        .width(28)
-        .height(28)
-        .backgroundColor(this.theme.surfaceLow)
-        .onClick(() => {
-          this.isOpen = false;
-        })
-      }
-      .width('100%')
-      .padding({ left: 16, right: 16, top: 16, bottom: 8 })
-
-      // 2. 硬件引擎状态胶囊
+      // 1. 硬件引擎状态胶囊
       Row({ space: 6 }) {
-        Circle()
+        Row()
           .width(6)
           .height(6)
-          .fill(nearLinkSanctuaryManager.isHardwareSupported() ? '#4EDEA3' : '#FBBF24')
+          .borderRadius(3)
+          .backgroundColor(nearLinkSanctuaryManager.isHardwareSupported() ? '#4EDEA3' : '#FBBF24')
 
         Text(nearLinkSanctuaryManager.isHardwareSupported() ? $r('app.string.nearlink_hw_ready') : $r('app.string.nearlink_sandbox_mode'))
           .fontSize(11)
@@ -108,9 +86,9 @@ export struct NearLinkSanctuaryDialog {
       .padding({ left: 12, right: 12, top: 4, bottom: 4 })
       .backgroundColor(this.theme.surfaceLow)
       .borderRadius(12)
-      .margin({ top: 4, bottom: 16 })
+      .margin({ top: 14, bottom: 16 })
 
-      // 3. 中间交互视窗
+      // 2. 中间交互视窗
       if (this.sanctuaryState === NearLinkSanctuaryState.IDLE) {
         Column({ space: 14 }) {
           Image($r('app.media.ic_nearlink'))
@@ -150,17 +128,19 @@ export struct NearLinkSanctuaryDialog {
       } else if (this.sanctuaryState === NearLinkSanctuaryState.SCANNING) {
         Column({ space: 16 }) {
           Stack({ alignContent: Alignment.Center }) {
-            Circle()
+            Row()
               .width(90)
               .height(90)
-              .fill(this.theme.primaryAccent)
+              .borderRadius(45)
+              .backgroundColor(this.theme.primaryAccent)
               .opacity(0.15)
               .scale({ x: this.rippleAnimScale, y: this.rippleAnimScale })
 
-            Circle()
+            Row()
               .width(60)
               .height(60)
-              .fill(this.theme.primaryAccent)
+              .borderRadius(30)
+              .backgroundColor(this.theme.primaryAccent)
               .opacity(0.25)
 
             Image($r('app.media.ic_nearlink'))
@@ -283,7 +263,8 @@ export struct NearLinkSanctuaryDialog {
     }
     .width('100%')
     .backgroundColor(this.theme.surfaceCard)
-    .borderRadius({ topLeft: 24, topRight: 24 })
-    .padding({ bottom: 24 })
+    .borderRadius(20)
+    .border({ width: 1, color: this.theme.borderSubtle })
+    .padding({ bottom: 16 })
   }
 }

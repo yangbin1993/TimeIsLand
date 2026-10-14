@@ -59,13 +59,19 @@ export class LiveViewHelper {
   /**
    * 启动实况窗 (状态栏胶囊 + 锁屏通知水滴卡片)
    */
-  public async startLiveView(tagTitle: string, totalSeconds: number, remainingSeconds: number): Promise<void> {
+  public async startLiveView(tagTitle: string, remainingSeconds: number): Promise<void> {
     const defaultTagStr = this.getString($r('app.string.liveview_default_tag'), 'FlowFocus');
     this.currentTag = tagTitle || defaultTagStr;
     this.currentSequence = 1;
 
     if (!this.isSupported) {
       hilog.info(DOMAIN, TAG, 'LiveView skipped: capability not supported on current device/emulator');
+      return;
+    }
+
+    const isAppLiveViewEnabled = AppStorage.get<boolean>('isLiveViewEnabled') ?? true;
+    if (!isAppLiveViewEnabled) {
+      hilog.info(DOMAIN, TAG, 'LiveView skipped: disabled in application settings by user');
       return;
     }
 

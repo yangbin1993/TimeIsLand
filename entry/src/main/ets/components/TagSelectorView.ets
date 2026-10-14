@@ -88,9 +88,9 @@ struct TagSelectorViewPreview {
     Column() {
       TagSelectorView({
         tags: [
-          { id: 1, name: '💻 Coding', colorHex: '#4EDEA3', iconName: 'laptop', isSystem: true },
-          { id: 2, name: '📖 Reading', colorHex: '#60A5FA', iconName: 'book', isSystem: true },
-          { id: 3, name: '🧘 Meditation', colorHex: '#FBBF24', iconName: 'self_improvement', isSystem: true }
+          { id: 1, name: '💻 工作', colorHex: '#4EDEA3', iconName: 'laptop', isSystem: true },
+          { id: 2, name: '📖 阅读', colorHex: '#60A5FA', iconName: 'book', isSystem: true },
+          { id: 3, name: '🧘 冥想', colorHex: '#FBBF24', iconName: 'self_improvement', isSystem: true }
         ],
         selectedTagId: 1
       })

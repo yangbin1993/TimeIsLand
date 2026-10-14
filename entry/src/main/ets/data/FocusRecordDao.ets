@@ -31,23 +31,44 @@ export class FocusRecordDao extends BaseDao<FocusRecordEntity> {
   }
 
   protected toEntity(rs: relationalStore.ResultSet): FocusRecordEntity {
-    const userColIndex = rs.getColumnIndex('user_id');
-    const noteColIndex = rs.getColumnIndex('note');
-    const ratingColIndex = rs.getColumnIndex('rating');
+    try {
+      const idColIndex = rs.getColumnIndex('id');
+      const userColIndex = rs.getColumnIndex('user_id');
+      const tagIdColIndex = rs.getColumnIndex('tag_id');
+      const targetMinColIndex = rs.getColumnIndex('target_minutes');
+      const actualSecColIndex = rs.getColumnIndex('actual_seconds');
+      const startTimeColIndex = rs.getColumnIndex('start_time');
+      const endTimeColIndex = rs.getColumnIndex('end_time');
+      const stateColIndex = rs.getColumnIndex('state');
+      const noteColIndex = rs.getColumnIndex('note');
+      const ratingColIndex = rs.getColumnIndex('rating');
 
-    const item: FocusRecordEntity = {
-      id: rs.getLong(rs.getColumnIndex('id')),
-      userId: userColIndex !== -1 && !rs.isColumnNull(userColIndex) ? rs.getString(userColIndex) : GUEST_USER_ID,
-      tagId: rs.getLong(rs.getColumnIndex('tag_id')),
-      targetMinutes: rs.getLong(rs.getColumnIndex('target_minutes')),
-      actualSeconds: rs.getLong(rs.getColumnIndex('actual_seconds')),
-      startTime: rs.getLong(rs.getColumnIndex('start_time')),
-      endTime: rs.getLong(rs.getColumnIndex('end_time')),
-      state: rs.getString(rs.getColumnIndex('state')) as FocusState,
-      note: rs.isColumnNull(noteColIndex) ? undefined : rs.getString(noteColIndex),
-      rating: rs.isColumnNull(ratingColIndex) ? undefined : rs.getLong(ratingColIndex)
-    };
-    return item;
+      const item: FocusRecordEntity = {
+        id: idColIndex !== -1 ? rs.getLong(idColIndex) : 0,
+        userId: userColIndex !== -1 && !rs.isColumnNull(userColIndex) ? rs.getString(userColIndex) : GUEST_USER_ID,
+        tagId: tagIdColIndex !== -1 ? rs.getLong(tagIdColIndex) : 1,
+        targetMinutes: targetMinColIndex !== -1 ? rs.getLong(targetMinColIndex) : 25,
+        actualSeconds: actualSecColIndex !== -1 ? rs.getLong(actualSecColIndex) : 0,
+        startTime: startTimeColIndex !== -1 ? rs.getLong(startTimeColIndex) : 0,
+        endTime: endTimeColIndex !== -1 ? rs.getLong(endTimeColIndex) : 0,
+        state: stateColIndex !== -1 ? (rs.getString(stateColIndex) as FocusState) : FocusState.COMPLETED,
+        note: noteColIndex !== -1 && !rs.isColumnNull(noteColIndex) ? rs.getString(noteColIndex) : undefined,
+        rating: ratingColIndex !== -1 && !rs.isColumnNull(ratingColIndex) ? rs.getLong(ratingColIndex) : undefined
+      };
+      return item;
+    } catch (err) {
+      const fallbackItem: FocusRecordEntity = {
+        id: 0,
+        userId: GUEST_USER_ID,
+        tagId: 1,
+        targetMinutes: 25,
+        actualSeconds: 0,
+        startTime: 0,
+        endTime: 0,
+        state: FocusState.COMPLETED
+      };
+      return fallbackItem;
+    }
   }
 
   protected toValues(entity: FocusRecordEntity): relationalStore.ValuesBucket {
@@ -69,27 +90,35 @@ export class FocusRecordDao extends BaseDao<FocusRecordEntity> {
    * 按时间戳起止区间及用户查询历史记录 (按开始时间倒序)
    */
   public async queryByDateRange(startTime: number, endTime: number, userId?: string): Promise<FocusRecordEntity[]> {
-    const predicates = new relationalStore.RdbPredicates('focus_records');
-    if (userId) {
-      predicates.equalTo('user_id', userId);
+    try {
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      if (userId) {
+        predicates.equalTo('user_id', userId);
+      }
+      predicates.greaterThanOrEqualTo('start_time', startTime);
+      predicates.lessThanOrEqualTo('start_time', endTime);
+      predicates.orderByDesc('start_time');
+      return await this.query(predicates);
+    } catch (err) {
+      return [];
     }
-    predicates.greaterThanOrEqualTo('start_time', startTime);
-    predicates.lessThanOrEqualTo('start_time', endTime);
-    predicates.orderByDesc('start_time');
-    return this.query(predicates);
   }
 
   /**
    * 查询指定用户的最近 N 条专注记录
    */
   public async queryRecent(limitCount: number = 20, userId?: string): Promise<FocusRecordEntity[]> {
-    const predicates = new relationalStore.RdbPredicates('focus_records');
-    if (userId) {
-      predicates.equalTo('user_id', userId);
+    try {
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      if (userId) {
+        predicates.equalTo('user_id', userId);
+      }
+      predicates.orderByDesc('start_time');
+      predicates.limitAs(limitCount);
+      return await this.query(predicates);
+    } catch (err) {
+      return [];
     }
-    predicates.orderByDesc('start_time');
-    predicates.limitAs(limitCount);
-    return this.query(predicates);
   }
 
   /**
@@ -106,23 +135,31 @@ export class FocusRecordDao extends BaseDao<FocusRecordEntity> {
    * 将旧访客记录批量合并归属至目标账号
    */
   public async consolidateGuestRecords(targetUserId: string): Promise<number> {
-    const store = await this.getStore();
-    const predicates = new relationalStore.RdbPredicates('focus_records');
-    predicates.equalTo('user_id', GUEST_USER_ID);
-    const updateValues: relationalStore.ValuesBucket = {
-      user_id: targetUserId
-    };
-    return store.update(updateValues, predicates);
+    try {
+      const store = await this.getStore();
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      predicates.equalTo('user_id', GUEST_USER_ID);
+      const updateValues: relationalStore.ValuesBucket = {
+        user_id: targetUserId
+      };
+      return await store.update(updateValues, predicates);
+    } catch (err) {
+      return 0;
+    }
   }
 
   /**
    * 统计待合并的本地访客记录数
    */
   public async countGuestRecords(): Promise<number> {
-    const predicates = new relationalStore.RdbPredicates('focus_records');
-    predicates.equalTo('user_id', GUEST_USER_ID);
-    const list = await this.query(predicates);
-    return list.length;
+    try {
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      predicates.equalTo('user_id', GUEST_USER_ID);
+      const list = await this.query(predicates);
+      return list.length;
+    } catch (err) {
+      return 0;
+    }
   }
 }
 
