@@ -1,16 +1,19 @@
-import { router } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { DialogHelper, DialogAction } from '@app/common';
 import { ThemePalette, ThemeMode } from '../theme/ThemeTypes';
 import { themeManager } from '../theme/ThemeManager';
 import { settingsManager } from '../data/SettingsManager';
 import { ThemeSelectorDialog } from '../components/ThemeSelectorDialog';
 import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
-import { biometricAuthManager, BiometricCapability } from '../utils/BiometricAuthManager';
+import { biometricAuthManager, BiometricCapability, BiometricModeType, CredentialChainNode } from '../utils/BiometricAuthManager';
 import { FeedbackHelper } from '../utils/FeedbackHelper';
 import { accountManager } from '../utils/AccountManager';
 import { timeIslandRepository } from '../data/TimeIslandRepository';
 import { GUEST_USER_ID } from '../model/UserModel';
+
+const DOMAIN = 0x0000;
+const TAG = 'TimeIslandSettings';
 
 /**
  * 路由分发器 Builder 声明
@@ -52,7 +55,9 @@ struct TimeIslandSettingsPage {
     isSupported: false,
     hasFingerprint: false,
     hasFace: false,
-    hasPin: false
+    hasPin: false,
+    primaryMode: BiometricModeType.NONE,
+    chainNodes: []
   };
 
   aboutToAppear(): void {
@@ -101,6 +106,7 @@ struct TimeIslandSettingsPage {
       }
       .width('100%')
       .height('100%')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 
       // 生境主题流转切换弹窗
       ThemeSelectorDialog({
@@ -109,6 +115,9 @@ struct TimeIslandSettingsPage {
           this.isThemeDialogOpen = false;
         }
       })
+      .width('100%')
+      .height(this.isThemeDialogOpen ? '100%' : 0)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
     }
     .width('100%')
     .height('100%')
@@ -122,18 +131,21 @@ struct TimeIslandSettingsPage {
   @Builder
   private buildHeader() {
     Row() {
-      Button({ type: ButtonType.Circle, stateEffect: true }) {
+      Button({ type: ButtonType.Normal, stateEffect: true }) {
         Image($r('app.media.ic_arrow_back'))
-          .width(18)
-          .height(18)
+          .width(20)
+          .height(20)
           .fillColor(this.theme.textPrimary)
       }
       .width(36)
       .height(36)
-      .backgroundColor(this.theme.surfaceLow)
-      .border({ width: 1, color: this.theme.borderSubtle })
+      .backgroundColor(Color.Transparent)
       .onClick(() => {
-        router.back();
+        try {
+          this.getUIContext().getRouter().back();
+        } catch (err) {
+          hilog.error(DOMAIN, TAG, 'Failed to navigate back: %{public}s', JSON.stringify(err));
+        }
       })
 
       Text($r('app.string.timeisland_settings_title'))
@@ -148,7 +160,7 @@ struct TimeIslandSettingsPage {
     .padding({
       left: 16,
       right: 16,
-      top: this.statusBarHeight > 0 ? this.statusBarHeight : 12,
+      top: (this.statusBarHeight > 0 ? this.statusBarHeight : 0) + 12,
       bottom: 12
     })
   }
@@ -166,7 +178,8 @@ struct TimeIslandSettingsPage {
         .letterSpacing(1)
         .padding({ left: 4 })
 
-      Column() {
+      Column({ space: 14 }) {
+        // 1. 用户身份基础信息行
         Row() {
           // 用户头像微视窗
           Stack() {
@@ -178,11 +191,11 @@ struct TimeIslandSettingsPage {
             Image($r('app.media.ic_account'))
               .width(22)
               .height(22)
-              .fillColor(this.isLoggedIn ? '#FFFFFF' : this.theme.textSecondary)
+              .fillColor(this.isLoggedIn ? this.theme.textInverse : this.theme.textSecondary)
           }
           .margin({ right: 14 })
 
-          // 账号名称与状态
+          // 账号名称与状态徽章
           Column({ space: 4 }) {
             Row({ space: 8 }) {
               Text(this.isLoggedIn ? this.currentUserDisplayName : $r('app.string.settings_account_guest_title'))
@@ -196,7 +209,7 @@ struct TimeIslandSettingsPage {
                 .fontWeight(FontWeight.Medium)
                 .fontColor(this.isLoggedIn ? this.theme.primaryAccent : this.theme.textMuted)
                 .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-                .backgroundColor(this.isLoggedIn ? this.theme.surfaceLow : this.theme.surfaceCard)
+                .backgroundColor(this.isLoggedIn ? this.theme.surfaceLow : this.theme.surfaceLowest)
                 .borderRadius(6)
                 .border({ width: 1, color: this.isLoggedIn ? this.theme.primaryAccent : this.theme.borderSubtle })
             }
@@ -215,46 +228,21 @@ struct TimeIslandSettingsPage {
               Text($r('app.string.settings_account_guest_desc'))
                 .fontSize(11)
                 .fontColor(this.theme.textMuted)
-                .maxLines(2)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .lineHeight(16)
             }
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start)
-          .margin({ right: 8 })
 
-          // 交互按钮
-          if (!this.isLoggedIn) {
-            Button({ type: ButtonType.Capsule, stateEffect: true }) {
-              Row({ space: 4 }) {
-                if (this.isLoggingIn) {
-                  LoadingProgress()
-                    .width(14)
-                    .height(14)
-                    .color('#FFFFFF')
-                }
-                Text($r('app.string.settings_account_btn_login'))
-                  .fontSize(12)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor('#FFFFFF')
-              }
-            }
-            .height(32)
-            .backgroundColor(this.theme.primaryAccent)
-            .padding({ left: 12, right: 12 })
-            .enabled(!this.isLoggingIn)
-            .onClick(() => {
-              soundEffectManager.play(SoundEffectType.PEN_CLICK);
-              this.handleHuaweiLogin();
-            })
-          } else {
+          // 已登录态下的退出登录按钮 (紧凑放置在右上角)
+          if (this.isLoggedIn) {
             Button({ type: ButtonType.Capsule, stateEffect: true }) {
               Text($r('app.string.settings_account_btn_logout'))
                 .fontSize(12)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(this.theme.textSecondary)
             }
-            .height(32)
+            .height(30)
             .backgroundColor(this.theme.surfaceLow)
             .border({ width: 1, color: this.theme.borderSubtle })
             .padding({ left: 12, right: 12 })
@@ -265,8 +253,39 @@ struct TimeIslandSettingsPage {
           }
         }
         .width('100%')
-        .padding(16)
+        .alignItems(VerticalAlign.Center)
+
+        // 2. 未登录态下的独立醒目行动按钮 (整行舒展，彻底消除横向挤压与遮挡)
+        if (!this.isLoggedIn) {
+          Button({ type: ButtonType.Capsule, stateEffect: true }) {
+            Row({ space: 6 }) {
+              if (this.isLoggingIn) {
+                LoadingProgress()
+                  .width(16)
+                  .height(16)
+                  .color(this.theme.textInverse)
+              }
+              Text($r('app.string.settings_account_btn_login'))
+                .fontSize(13)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(this.theme.textInverse)
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.Center)
+          }
+          .width('100%')
+          .height(36)
+          .backgroundColor(this.theme.primaryAccent)
+          .shadow({ radius: 8, color: this.theme.primaryAccentGlow, offsetY: 2 })
+          .enabled(!this.isLoggingIn)
+          .onClick(() => {
+            soundEffectManager.play(SoundEffectType.PEN_CLICK);
+            this.handleHuaweiLogin();
+          })
+        }
       }
+      .width('100%')
+      .padding(16)
       .backgroundColor(this.theme.surfaceCard)
       .borderRadius(16)
       .border({ width: 1, color: this.theme.borderCard })
@@ -285,13 +304,14 @@ struct TimeIslandSettingsPage {
     }
     this.isLoggingIn = true;
     try {
-      const user = await accountManager.loginWithHuaweiID(getContext(this) as common.UIAbilityContext);
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      const user = await accountManager.loginWithHuaweiID(context);
       DialogHelper.showToast($r('app.string.settings_account_login_success'));
 
       // 检查是否存在待合并的本地访客历史专注记录
       const guestRecordsCount = await timeIslandRepository.countGuestRecords();
       if (guestRecordsCount > 0) {
-        const resMgr = getContext(this).resourceManager;
+        const resMgr = context.resourceManager;
         const res = await DialogHelper.showDialog({
           title: resMgr.getStringSync($r('app.string.settings_account_merge_title').id),
           message: resMgr.getStringSync($r('app.string.settings_account_merge_message').id),
@@ -458,10 +478,22 @@ struct TimeIslandSettingsPage {
         // 1. 生物特征心流锁主开关行
         Row() {
           Column({ space: 3 }) {
-            Text($r('app.string.timeisland_settings_biometric_lock'))
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.theme.textPrimary)
+            Row({ space: 6 }) {
+              Text($r('app.string.timeisland_settings_biometric_lock'))
+                .fontSize(14)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(this.theme.textPrimary)
+
+              if (!this.biometricCapability.isSupported) {
+                Text($r('app.string.timeisland_settings_biometric_status_unsupported'))
+                  .fontSize(9)
+                  .fontColor(this.theme.textMuted)
+                  .padding({ left: 5, right: 5, top: 1, bottom: 1 })
+                  .backgroundColor(this.theme.surfaceLow)
+                  .borderRadius(4)
+              }
+            }
+
             Text($r('app.string.timeisland_settings_biometric_lock_desc'))
               .fontSize(11)
               .fontColor(this.theme.textMuted)
@@ -481,54 +513,65 @@ struct TimeIslandSettingsPage {
         }
         .width('100%')
         .padding({ left: 16, right: 16, top: 14, bottom: 14 })
-        .border({ width: { bottom: 1 }, color: this.theme.borderSubtle })
+        .border({ width: { bottom: this.isBiometric ? 1 : 0 }, color: this.theme.borderSubtle })
 
-        // 2. 生物特征硬件与系统凭据就绪详情微晶卡片
-        Column({ space: 10 }) {
-          Row() {
-            Image($r('app.media.ic_shield_check'))
-              .width(14)
-              .height(14)
-              .fillColor(this.isBiometric ? this.theme.primaryAccent : this.theme.textMuted)
+        // 2. 仅在开关开启后展开：生物特征硬件与系统凭据智能降级链路微晶卡片
+        if (this.isBiometric) {
+          Column({ space: 10 }) {
+            Row() {
+              Image($r('app.media.ic_shield_check'))
+                .width(14)
+                .height(14)
+                .fillColor(this.theme.primaryAccent)
 
-            Text($r('app.string.timeisland_settings_biometric_details'))
-              .fontSize(11)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.isBiometric ? this.theme.primaryAccent : this.theme.textSecondary)
-              .margin({ left: 6 })
+              Text($r('app.string.timeisland_settings_biometric_chain_title'))
+                .fontSize(11)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(this.theme.primaryAccent)
+                .margin({ left: 6 })
 
-            Blank()
+              Blank()
 
-            Text(this.biometricCapability.isSupported ? $r('app.string.timeisland_settings_biometric_status_supported') : $r('app.string.timeisland_settings_biometric_status_unsupported'))
+              Text(this.biometricCapability.isSupported ? $r('app.string.timeisland_settings_biometric_status_supported') : $r('app.string.timeisland_settings_biometric_status_unsupported'))
+                .fontSize(10)
+                .fontColor(this.biometricCapability.isSupported ? this.theme.primaryAccent : this.theme.textMuted)
+                .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+                .backgroundColor(this.biometricCapability.isSupported ? this.theme.primaryAccentBg : this.theme.surfaceLow)
+                .borderRadius(6)
+            }
+            .width('100%')
+
+            // 3. 智能降级链条节点流程 (首选 -> 降级 -> 兜底)
+            if (this.biometricCapability.chainNodes.length > 0) {
+              Row({ space: 4 }) {
+                ForEach(this.biometricCapability.chainNodes, (node: CredentialChainNode, index: number) => {
+                  this.buildChainNodePill(node)
+
+                  if (index < this.biometricCapability.chainNodes.length - 1) {
+                    Text('→')
+                      .fontSize(10)
+                      .fontColor(this.theme.textMuted)
+                      .width(12)
+                      .textAlign(TextAlign.Center)
+                  }
+                }, (node: CredentialChainNode) => node.type)
+              }
+              .width('100%')
+              .alignItems(VerticalAlign.Center)
+            } else {
+              Text($r('app.string.timeisland_settings_biometric_none_desc'))
+                .fontSize(10)
+                .fontColor(this.theme.textMuted)
+                .padding({ top: 2, bottom: 2 })
+            }
+
+            // 4. 降级机制安全与生态底座说明
+            Text($r('app.string.timeisland_settings_biometric_chain_desc'))
               .fontSize(10)
-              .fontColor(this.biometricCapability.isSupported ? this.theme.primaryAccent : this.theme.textMuted)
-              .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-              .backgroundColor(this.biometricCapability.isSupported ? this.theme.primaryAccentBg : this.theme.surfaceLow)
-              .borderRadius(6)
-          }
-          .width('100%')
+              .fontColor(this.theme.textMuted)
+              .lineHeight(14)
 
-          // 三项安全能力阵列 (指纹 / 面容 / 锁屏凭据)
-          Row({ space: 8 }) {
-            this.buildCredentialPill(
-              $r('app.string.timeisland_settings_biometric_fingerprint'),
-              this.biometricCapability.hasFingerprint
-            )
-
-            this.buildCredentialPill(
-              $r('app.string.timeisland_settings_biometric_face'),
-              this.biometricCapability.hasFace
-            )
-
-            this.buildCredentialPill(
-              $r('app.string.timeisland_settings_biometric_pin'),
-              this.biometricCapability.hasPin
-            )
-          }
-          .width('100%')
-
-          // 生效场景防护说明标签
-          if (this.isBiometric) {
+            // 5. 生效场景防护说明标签
             Row({ space: 6 }) {
               Text($r('app.string.timeisland_settings_biometric_scope_quit'))
                 .fontSize(9)
@@ -546,45 +589,53 @@ struct TimeIslandSettingsPage {
             }
             .width('100%')
           }
+          .width('100%')
+          .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+          .backgroundColor(this.theme.surfaceLowest)
         }
-        .width('100%')
-        .padding({ left: 16, right: 16, top: 12, bottom: 12 })
-        .backgroundColor(this.theme.surfaceLowest)
       }
       .backgroundColor(this.theme.surfaceCard)
       .borderRadius(16)
       .border({ width: 1, color: this.theme.borderCard })
       .shadow({ radius: 12, color: this.theme.shadowCard, offsetY: 2 })
+      .animation({ duration: 250, curve: Curve.FastOutSlowIn })
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
   }
 
   /**
-   * 凭据能力状态胶囊
+   * 凭据降级链路节点胶囊
    */
   @Builder
-  private buildCredentialPill(name: Resource, isReady: boolean) {
+  private buildChainNodePill(node: CredentialChainNode) {
     Row({ space: 4 }) {
       Row()
         .width(5)
         .height(5)
         .borderRadius(2.5)
-        .backgroundColor(isReady ? this.theme.primaryAccent : '#64748b')
+        .backgroundColor(node.isPrimary ? this.theme.primaryAccent : this.theme.textMuted)
 
-      Text(name)
+      Text(node.nameRes)
         .fontSize(10)
-        .fontColor(isReady ? this.theme.textPrimary : this.theme.textMuted)
+        .fontWeight(node.isPrimary ? FontWeight.Medium : FontWeight.Normal)
+        .fontColor(node.isPrimary ? this.theme.textPrimary : this.theme.textSecondary)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-      Text(isReady ? $r('app.string.timeisland_settings_biometric_status_supported') : $r('app.string.timeisland_settings_biometric_status_unsupported'))
+      Text(node.badgeRes)
         .fontSize(8)
-        .fontColor(isReady ? this.theme.primaryAccent : this.theme.textMuted)
+        .fontColor(node.isPrimary ? this.theme.primaryAccent : this.theme.textMuted)
+        .padding({ left: 4, right: 4, top: 1, bottom: 1 })
+        .backgroundColor(node.isPrimary ? this.theme.primaryAccentBg : this.theme.surfaceLow)
+        .borderRadius(4)
     }
     .layoutWeight(1)
-    .padding({ left: 6, right: 6, top: 5, bottom: 5 })
+    .padding({ left: 4, right: 4, top: 6, bottom: 6 })
+    .justifyContent(FlexAlign.Center)
     .backgroundColor(this.theme.surfaceCard)
     .borderRadius(8)
-    .border({ width: 1, color: isReady ? this.theme.borderSubtle : '#00000000' })
+    .border({ width: 1, color: node.isPrimary ? this.theme.borderSubtle : Color.Transparent })
   }
 
   /**
@@ -604,7 +655,14 @@ struct TimeIslandSettingsPage {
         return;
       }
 
-      const verifyTitle = getContext(this).resourceManager.getStringSync($r('app.string.timeisland_settings_biometric_verify_title'));
+      let verifyTitle: string = 'Verify Identity';
+      try {
+        const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+        verifyTitle = context.resourceManager.getStringSync($r('app.string.timeisland_settings_biometric_verify_title').id);
+      } catch (err) {
+        hilog.error(DOMAIN, TAG, 'Failed to resolve biometric verify title: %{public}s', JSON.stringify(err));
+      }
+
       const isSuccess = await biometricAuthManager.authenticate(verifyTitle);
       if (isSuccess) {
         soundEffectManager.play(SoundEffectType.SWITCH_OPEN);
@@ -616,7 +674,14 @@ struct TimeIslandSettingsPage {
         AppStorage.setOrCreate('isBiometricEnabled', false);
       }
     } else {
-      const verifyTitle = getContext(this).resourceManager.getStringSync($r('app.string.timeisland_settings_biometric_verify_close_title'));
+      let verifyTitle: string = 'Verify Identity to Close';
+      try {
+        const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+        verifyTitle = context.resourceManager.getStringSync($r('app.string.timeisland_settings_biometric_verify_close_title').id);
+      } catch (err) {
+        hilog.error(DOMAIN, TAG, 'Failed to resolve biometric verify close title: %{public}s', JSON.stringify(err));
+      }
+
       const isSuccess = await biometricAuthManager.authenticate(verifyTitle);
       if (isSuccess) {
         soundEffectManager.play(SoundEffectType.SWITCH_CLOSE);
@@ -684,6 +749,7 @@ struct TimeIslandSettingsPage {
         .fontSize(12)
         .fontWeight(FontWeight.Bold)
         .fontColor(this.theme.textSecondary)
+        .letterSpacing(1)
         .margin({ left: 4 })
 
       Row() {
@@ -705,34 +771,37 @@ struct TimeIslandSettingsPage {
           Text($r('app.string.timeisland_theme_preview_subtitle'))
             .fontSize(11)
             .fontColor(this.theme.textMuted)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
+        .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-
-        Blank()
+        .margin({ right: 12 })
 
         Row({ space: 8 }) {
           // 四色生境微晶色彩原石
           Row({ space: 4 }) {
-            Row().width(8).height(8).borderRadius(4).backgroundColor('#10B981')
-            Row().width(8).height(8).borderRadius(4).backgroundColor('#38BDF8')
-            Row().width(8).height(8).borderRadius(4).backgroundColor('#F59E0B')
-            Row().width(8).height(8).borderRadius(4).backgroundColor('#A855F7')
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#10B981')
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#38BDF8')
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#F59E0B')
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#A855F7')
           }
           .padding({ left: 6, right: 6, top: 4, bottom: 4 })
           .backgroundColor(this.theme.surfaceLowest)
-          .borderRadius(10)
+          .borderRadius(8)
 
           Image($r('app.media.ic_palette'))
-            .width(20)
-            .height(20)
+            .width(18)
+            .height(18)
             .fillColor(this.theme.primaryAccent)
 
           Image($r('app.media.ic_arrow_back'))
-            .width(14)
-            .height(14)
+            .width(12)
+            .height(12)
             .fillColor(this.theme.textMuted)
             .rotate({ angle: 180 })
         }
+        .alignItems(VerticalAlign.Center)
       }
       .width('100%')
       .padding({ left: 16, right: 16, top: 14, bottom: 14 })
@@ -740,6 +809,7 @@ struct TimeIslandSettingsPage {
       .borderRadius(16)
       .border({ width: 1, color: this.theme.borderCard })
       .shadow({ radius: 12, color: this.theme.shadowCard, offsetY: 2 })
+      .clip(true)
       .onClick(() => {
         soundEffectManager.play(SoundEffectType.BUBBLE);
         this.isThemeDialogOpen = true;
@@ -762,24 +832,18 @@ struct TimeIslandSettingsPage {
         .margin({ left: 4 })
 
       Column({ space: 0 }) {
-        // 1. 应用品牌信息
+        // 1. 应用品牌与版本信息 (极致纯净规范)
         Row() {
           Row({ space: 12 }) {
             Image($r('app.media.startIcon'))
-              .width(40)
-              .height(40)
-              .borderRadius(20)
+              .width(36)
+              .height(36)
+              .borderRadius(18)
 
-            Column({ space: 3 }) {
-              Text($r('app.string.app_name'))
-                .fontSize(14)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(this.theme.textPrimary)
-              Text($r('app.string.timeisland_settings_app_desc'))
-                .fontSize(11)
-                .fontColor(this.theme.textMuted)
-            }
-            .alignItems(HorizontalAlign.Start)
+            Text($r('app.string.app_name'))
+              .fontSize(15)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.theme.textPrimary)
           }
 
           Blank()
@@ -795,7 +859,7 @@ struct TimeIslandSettingsPage {
         .padding(16)
         .border({ width: { bottom: 1 }, color: this.theme.borderSubtle })
 
-        // 2. 意见与灵感反馈入口 (Task 2.4 原生邮件直投/剪贴板平滑降级)
+        // 2. 建议与灵感反馈入口 (保留副标题小字)
         Row() {
           Column({ space: 3 }) {
             Text($r('app.string.timeisland_settings_feedback_title'))
@@ -812,26 +876,16 @@ struct TimeIslandSettingsPage {
           .alignItems(HorizontalAlign.Start)
           .margin({ right: 12 })
 
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            Image($r('app.media.ic_arrow_back'))
-              .width(16)
-              .height(16)
-              .fillColor(this.theme.textSecondary)
-              .rotate({ angle: 180 })
-          }
-          .width(32)
-          .height(32)
-          .backgroundColor(this.theme.surfaceLow)
-          .onClick(() => {
-            soundEffectManager.play(SoundEffectType.PEN_CLICK);
-            FeedbackHelper.sendFeedback(getContext(this) as common.UIAbilityContext);
-          })
+          Image($r('app.media.ic_chevron_right'))
+            .width(18)
+            .height(18)
+            .fillColor(this.theme.textSecondary)
         }
         .width('100%')
         .padding(16)
         .onClick(() => {
           soundEffectManager.play(SoundEffectType.PEN_CLICK);
-          FeedbackHelper.sendFeedback(getContext(this) as common.UIAbilityContext);
+          FeedbackHelper.openFeedback(this.getUIContext());
         })
       }
       .backgroundColor(this.theme.surfaceCard)

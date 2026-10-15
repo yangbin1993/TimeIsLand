@@ -1,4 +1,3 @@
-import { router } from '@kit.ArkUI';
 import { FocusStatsView } from '../components/FocusStatsView';
 
 /**
@@ -32,7 +31,7 @@ struct FocusStatsPage {
         .width(36)
         .height(36)
         .onClick(() => {
-          router.back();
+          this.getUIContext().getRouter().back();
         })
 
         Text($r('app.string.timeisland_nav_stats'))

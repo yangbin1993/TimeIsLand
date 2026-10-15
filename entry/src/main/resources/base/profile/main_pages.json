@@ -2,6 +2,7 @@
   "src": [
     "pages/TimeIslandHomePage",
     "pages/FocusStatsPage",
-    "pages/TimeIslandSettingsPage"
+    "pages/TimeIslandSettingsPage",
+    "pages/FeedbackWebPage"
   ]
 }

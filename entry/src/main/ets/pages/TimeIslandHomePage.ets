@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit';
 import { DialogHelper, BreakpointType, DialogType } from '@app/common';
 import { FocusState, FocusTag } from '../model/FocusTypes';
 import { FocusTimerViewModel, FocusTimerIntent, FocusTimerEffect, FocusTimerState } from '../viewmodel/FocusTimerViewModel';
@@ -8,16 +9,19 @@ import { TimeDurationSelector } from '../components/TimeDurationSelector';
 import { ThemeSelectorDialog } from '../components/ThemeSelectorDialog';
 import { NearLinkSanctuaryView } from '../components/NearLinkSanctuaryDialog';
 import { FocusStatsView } from '../components/FocusStatsView';
-import { nearLinkSanctuaryManager, NearLinkSanctuaryState, PartnerIslandInfo } from '../utils/NearLinkSanctuaryManager';
+import { nearLinkSanctuaryManager, NearLinkSanctuaryState, PartnerIslandInfo, SanctuaryStateListener } from '../utils/NearLinkSanctuaryManager';
 import { ThemePalette, ThemeMode } from '../theme/ThemeTypes';
 import { themeManager } from '../theme/ThemeManager';
-import { router } from '@kit.ArkUI';
 import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
-import { whiteNoiseManager, WhiteNoiseType } from '../utils/WhiteNoiseManager';
+import { whiteNoiseManager } from '../utils/WhiteNoiseManager';
 import { widgetSyncManager } from '../utils/WidgetSyncManager';
 import { hapticFeedbackHelper } from '../utils/HapticFeedbackHelper';
 import { zenFlipSensorManager, ZenFlipState, ZenFlipListener } from '../utils/ZenFlipSensorManager';
 import { BiometricAuthManager } from '../utils/BiometricAuthManager';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+
+const DOMAIN = 0x0000;
+const TAG = 'TimeIslandHome';
 
 /**
  * 路由分发器 Builder 声明
@@ -59,6 +63,7 @@ struct TimeIslandHomePage {
   @State private currentSoundId: string = 'tide';
   @State private isThemeDialogOpen: boolean = false;
   @State private partnerInfo: PartnerIslandInfo | null = null;
+  @State private nearLinkState: NearLinkSanctuaryState = nearLinkSanctuaryManager.getState();
   @State private dualPaneMode: string = 'compass';
 
   private getCurrentSoundRes(): Resource {
@@ -69,6 +74,11 @@ struct TimeIslandHomePage {
     }
     return $r('app.string.timeisland_sound_tide');
   }
+
+  private sanctuaryStateListener: SanctuaryStateListener = (sanctuaryState: NearLinkSanctuaryState, partner: PartnerIslandInfo | null): void => {
+    this.nearLinkState = sanctuaryState;
+    this.partnerInfo = partner;
+  };
 
   private zenFlipListener: ZenFlipListener = (flipState: ZenFlipState): void => {
     this.zenFlipState = flipState;
@@ -103,10 +113,9 @@ struct TimeIslandHomePage {
     this.vm.dispatch(FocusTimerIntent.initData());
 
     // 监听星闪双子岛伴读状态
+    this.nearLinkState = nearLinkSanctuaryManager.getState();
     this.partnerInfo = nearLinkSanctuaryManager.getPartner();
-    nearLinkSanctuaryManager.addStateListener((state: NearLinkSanctuaryState, partner: PartnerIslandInfo | null): void => {
-      this.partnerInfo = partner;
-    });
+    nearLinkSanctuaryManager.addStateListener(this.sanctuaryStateListener);
 
     // 注册翻转静心真机传感器监听
     zenFlipSensorManager.addListener(this.zenFlipListener);
@@ -125,6 +134,7 @@ struct TimeIslandHomePage {
   }
 
   aboutToDisappear(): void {
+    nearLinkSanctuaryManager.removeStateListener(this.sanctuaryStateListener);
     zenFlipSensorManager.removeListener(this.zenFlipListener);
     zenFlipSensorManager.disarmZenFlip();
     this.vm.onCleared();
@@ -138,7 +148,7 @@ struct TimeIslandHomePage {
     let cancelStr = '';
 
     try {
-      const rm = getContext(this).resourceManager;
+      const rm = (this.getUIContext().getHostContext() as common.UIAbilityContext).resourceManager;
       titleStr = rm.getStringSync($r('app.string.focus_dialog_abandon_title').id);
       msgStr = rm.getStringSync($r('app.string.focus_dialog_abandon_content').id);
       confirmStr = rm.getStringSync($r('app.string.focus_dialog_abandon_confirm').id);
@@ -169,7 +179,7 @@ struct TimeIslandHomePage {
     if (this.isBiometricEnabled) {
       let promptStr = '';
       try {
-        promptStr = getContext(this).resourceManager.getStringSync($r('app.string.focus_auth_prompt').id);
+        promptStr = (this.getUIContext().getHostContext() as common.UIAbilityContext).resourceManager.getStringSync($r('app.string.focus_auth_prompt').id);
       } catch (_e) {
         promptStr = 'Verify identity to abandon flow';
       }
@@ -196,7 +206,7 @@ struct TimeIslandHomePage {
         DialogHelper.showToast($r('app.string.timeisland_toast_focus_completed'));
         // 实时触发桌面元服务原子化卡片数据同步跳变
         widgetSyncManager.syncFocusDataToWidgets(
-          getContext(this),
+          this.getUIContext().getHostContext() as common.UIAbilityContext,
           this.state.todayTotalMinutes,
           this.state.todayCompletedCount,
           this.state.currentTag?.name || 'Flow'
@@ -522,7 +532,13 @@ struct TimeIslandHomePage {
       Image($r('app.media.ic_nearlink'))
         .width(20)
         .height(20)
-        .fillColor(this.partnerInfo ? this.theme.primaryAccent : this.theme.textMuted)
+        .fillColor(
+          (this.nearLinkState === NearLinkSanctuaryState.CONNECTED || this.nearLinkState === NearLinkSanctuaryState.SIMULATED)
+            ? this.theme.primaryAccent
+            : (this.nearLinkState === NearLinkSanctuaryState.SCANNING || this.nearLinkState === NearLinkSanctuaryState.BROADCASTING
+                ? this.theme.havenAmber
+                : this.theme.textMuted)
+        )
 
       Column({ space: 2 }) {
         Row({ space: 6 }) {
@@ -531,15 +547,36 @@ struct TimeIslandHomePage {
             .fontWeight(FontWeight.Bold)
             .fontColor(this.theme.textPrimary)
 
-          Text(this.partnerInfo ? $r('app.string.nearlink_partner_focusing') : $r('app.string.timeisland_tag_read'))
+          // 依据真实星闪近场连接状态展示动态微标
+          Text(
+            (this.nearLinkState === NearLinkSanctuaryState.CONNECTED || this.nearLinkState === NearLinkSanctuaryState.SIMULATED)
+              ? (this.partnerInfo?.isPartnerFocusing ? $r('app.string.nearlink_partner_focusing') : $r('app.string.nearlink_status_resonating'))
+              : (this.nearLinkState === NearLinkSanctuaryState.SCANNING
+                  ? $r('app.string.nearlink_scanning')
+                  : (this.nearLinkState === NearLinkSanctuaryState.BROADCASTING ? $r('app.string.nearlink_broadcasting') : $r('app.string.nearlink_connected')))
+          )
             .fontSize(9)
-            .fontColor(this.theme.primaryAccent)
+            .fontColor(
+              (this.nearLinkState === NearLinkSanctuaryState.CONNECTED || this.nearLinkState === NearLinkSanctuaryState.SIMULATED)
+                ? this.theme.primaryAccent
+                : this.theme.textSecondary
+            )
             .padding({ left: 4, right: 4, top: 1, bottom: 1 })
-            .backgroundColor(this.theme.primaryAccentBg)
+            .backgroundColor(
+              (this.nearLinkState === NearLinkSanctuaryState.CONNECTED || this.nearLinkState === NearLinkSanctuaryState.SIMULATED)
+                ? this.theme.primaryAccentBg
+                : this.theme.surfaceLowest
+            )
             .borderRadius(4)
         }
 
-        Text(this.partnerInfo ? $r('app.string.foldable_nearlink_companion_sub') : $r('app.string.nearlink_desc'))
+        Text(
+          this.partnerInfo
+            ? $r('app.string.foldable_nearlink_companion_sub')
+            : (this.nearLinkState === NearLinkSanctuaryState.SCANNING
+                ? $r('app.string.timeisland_tab_nearlink_toast')
+                : $r('app.string.nearlink_desc'))
+        )
           .fontSize(10)
           .fontColor(this.theme.textMuted)
           .maxLines(1)
@@ -549,7 +586,11 @@ struct TimeIslandHomePage {
       .alignItems(HorizontalAlign.Start)
 
       Button({ type: ButtonType.Capsule, stateEffect: true }) {
-        Text(this.partnerInfo ? $r('app.string.nearlink_send_ripple') : $r('app.string.nearlink_title'))
+        Text(
+          (this.nearLinkState === NearLinkSanctuaryState.CONNECTED || this.nearLinkState === NearLinkSanctuaryState.SIMULATED) && this.partnerInfo
+            ? $r('app.string.nearlink_send_ripple')
+            : $r('app.string.nearlink_title')
+        )
           .fontSize(11)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.theme.primaryAccent)
@@ -558,7 +599,7 @@ struct TimeIslandHomePage {
       .backgroundColor(this.theme.primaryAccentBg)
       .border({ width: 1, color: this.theme.primaryAccentGlow })
       .onClick(() => {
-        if (this.partnerInfo) {
+        if ((this.nearLinkState === NearLinkSanctuaryState.CONNECTED || this.nearLinkState === NearLinkSanctuaryState.SIMULATED) && this.partnerInfo) {
           soundEffectManager.play(SoundEffectType.BUBBLE);
           nearLinkSanctuaryManager.sendRippleToPartner();
           DialogHelper.showToast($r('app.string.nearlink_ripple_sent'));
@@ -699,27 +740,25 @@ struct TimeIslandHomePage {
 
       Blank()
 
-      // 右侧：仅保留设置入口 (生境设置已移动至设置模块，星闪由底部专注生态导航直达)
-      Button({ type: ButtonType.Normal, stateEffect: true }) {
-        Row({ space: 5 }) {
-          Image($r('app.media.ic_settings'))
-            .width(16)
-            .height(16)
-            .fillColor(this.theme.textPrimary)
-          Text($r('app.string.timeisland_top_btn_settings'))
-            .fontSize(12)
-            .fontColor(this.theme.textPrimary)
-            .fontWeight(FontWeight.Medium)
-        }
-        .padding({ left: 10, right: 12, top: 6, bottom: 6 })
+      // 右侧：极简纯齿轮设置按钮 (去除外框与冗余文字，回归通透禅意)
+      Button({ type: ButtonType.Circle, stateEffect: true }) {
+        Image($r('app.media.ic_settings'))
+          .width(20)
+          .height(20)
+          .fillColor(this.theme.textPrimary)
       }
-      .backgroundColor('rgba(28, 37, 65, 0.45)')
-      .borderRadius(16)
-      .border({ width: 1, color: 'rgba(255, 255, 255, 0.08)' })
-      .backdropBlur(20)
+      .width(36)
+      .height(36)
+      .backgroundColor(Color.Transparent)
       .onClick(() => {
         soundEffectManager.play(SoundEffectType.BUBBLE);
-        router.pushUrl({ url: 'pages/TimeIslandSettingsPage' });
+        try {
+          this.getUIContext().getRouter().pushUrl({ url: 'pages/TimeIslandSettingsPage' }).catch((err: Error) => {
+            hilog.error(DOMAIN, TAG, 'Failed to pushUrl asynchronously: %{public}s', err.message);
+          });
+        } catch (err) {
+          hilog.error(DOMAIN, TAG, 'Failed to navigate to TimeIslandSettingsPage: %{public}s', JSON.stringify(err));
+        }
       })
     }
     .width('100%')

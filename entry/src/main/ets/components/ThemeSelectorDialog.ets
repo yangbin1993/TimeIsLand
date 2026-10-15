@@ -1,5 +1,5 @@
 import { DialogHelper } from '@app/common';
-import { ThemeMode, ThemeOption } from '../theme/ThemeTypes';
+import { ThemeMode, ThemeOption, ThemePalette } from '../theme/ThemeTypes';
 import { themeManager } from '../theme/ThemeManager';
 import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
 
@@ -9,7 +9,9 @@ import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager
  */
 @Component
 export struct ThemeSelectorDialog {
+  @StorageProp('currentTheme') theme: ThemePalette = themeManager.getPaletteByMode(ThemeMode.DARK);
   @StorageProp('currentThemeMode') currentMode: ThemeMode = ThemeMode.DARK;
+  @StorageProp('bottomNavHeight') bottomNavHeight: number = 0;
   @Prop visible: boolean = false;
   onClose: () => void = () => {};
 
@@ -18,22 +20,23 @@ export struct ThemeSelectorDialog {
   build() {
     if (this.visible) {
       Stack({ alignContent: Alignment.Bottom }) {
-        // 半透明暗夜微光遮罩
+        // 半透明微光全屏遮罩 (无缝覆盖整屏包括顶部状态栏与底部手势条)
         Column()
           .width('100%')
           .height('100%')
-          .backgroundColor('#99050810')
+          .backgroundColor(this.currentMode === ThemeMode.LIGHT ? 'rgba(15, 23, 42, 0.45)' : 'rgba(0, 0, 0, 0.72)')
+          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
           .onClick(() => {
             this.onClose();
           })
 
-        // 浮层主工坊卡片面板
+        // 浮层主工坊卡片面板 (跟随当前 theme 响应式实时换肤)
         Column({ space: 14 }) {
           // 顶部阻尼手柄
           Column()
             .width(40)
             .height(4)
-            .backgroundColor('#334155')
+            .backgroundColor(this.theme.borderSubtle)
             .borderRadius(2)
             .margin({ top: 8, bottom: 2 })
 
@@ -44,19 +47,19 @@ export struct ThemeSelectorDialog {
                 Text($r('app.string.timeisland_theme_title'))
                   .fontSize(17)
                   .fontWeight(FontWeight.Bold)
-                  .fontColor('#F8FAFC')
+                  .fontColor(this.theme.textPrimary)
                 Text($r('app.string.timeisland_theme_badge'))
                   .fontSize(10)
                   .fontWeight(FontWeight.Normal)
-                  .fontColor('#38BDF8')
+                  .fontColor(this.theme.primaryAccent)
                   .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-                  .backgroundColor('#1038BDF8')
+                  .backgroundColor(this.theme.primaryAccentBg)
                   .borderRadius(6)
               }
 
               Text($r('app.string.timeisland_theme_preview_subtitle'))
                 .fontSize(11)
-                .fontColor('#94A3B8')
+                .fontColor(this.theme.textMuted)
                 .maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
@@ -67,11 +70,12 @@ export struct ThemeSelectorDialog {
               Image($r('app.media.ic_close'))
                 .width(18)
                 .height(18)
-                .fillColor('#94A3B8')
+                .fillColor(this.theme.textSecondary)
             }
             .width(32)
             .height(32)
-            .backgroundColor('#1E293B')
+            .backgroundColor(this.theme.surfaceLow)
+            .border({ width: 1, color: this.theme.borderSubtle })
             .onClick(() => {
               this.onClose();
             })
@@ -92,14 +96,21 @@ export struct ThemeSelectorDialog {
           .constraintSize({ maxHeight: '60%' })
         }
         .width('100%')
-        .padding({ left: 16, right: 16, top: 6, bottom: 24 })
-        .backgroundColor('#0D1322')
+        .padding({
+          left: 16,
+          right: 16,
+          top: 6,
+          bottom: 24 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0)
+        })
+        .backgroundColor(this.theme.surfaceCard)
         .borderRadius({ topLeft: 24, topRight: 24 })
-        .border({ width: { top: 1 }, color: 'rgba(255, 255, 255, 0.12)' })
-        .shadow({ radius: 36, color: 'rgba(0, 0, 0, 0.85)', offsetY: -8 })
+        .border({ width: { top: 1 }, color: this.theme.borderCard })
+        .shadow({ radius: 36, color: this.theme.shadowModal, offsetY: -8 })
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       }
       .width('100%')
       .height('100%')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
       .animation({ duration: 250, curve: Curve.FastOutSlowIn })
     }
   }
@@ -121,7 +132,7 @@ export struct ThemeSelectorDialog {
               .height(42)
               .borderRadius(14)
               .backgroundColor(opt.canvasPreviewColor)
-              .border({ width: 1, color: this.currentMode === opt.mode ? opt.primaryPreviewColor : 'rgba(255, 255, 255, 0.1)' })
+              .border({ width: 1, color: this.currentMode === opt.mode ? opt.primaryPreviewColor : this.theme.borderSubtle })
 
             // 外晕层
             Row()
@@ -147,11 +158,11 @@ export struct ThemeSelectorDialog {
             Text(opt.nameRes)
               .fontSize(14)
               .fontWeight(FontWeight.Bold)
-              .fontColor(this.currentMode === opt.mode ? opt.primaryPreviewColor : '#F8FAFC')
+              .fontColor(this.currentMode === opt.mode ? opt.primaryPreviewColor : this.theme.textPrimary)
 
             Text(opt.descRes)
               .fontSize(11)
-              .fontColor('#94A3B8')
+              .fontColor(this.theme.textMuted)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
@@ -164,7 +175,7 @@ export struct ThemeSelectorDialog {
         Row() {
           Text($r('app.string.timeisland_theme_swatches_label'))
             .fontSize(10)
-            .fontColor('#64748B')
+            .fontColor(this.theme.textMuted)
             .fontWeight(FontWeight.Medium)
 
           Blank()
@@ -186,7 +197,7 @@ export struct ThemeSelectorDialog {
               .width(12)
               .height(12)
               .borderRadius(6)
-              .backgroundColor('#101626')
+              .backgroundColor(opt.canvasPreviewColor)
               .border({ width: 1.5, color: opt.dialDiscBorder })
 
             // 核心微亮点
@@ -199,21 +210,21 @@ export struct ThemeSelectorDialog {
         }
         .width('100%')
         .padding({ left: 10, right: 10, top: 6, bottom: 6 })
-        .backgroundColor('#080D1A')
+        .backgroundColor(this.theme.surfaceLow)
         .borderRadius(10)
-        .border({ width: 1, color: 'rgba(255, 255, 255, 0.05)' })
+        .border({ width: 1, color: this.theme.borderSubtle })
       }
       .width('100%')
       .padding(14)
       .borderRadius(16)
-      .backgroundColor(this.currentMode === opt.mode ? '#131B2E' : '#0F1524')
+      .backgroundColor(this.currentMode === opt.mode ? this.theme.surfaceIndigo : this.theme.surfaceLowest)
       .border({
         width: 1,
-        color: this.currentMode === opt.mode ? opt.primaryPreviewColor : 'rgba(255, 255, 255, 0.08)'
+        color: this.currentMode === opt.mode ? opt.primaryPreviewColor : this.theme.borderSubtle
       })
       .shadow({
-        radius: this.currentMode === opt.mode ? 20 : 8,
-        color: this.currentMode === opt.mode ? opt.primaryPreviewColor : 'rgba(0, 0, 0, 0.4)',
+        radius: this.currentMode === opt.mode ? 16 : 4,
+        color: this.currentMode === opt.mode ? opt.primaryPreviewColor : this.theme.shadowCard,
         offsetY: 2
       })
       .onClick(async () => {
@@ -228,7 +239,7 @@ export struct ThemeSelectorDialog {
           Image($r('app.media.ic_check'))
             .width(12)
             .height(12)
-            .fillColor('#070A12')
+            .fillColor(this.theme.textInverse)
         }
         .width(20)
         .height(20)

@@ -168,9 +168,16 @@ export class ThemeManager {
       }
     }
 
-    // 2. 窗口级状态栏文本图标动态协同 (沉浸式 Edge-to-Edge 系统栏图标/文字反色)
+    // 2. 构造响应式色板并派发给 AppStorage
+    const palette = this.getPaletteByMode(mode);
+    AppStorage.setOrCreate<ThemePalette>('currentTheme', palette);
+    AppStorage.setOrCreate<ThemeMode>('currentThemeMode', mode);
+
+    // 3. 窗口级状态栏文本图标动态协同与底层画布背景同步 (彻底消除 Edge-to-Edge 系统栏透明区色差)
     if (this.mainWindow) {
       try {
+        const bgHex = isLightMode ? '#F8FAFC' : (mode === ThemeMode.GOLD ? '#14120E' : (mode === ThemeMode.MOSS ? '#0D1714' : '#070A12'));
+        this.mainWindow.setWindowBackgroundColor(bgHex);
         await this.mainWindow.setWindowSystemBarProperties({
           statusBarColor: '#00000000',
           navigationBarColor: '#00000000',
@@ -181,11 +188,6 @@ export class ThemeManager {
         hilog.warn(DOMAIN, TAG, 'Failed to update window system bar properties: %{public}s', JSON.stringify(err));
       }
     }
-
-    // 2. 构造响应式色板并派发给 AppStorage
-    const palette = this.getPaletteByMode(mode);
-    AppStorage.setOrCreate<ThemePalette>('currentTheme', palette);
-    AppStorage.setOrCreate<ThemeMode>('currentThemeMode', mode);
 
     hilog.info(DOMAIN, TAG, 'Successfully applied theme mode: %{public}s', mode);
   }

@@ -890,11 +890,11 @@
     },
     {
       "name": "timeisland_settings_feedback_title",
-      "value": "意见与灵感反馈"
+      "value": "建议与灵感反馈"
     },
     {
       "name": "timeisland_settings_feedback_desc",
-      "value": "支持系统邮件直投或免权限邮箱复制，倾听每一位专注者的心声"
+      "value": "倾听每一位专注者的心声与建议"
     },
     {
       "name": "timeisland_feedback_mail_subject",
@@ -1355,6 +1355,110 @@
     {
       "name": "timeisland_top_btn_nearlink",
       "value": "星闪"
+    },
+    {
+      "name": "timeisland_settings_biometric_chain_title",
+      "value": "多模态智能降级"
+    },
+    {
+      "name": "timeisland_settings_biometric_badge_primary",
+      "value": "首选"
+    },
+    {
+      "name": "timeisland_settings_biometric_badge_fallback",
+      "value": "降级"
+    },
+    {
+      "name": "timeisland_settings_biometric_badge_last",
+      "value": "兜底"
+    },
+    {
+      "name": "timeisland_settings_biometric_chain_desc",
+      "value": "接入 HarmonyOS 统一身份安全底座：优先面容无感识别，失败时智能降级指纹或系统密码"
+    },
+    {
+      "name": "timeisland_settings_biometric_none_desc",
+      "value": "当前设备尚未录入面容、指纹或锁屏密码，请先在系统设置中录入凭据"
+    },
+    {
+      "name": "timeisland_feedback_web_title",
+      "value": "意见反馈"
+    },
+    {
+      "name": "timeisland_feedback_web_refresh",
+      "value": "刷新"
+    },
+    {
+      "name": "timeisland_feedback_web_error_title",
+      "value": "暂时无法连接至反馈中心"
+    },
+    {
+      "name": "timeisland_feedback_web_error_desc",
+      "value": "网络连接稍有迟缓，请检查网络设置后重试"
+    },
+    {
+      "name": "timeisland_feedback_web_retry",
+      "value": "重新加载"
+    },
+    {
+      "name": "timeisland_feedback_web_open_in_browser",
+      "value": "在浏览器中打开"
+    },
+    {
+      "name": "timeisland_feedback_open_browser_toast",
+      "value": "正在通过系统浏览器打开反馈页面..."
+    },
+    {
+      "name": "timeisland_feedback_native_title",
+      "value": "建议与灵感反馈"
+    },
+    {
+      "name": "timeisland_feedback_tag_feature",
+      "value": "✨ 功能建议"
+    },
+    {
+      "name": "timeisland_feedback_tag_bug",
+      "value": "🐞 问题反馈"
+    },
+    {
+      "name": "timeisland_feedback_tag_theme",
+      "value": "🎨 生境灵感"
+    },
+    {
+      "name": "timeisland_feedback_tag_chat",
+      "value": "💬 随便聊聊"
+    },
+    {
+      "name": "timeisland_feedback_input_placeholder",
+      "value": "在此写下您对时光岛的心流体验、功能期许或遇到的小瑕疵，我们将认真倾听每一条建议..."
+    },
+    {
+      "name": "timeisland_feedback_contact_placeholder",
+      "value": "微信或邮箱（选填）"
+    },
+    {
+      "name": "timeisland_feedback_submit_btn",
+      "value": "投递心声"
+    },
+    {
+      "name": "timeisland_feedback_submitting",
+      "value": "投递中..."
+    },
+    {
+      "name": "timeisland_feedback_success_toast",
+      "value": "灵感已投递至开发者，感谢您的陪伴！"
+    },
+    {
+      "name": "timeisland_feedback_empty_toast",
+      "value": "请先输入您的反馈或建议内容"
+    },
+    {
+      "name": "timeisland_feedback_fallback_toast",
+      "value": "已自动转入邮件直投通道"
+    },
+    {
+      "name": "timeisland_feedback_footer_note",
+      "value": "免登录直连 · 您的意见将秒级送达开发者微信"
     }
   ]
 }
