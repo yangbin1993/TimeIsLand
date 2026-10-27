@@ -26,6 +26,7 @@ export class FocusTimerState {
   public selectedNoiseId: string = 'forest';
   public todayTotalMinutes: number = 0;
   public todayCompletedCount: number = 0;
+  public allTimeMinutes: number = 0;
 
   /**
    * 格式化展示时间 (倒计时 MM:SS 或 心流延展 +MM:SS)
@@ -65,6 +66,9 @@ export class FocusTimerIntent {
   public minutes?: number;
   public tag?: FocusTag;
   public noiseId?: string;
+  public recordId?: number;
+  public note?: string;
+  public rating?: number;
 
   constructor(type: string, minutes?: number, tag?: FocusTag, noiseId?: string) {
     this.type = type;
@@ -108,6 +112,14 @@ export class FocusTimerIntent {
   public static toggleWhiteNoise(noiseId?: string): FocusTimerIntent {
     return new FocusTimerIntent('TOGGLE_WHITE_NOISE', undefined, undefined, noiseId);
   }
+
+  public static saveReflection(recordId: number, note: string, rating: number): FocusTimerIntent {
+    const intent = new FocusTimerIntent('SAVE_REFLECTION');
+    intent.recordId = recordId;
+    intent.note = note;
+    intent.rating = rating;
+    return intent;
+  }
 }
 
 /**
@@ -132,6 +144,7 @@ export class FocusTimerEffect {
  */
 export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, FocusTimerIntent, FocusTimerEffect> {
   public state: FocusTimerState = new FocusTimerState();
+  public lastCompletedRecordId: number = 0;
   private repository: TimeIslandRepository;
   private timerId: number = -1;
   private focusStartTime: number = 0;
@@ -180,6 +193,11 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
       case 'COMPLETE_TIMER':
         this.completeTimer();
         break;
+      case 'SAVE_REFLECTION':
+        if (intent.recordId !== undefined && intent.rating !== undefined) {
+          this.saveReflection(intent.recordId, intent.note || '', intent.rating);
+        }
+        break;
       case 'TOGGLE_WHITE_NOISE':
         this.toggleWhiteNoise(intent.noiseId);
         break;
@@ -200,6 +218,7 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
       const overview = await this.repository.computeOverviewStats();
       this.state.todayTotalMinutes = overview.todayMinutes;
       this.state.todayCompletedCount = overview.todayCompletedCount;
+      this.state.allTimeMinutes = overview.allTimeMinutes;
     } catch (err) {
       hilog.warn(DOMAIN, TAG, `loadInitialData running in previewer or uninitialized: ${(err as Error).message}`);
       // 预览器环境优雅降级：注入默认展示数据，避免Node服务崩溃
@@ -218,6 +237,7 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
       }
       this.state.todayTotalMinutes = 50;
       this.state.todayCompletedCount = 2;
+      this.state.allTimeMinutes = 320;
     }
   }
 
@@ -353,9 +373,11 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
     let recordId = 0;
     try {
       recordId = await this.repository.saveFocusRecord(record);
+      this.lastCompletedRecordId = recordId;
       // 累加今日指标
       const addedMins = Math.floor(actualSecs / 60);
       this.state.todayTotalMinutes += addedMins;
+      this.state.allTimeMinutes += addedMins;
       this.state.todayCompletedCount += 1;
     } catch (err) {
       hilog.error(DOMAIN, TAG, `Failed to save completed record: ${(err as Error).message}`);
@@ -372,6 +394,20 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
     this.state.flowDriftSeconds = 0;
     this.state.isGraceHavenActive = false;
     this.state.isGracePeriodUsed = false;
+  }
+
+  /**
+   * 保存专注随笔心得与气韵星级
+   */
+  public async saveReflection(recordId: number, note: string, rating: number): Promise<void> {
+    try {
+      await this.repository.updateFocusRecordReflection(recordId, note, rating);
+      this.emitEffect(new FocusTimerEffect('SHOW_TOAST', 'reflection_dialog_toast_saved'));
+      this.emitEffect(new FocusTimerEffect('TRIGGER_HAPTIC', undefined, 'tick'));
+      this.emitEffect(new FocusTimerEffect('REFLECTION_SAVED', undefined, undefined, recordId));
+    } catch (err) {
+      hilog.error(DOMAIN, TAG, `Failed to save reflection for record #${recordId}: ${(err as Error).message}`);
+    }
   }
 
   /**

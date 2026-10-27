@@ -6,7 +6,8 @@ import {
   DialogHelper,
   CrashHandler,
   AppLifecycleManager,
-  displayAdaptiveManager
+  displayAdaptiveManager,
+  permissionHelper
 } from '@app/common';
 import { focusTagDao } from './data/FocusTagDao';
 import { focusRecordDao } from './data/FocusRecordDao';
@@ -18,6 +19,7 @@ import { liveViewHelper } from './utils/LiveViewHelper';
 import { apmsManager } from './utils/ApmsManager';
 import { accountManager } from './utils/AccountManager';
 import { NearLinkConfig } from './utils/NearLinkConfig';
+import { appPermissionConfigProvider } from './utils/AppPermissionConfigProvider';
 
 const DOMAIN = 0x0000;
 const TAG = 'TimeIslandAppAbility';
@@ -157,6 +159,7 @@ export default class AppAbility extends UIAbility {
       {
         name: 'timeisland.db',
         version: 1,
+        isCloudSync: true,
         migrations: []
       },
       [
@@ -170,6 +173,9 @@ export default class AppAbility extends UIAbility {
 
     // 加载星闪近场专属配置 (Service UUID 等)
     NearLinkConfig.init(this.context);
+
+    // 注入鸿蒙统一权限配置与挽回引导提供者
+    permissionHelper.setConfigProvider(appPermissionConfigProvider);
 
     hilog.info(DOMAIN, TAG, 'TimeIsland infrastructure initialized.');
   }

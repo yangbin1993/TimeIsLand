@@ -23,6 +23,11 @@ export interface RdbConfig {
    * 数据库安全级别，默认 S1
    */
   securityLevel?: relationalStore.SecurityLevel;
+
+  /**
+   * 是否支持端云协同同步
+   */
+  isCloudSync?: boolean;
 }
 
 /**

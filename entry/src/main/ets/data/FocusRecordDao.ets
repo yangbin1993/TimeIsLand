@@ -161,6 +161,73 @@ export class FocusRecordDao extends BaseDao<FocusRecordEntity> {
       return 0;
     }
   }
+
+  /**
+   * 统计当前用户或本地全表的总记录数
+   */
+  public async countAllRecords(userId?: string): Promise<number> {
+    try {
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      if (userId) {
+        predicates.equalTo('user_id', userId);
+      }
+      const list = await this.query(predicates);
+      return list.length;
+    } catch (err) {
+      return 0;
+    }
+  }
+
+  /**
+   * 查询所有专注记录 (用于备份与导出)
+   */
+  public async queryAll(userId?: string): Promise<FocusRecordEntity[]> {
+    try {
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      if (userId) {
+        predicates.equalTo('user_id', userId);
+      }
+      predicates.orderByDesc('start_time');
+      return await this.query(predicates);
+    } catch (err) {
+      return [];
+    }
+  }
+
+  /**
+   * 清空指定用户的所有专注记录 (若未传参则清空本地全表)
+   */
+  public async clearAllRecords(userId?: string): Promise<number> {
+    try {
+      const store = await this.getStore();
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      if (userId) {
+        predicates.equalTo('user_id', userId);
+      }
+      return await store.delete(predicates);
+    } catch (err) {
+      return 0;
+    }
+  }
+
+  /**
+   * 更新指定记录的心流随笔心得与气韵评级
+   */
+  public async updateNoteAndRating(recordId: number, note: string, rating: number): Promise<boolean> {
+    try {
+      const store = await this.getStore();
+      const predicates = new relationalStore.RdbPredicates('focus_records');
+      predicates.equalTo('id', recordId);
+      const values: relationalStore.ValuesBucket = {
+        note: note,
+        rating: rating
+      };
+      const updatedRows = await store.update(values, predicates);
+      return updatedRows > 0;
+    } catch (err) {
+      return false;
+    }
+  }
 }
 
 export const focusRecordDao: FocusRecordDao = new FocusRecordDao();

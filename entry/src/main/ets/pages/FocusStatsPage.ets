@@ -1,4 +1,7 @@
 import { FocusStatsView } from '../components/FocusStatsView';
+import { ThemePalette, ThemeMode } from '../theme/ThemeTypes';
+import { themeManager } from '../theme/ThemeManager';
+import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
 
 /**
  * 统计页面路由分发器 Builder 声明
@@ -9,50 +12,29 @@ export function FocusStatsPageBuilder() {
 }
 
 /**
- * 时光岛 - 心流统计与历史流水独立页面 (备用独立路由容器)
+ * 时光岛 - 心流统计与历史流水独立页面 (FocusStatsPage)
+ * 职责: 承载全场景心流气韵看板，对齐全局无框返回与生境主题自适应
  */
 @Entry
 @Component
 struct FocusStatsPage {
   @StorageProp('statusBarHeight') statusBarHeight: number = 0;
+  @StorageProp('bottomNavHeight') bottomNavHeight: number = 0;
+  @StorageProp('currentTheme') theme: ThemePalette = themeManager.getPaletteByMode(ThemeMode.DARK);
 
   build() {
     Column() {
-      // 独立页面顶部返回导航条
-      Row() {
-        Button({ type: ButtonType.Circle }) {
-          Image($r('app.media.ic_arrow_back'))
-            .width(18)
-            .height(18)
-            .fillColor($r('app.color.timeisland_text_primary'))
-        }
-        .backgroundColor($r('app.color.timeisland_surface_low'))
-        .border({ width: 1, color: $r('app.color.timeisland_border_subtle') })
-        .width(36)
-        .height(36)
-        .onClick(() => {
-          this.getUIContext().getRouter().back();
-        })
+      // 1. 顶部沉浸式导航条 (严格对齐全局规范：无框返回键 + 靠左标题)
+      this.buildHeader()
 
-        Text($r('app.string.timeisland_nav_stats'))
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r('app.color.timeisland_text_primary'))
-          .margin({ left: 12 })
-
-        Blank()
-      }
-      .width('100%')
-      .padding({
-        left: 16,
-        right: 16,
-        top: this.statusBarHeight > 0 ? this.statusBarHeight : 12,
-        bottom: 8
-      })
-
+      // 2. 统计看板主体滚动视窗
       Scroll() {
-        FocusStatsView()
-          .padding({ left: 16, right: 16, bottom: 20 })
+        Column() {
+          FocusStatsView()
+          Blank().height(16 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0))
+        }
+        .width('100%')
+        .padding({ left: 16, right: 16, top: 4, bottom: 20 })
       }
       .scrollBar(BarState.Off)
       .width('100%')
@@ -61,18 +43,44 @@ struct FocusStatsPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor($r('app.color.timeisland_bg_canvas'))
+    .backgroundColor(this.theme.bgCanvas)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
-}
 
-/**
- * 统计页面独立预览组件
- */
-@Preview
-@Component
-struct FocusStatsPagePreview {
-  build() {
-    FocusStatsPage()
+  /**
+   * 顶部沉浸式导航栏
+   */
+  @Builder
+  private buildHeader() {
+    Row() {
+      Button({ type: ButtonType.Circle, stateEffect: true }) {
+        Image($r('app.media.ic_arrow_back'))
+          .width(20)
+          .height(20)
+          .fillColor(this.theme.textPrimary)
+      }
+      .width(36)
+      .height(36)
+      .backgroundColor(Color.Transparent)
+      .onClick(() => {
+        soundEffectManager.play(SoundEffectType.PEN_CLICK);
+        this.getUIContext().getRouter().back();
+      })
+
+      Text($r('app.string.timeisland_nav_stats'))
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.textPrimary)
+        .margin({ left: 10 })
+
+      Blank()
+    }
+    .width('100%')
+    .padding({
+      left: 16,
+      right: 16,
+      top: (this.statusBarHeight > 0 ? this.statusBarHeight : 0) + 10,
+      bottom: 8
+    })
   }
 }

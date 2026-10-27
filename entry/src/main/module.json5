@@ -71,6 +71,26 @@
       },
       {
         "name": "ohos.permission.ACCELEROMETER"
+      },
+      {
+        "name": "ohos.permission.READ_CALENDAR",
+        "reason": "$string:calendar_permission_reason",
+        "usedScene": {
+          "abilities": [
+            "AppAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.WRITE_CALENDAR",
+        "reason": "$string:calendar_permission_reason",
+        "usedScene": {
+          "abilities": [
+            "AppAbility"
+          ],
+          "when": "inuse"
+        }
       }
     ],
     "extensionAbilities": [

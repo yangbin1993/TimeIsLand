@@ -34,6 +34,11 @@ export class SettingsManager {
       const isHaptic = await this.prefStore.get('is_haptic', true) as boolean;
       const isSoundAlert = await this.prefStore.get('is_sound_alert', true) as boolean;
       const isBiometric = await this.prefStore.get('is_biometric_lock', false) as boolean;
+      const isCloudSync = await this.prefStore.get('is_cloud_sync', true) as boolean;
+      const isWidgetSync = await this.prefStore.get('is_widget_sync', true) as boolean;
+      const isCardAutoNoise = await this.prefStore.get('is_card_auto_noise', true) as boolean;
+      const isSolarTermNotice = await this.prefStore.get('is_solar_term_notice', true) as boolean;
+      const isCalendarSync = await this.prefStore.get('is_calendar_sync', true) as boolean;
 
       AppStorage.setOrCreate('isLiveViewEnabled', isLiveView);
       AppStorage.setOrCreate('isNearlinkEnabled', isNearlink);
@@ -43,6 +48,11 @@ export class SettingsManager {
       AppStorage.setOrCreate('isHapticFeedbackEnabled', isHaptic);
       AppStorage.setOrCreate('isSoundAlertEnabled', isSoundAlert);
       AppStorage.setOrCreate('isBiometricEnabled', isBiometric);
+      AppStorage.setOrCreate('isCloudSyncEnabled', isCloudSync);
+      AppStorage.setOrCreate('isWidgetSyncEnabled', isWidgetSync);
+      AppStorage.setOrCreate('isCardAutoNoiseEnabled', isCardAutoNoise);
+      AppStorage.setOrCreate('isSolarTermNoticeEnabled', isSolarTermNotice);
+      AppStorage.setOrCreate('isCalendarSyncEnabled', isCalendarSync);
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'Failed to load preferences: %{public}s', JSON.stringify(err));
       // 降级兜底默认值
@@ -54,6 +64,11 @@ export class SettingsManager {
       AppStorage.setOrCreate('isHapticFeedbackEnabled', true);
       AppStorage.setOrCreate('isSoundAlertEnabled', true);
       AppStorage.setOrCreate('isBiometricEnabled', false);
+      AppStorage.setOrCreate('isCloudSyncEnabled', true);
+      AppStorage.setOrCreate('isWidgetSyncEnabled', true);
+      AppStorage.setOrCreate('isCardAutoNoiseEnabled', true);
+      AppStorage.setOrCreate('isSolarTermNoticeEnabled', true);
+      AppStorage.setOrCreate('isCalendarSyncEnabled', true);
     }
   }
 

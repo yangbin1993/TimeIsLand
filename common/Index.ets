@@ -142,5 +142,3 @@ export {
   FoldStatusType,
   BreakpointConstants
 } from './src/main/ets/device/BreakpointSystem';
-
-

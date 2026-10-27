@@ -1,5 +1,7 @@
+import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { advertising, scan, dataTransfer, constant } from '@kit.NearLinkKit';
+import { permissionHelper } from '@app/common';
 import { NearLinkConfig } from './NearLinkConfig';
 
 const DOMAIN = 0x0000;
@@ -104,6 +106,14 @@ export class NearLinkSanctuaryManager {
     return this.isNearLinkHardwareSupported;
   }
 
+  /**
+   * 动态申请星闪近场通信权限（支持被拒后引导弹窗并跳转系统设置页）
+   */
+  public async requestNearLinkPermission(context: common.UIAbilityContext): Promise<boolean> {
+    const result = await permissionHelper.requestWithGuide(context, ['ohos.permission.ACCESS_NEARLINK']);
+    return result.allGranted;
+  }
+
   public getState(): NearLinkSanctuaryState {
     return this.currentState;
   }
@@ -148,6 +158,14 @@ export class NearLinkSanctuaryManager {
 
     if (!this.isNearLinkHardwareSupported) {
       hilog.info(DOMAIN, TAG, 'No NearLink chip detected. Switching to Sanctuary Sandbox Simulation mode.');
+      this.startSandboxSimulation();
+      return;
+    }
+
+    // 检查星闪运行时权限 (ACCESS_NEARLINK)
+    const hasNearlinkPerm = await permissionHelper.checkPermission('ohos.permission.ACCESS_NEARLINK');
+    if (!hasNearlinkPerm) {
+      hilog.info(DOMAIN, TAG, 'NearLink permission not granted. Gracefully degrading to Sanctuary Sandbox Simulation mode.');
       this.startSandboxSimulation();
       return;
     }

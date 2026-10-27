@@ -9,6 +9,7 @@ import { TimeDurationSelector } from '../components/TimeDurationSelector';
 import { ThemeSelectorDialog } from '../components/ThemeSelectorDialog';
 import { NearLinkSanctuaryView } from '../components/NearLinkSanctuaryDialog';
 import { FocusStatsView } from '../components/FocusStatsView';
+import { FocusReflectionDialog } from '../components/FocusReflectionDialog';
 import { nearLinkSanctuaryManager, NearLinkSanctuaryState, PartnerIslandInfo, SanctuaryStateListener } from '../utils/NearLinkSanctuaryManager';
 import { ThemePalette, ThemeMode } from '../theme/ThemeTypes';
 import { themeManager } from '../theme/ThemeManager';
@@ -18,6 +19,8 @@ import { widgetSyncManager } from '../utils/WidgetSyncManager';
 import { hapticFeedbackHelper } from '../utils/HapticFeedbackHelper';
 import { zenFlipSensorManager, ZenFlipState, ZenFlipListener } from '../utils/ZenFlipSensorManager';
 import { BiometricAuthManager } from '../utils/BiometricAuthManager';
+import { calendarSyncManager } from '../utils/CalendarSyncManager';
+import { timeIslandRepository } from '../data/TimeIslandRepository';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 const DOMAIN = 0x0000;
@@ -51,6 +54,7 @@ struct TimeIslandHomePage {
   @StorageProp('isHapticFeedbackEnabled') isHapticFeedbackEnabled: boolean = true;
   @StorageProp('isZenFlipEnabled') isZenFlipEnabled: boolean = true;
   @StorageProp('isBiometricEnabled') isBiometricEnabled: boolean = false;
+  @StorageProp('isCalendarSyncEnabled') isCalendarSyncEnabled: boolean = true;
   @State private zenFlipState: ZenFlipState = ZenFlipState.IDLE;
   @State private activeTab: string = 'focus';
 
@@ -65,6 +69,9 @@ struct TimeIslandHomePage {
   @State private partnerInfo: PartnerIslandInfo | null = null;
   @State private nearLinkState: NearLinkSanctuaryState = nearLinkSanctuaryManager.getState();
   @State private dualPaneMode: string = 'compass';
+  @State private isZenImmersive: boolean = false;
+  @State private isReflectionDialogOpen: boolean = false;
+  @State private completedRecordId: number = 0;
 
   private getCurrentSoundRes(): Resource {
     if (this.currentSoundId === 'moss_rain') {
@@ -75,9 +82,43 @@ struct TimeIslandHomePage {
     return $r('app.string.timeisland_sound_tide');
   }
 
+  @StorageProp('cardQuickStartMinutes') @Watch('onCardQuickStartChanged') cardQuickStartMinutes: number = 0;
+  @StorageProp('isCardAutoNoiseEnabled') isCardAutoNoiseEnabled: boolean = true;
+  @StorageProp('isWidgetSyncEnabled') isWidgetSyncEnabled: boolean = true;
+
+  private onCardQuickStartChanged(): void {
+    const quickMins = this.cardQuickStartMinutes;
+    if (quickMins && quickMins > 0) {
+      AppStorage.setOrCreate('cardQuickStartMinutes', 0);
+      if (this.state.status === FocusState.RUNNING || this.state.status === FocusState.FLOW_DRIFT) {
+        DialogHelper.showToast($r('app.string.widget_toast_already_focusing'));
+        return;
+      }
+      this.vm.dispatch(FocusTimerIntent.selectDuration(quickMins));
+      this.vm.dispatch(FocusTimerIntent.startTimer());
+      if (this.isCardAutoNoiseEnabled) {
+        whiteNoiseManager.playSound(this.vm.state.selectedNoiseId);
+      }
+      hapticFeedbackHelper.trigger('complete');
+      DialogHelper.showToast($r('app.string.widget_quick_start_toast'));
+    }
+  }
+
   private sanctuaryStateListener: SanctuaryStateListener = (sanctuaryState: NearLinkSanctuaryState, partner: PartnerIslandInfo | null): void => {
     this.nearLinkState = sanctuaryState;
     this.partnerInfo = partner;
+    if (this.isWidgetSyncEnabled) {
+      const isNearLinkActive = sanctuaryState === NearLinkSanctuaryState.CONNECTED || sanctuaryState === NearLinkSanctuaryState.SIMULATED;
+      widgetSyncManager.syncFocusDataToWidgets(
+        this.getUIContext().getHostContext() as common.UIAbilityContext,
+        this.state.todayTotalMinutes,
+        this.state.todayCompletedCount,
+        this.state.currentTag?.name || 'Flow',
+        this.state.allTimeMinutes,
+        0,
+        isNearLinkActive
+      ).catch(() => {});
+    }
   };
 
   private zenFlipListener: ZenFlipListener = (flipState: ZenFlipState): void => {
@@ -123,14 +164,8 @@ struct TimeIslandHomePage {
   }
 
   onPageShow(): void {
-    // 响应来自桌面原子化卡片的一键起航参数
-    const quickMins = AppStorage.get<number>('cardQuickStartMinutes');
-    if (quickMins && quickMins > 0) {
-      AppStorage.setOrCreate('cardQuickStartMinutes', 0);
-      this.vm.dispatch(FocusTimerIntent.selectDuration(quickMins));
-      this.vm.dispatch(FocusTimerIntent.startTimer());
-      whiteNoiseManager.playSound(this.vm.state.selectedNoiseId);
-    }
+    // 响应冷启动或热拉起桌面卡片一键起航
+    this.onCardQuickStartChanged();
   }
 
   aboutToDisappear(): void {
@@ -196,22 +231,54 @@ struct TimeIslandHomePage {
 
     hapticFeedbackHelper.trigger('warning');
     zenFlipSensorManager.disarmZenFlip();
+    this.isZenImmersive = false;
     this.vm.dispatch(FocusTimerIntent.giveUpTimer());
+  }
+
+  /**
+   * 专注达成后异步同步单条心流记录至系统默认日历
+   */
+  private async syncRecordToCalendar(recordId: number, note?: string, rating?: number): Promise<void> {
+    if (!this.isCalendarSyncEnabled || recordId <= 0) {
+      return;
+    }
+    try {
+      const record = await timeIslandRepository.getRecordById(recordId);
+      if (record) {
+        const tagName = this.state.currentTag?.name || 'Flow';
+        await calendarSyncManager.syncFocusRecordToCalendar(
+          this.getUIContext().getHostContext() as common.UIAbilityContext,
+          record,
+          tagName,
+          note,
+          rating
+        );
+      }
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, 'Calendar auto sync failed: %{public}s', JSON.stringify(err));
+    }
   }
 
   private handleEffect(effect: FocusTimerEffect): void {
     if (effect.type === 'SHOW_TOAST') {
       if (effect.messageKey === 'timeisland_toast_focus_completed') {
+        this.isZenImmersive = false;
         whiteNoiseManager.pause();
         DialogHelper.showToast($r('app.string.timeisland_toast_focus_completed'));
-        // 实时触发桌面元服务原子化卡片数据同步跳变
-        widgetSyncManager.syncFocusDataToWidgets(
-          this.getUIContext().getHostContext() as common.UIAbilityContext,
-          this.state.todayTotalMinutes,
-          this.state.todayCompletedCount,
-          this.state.currentTag?.name || 'Flow'
-        ).catch(() => {});
+        if (this.isWidgetSyncEnabled) {
+          const isNearLinkActive = this.nearLinkState === NearLinkSanctuaryState.CONNECTED || this.nearLinkState === NearLinkSanctuaryState.SIMULATED;
+          widgetSyncManager.syncFocusDataToWidgets(
+            this.getUIContext().getHostContext() as common.UIAbilityContext,
+            this.state.todayTotalMinutes,
+            this.state.todayCompletedCount,
+            this.state.currentTag?.name || 'Flow',
+            this.state.allTimeMinutes,
+            0,
+            isNearLinkActive
+          ).catch(() => {});
+        }
       } else if (effect.messageKey === 'timeisland_toast_give_up') {
+        this.isZenImmersive = false;
         whiteNoiseManager.pause();
         DialogHelper.showToast($r('app.string.timeisland_toast_give_up'));
       } else if (effect.messageKey === 'timeisland_toast_cannot_change_duration') {
@@ -222,6 +289,13 @@ struct TimeIslandHomePage {
         DialogHelper.showToast($r('app.string.timeisland_toast_grace_haven_returned'));
       } else if (effect.messageKey === 'timeisland_toast_grace_haven_timeout') {
         DialogHelper.showToast($r('app.string.timeisland_toast_grace_haven_timeout'));
+      } else if (effect.messageKey === 'reflection_dialog_toast_saved') {
+        DialogHelper.showToast($r('app.string.reflection_dialog_toast_saved'));
+      }
+    } else if (effect.type === 'FOCUS_FINISHED') {
+      if (effect.recordId && effect.recordId > 0) {
+        this.completedRecordId = effect.recordId;
+        this.isReflectionDialogOpen = true;
       }
     } else if (effect.type === 'FLOW_TARGET_REACHED') {
       soundEffectManager.play(SoundEffectType.BUBBLE);
@@ -241,8 +315,10 @@ struct TimeIslandHomePage {
 
   build() {
     Column() {
-      // 1. 顶部 Header 与品牌标识 (提升为外部固定顶栏，无论切换哪个Tab均绝对居于同一位置)
-      this.buildTopHeader()
+      // 1. 顶部 Header 与品牌标识 (全屏沉浸模式下自动隐藏，平滑释放垂直空间)
+      if (!this.isZenImmersive) {
+        this.buildTopHeader()
+      }
 
       // 2. 主内容滚动视窗与底部常驻导航
       Stack({ alignContent: Alignment.Bottom }) {
@@ -256,14 +332,14 @@ struct TimeIslandHomePage {
               this.buildSinglePaneLayout()
             }
 
-            // 占位垫底，避免被底部导航遮挡 (动态避让手势安全区)
-            Blank().height(80 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0))
+            // 占位垫底，避免被底部导航遮挡 (全屏沉浸态下收缩垫底)
+            Blank().height(this.isZenImmersive ? 20 : (80 + (this.bottomNavHeight > 0 ? this.bottomNavHeight : 0)))
           }
           .width('100%')
           .padding({
             left: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
             right: (this.isFoldExpanded || this.currentBreakpoint !== 'sm') ? 20 : 16,
-            top: 8,
+            top: this.isZenImmersive ? (this.statusBarHeight > 0 ? this.statusBarHeight + 8 : 16) : 8,
             bottom: 20
           })
         }
@@ -271,14 +347,60 @@ struct TimeIslandHomePage {
         .width('100%')
         .height('100%')
 
-        // 9. 底部常驻禅意导航栏
-        this.buildBottomNavBar()
+        // 9. 底部常驻禅意导航栏 (全屏沉浸模式下自动优雅隐退)
+        if (!this.isZenImmersive) {
+          this.buildBottomNavBar()
+        }
+
+        // 沉浸全屏微晶退出按钮 (右上方半透明悬浮微晶，极致轻量)
+        if (this.isZenImmersive) {
+          Row({ space: 5 }) {
+            Image($r('app.media.ic_close'))
+              .width(13)
+              .height(13)
+              .fillColor(this.theme.textSecondary)
+
+            Text($r('app.string.timeisland_zen_immersive_exit'))
+              .fontSize(11)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.theme.textSecondary)
+          }
+          .padding({ left: 10, right: 12, top: 6, bottom: 6 })
+          .backgroundColor(this.theme.surfaceCard)
+          .borderRadius(16)
+          .border({ width: 1, color: this.theme.borderSubtle, radius: 16 })
+          .shadow({ radius: 12, color: this.theme.shadowCard, offsetY: 2 })
+          .position({ x: '100%', y: (this.statusBarHeight > 0 ? this.statusBarHeight : 0) + 12 })
+          .markAnchor({ x: '100%', y: 0 })
+          .margin({ right: 16 })
+          .onClick(() => {
+            soundEffectManager.play(SoundEffectType.PEN_CLICK);
+            hapticFeedbackHelper.trigger('tick');
+            this.isZenImmersive = false;
+            DialogHelper.showToast($r('app.string.timeisland_zen_immersive_toast_exit'));
+          })
+        }
 
         // 10. 生境主题流转切换弹窗
         ThemeSelectorDialog({
           visible: this.isThemeDialogOpen,
           onClose: () => {
             this.isThemeDialogOpen = false;
+          }
+        })
+
+        // 11. 心流随笔与打卡复盘弹窗
+        FocusReflectionDialog({
+          visible: this.isReflectionDialogOpen,
+          recordId: this.completedRecordId,
+          onSave: (recordId: number, note: string, rating: number) => {
+            this.isReflectionDialogOpen = false;
+            this.vm.dispatch(FocusTimerIntent.saveReflection(recordId, note, rating));
+            this.syncRecordToCalendar(recordId, note, rating);
+          },
+          onSkip: () => {
+            this.isReflectionDialogOpen = false;
+            this.syncRecordToCalendar(this.completedRecordId);
           }
         })
       }
@@ -289,6 +411,7 @@ struct TimeIslandHomePage {
     .height('100%')
     .backgroundColor(this.theme.bgCanvas)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .animation({ duration: 250, curve: Curve.FastOutSlowIn })
   }
 
   /**
@@ -300,6 +423,7 @@ struct TimeIslandHomePage {
       if (this.activeTab === 'biome') {
         // 生态 Tab: 动态晨昏地貌与微缩生境群岛
         IslandBiomeView({
+          allTimeMinutes: this.state.allTimeMinutes,
           todayMinutes: this.state.todayTotalMinutes,
           focusState: this.state.status,
           isFlowDrift: this.state.status === FocusState.FLOW_DRIFT
@@ -335,23 +459,25 @@ struct TimeIslandHomePage {
             })
         )
 
-        // 4. 时长选择胶囊
-        TimeDurationSelector({
-          selectedMinutes: this.state.selectedMinutes,
-          disabled: this.state.status !== FocusState.IDLE,
-          onSelectMinutes: (mins: number) => {
-            this.vm.dispatch(FocusTimerIntent.selectDuration(mins));
-          }
-        })
+        // 4. 时长选择胶囊与气韵标签 (全屏沉浸专注态下优雅隐去，留出极致通透的居中呼吸空间)
+        if (!this.isZenImmersive || this.state.status === FocusState.IDLE) {
+          TimeDurationSelector({
+            selectedMinutes: this.state.selectedMinutes,
+            disabled: this.state.status !== FocusState.IDLE,
+            onSelectMinutes: (mins: number) => {
+              this.vm.dispatch(FocusTimerIntent.selectDuration(mins));
+            }
+          })
 
-        // 5. 心流气韵场域标签
-        TagSelectorView({
-          tags: this.state.tags,
-          selectedTagId: this.state.currentTag ? this.state.currentTag.id : 1,
-          onSelectTag: (tag: FocusTag) => {
-            this.vm.dispatch(FocusTimerIntent.selectTag(tag));
-          }
-        })
+          // 5. 心流气韵场域标签
+          TagSelectorView({
+            tags: this.state.tags,
+            selectedTagId: this.state.currentTag ? this.state.currentTag.id : 1,
+            onSelectTag: (tag: FocusTag) => {
+              this.vm.dispatch(FocusTimerIntent.selectTag(tag));
+            }
+          })
+        }
 
         // 6. 核心操作控制中枢 (启航心流 / 息心)
         this.buildActionControls()
@@ -378,6 +504,7 @@ struct TimeIslandHomePage {
       Row({ space: 16 }) {
         Column({ space: 12 }) {
           IslandBiomeView({
+            allTimeMinutes: this.state.allTimeMinutes,
             todayMinutes: this.state.todayTotalMinutes,
             focusState: this.state.status,
             isFlowDrift: this.state.status === FocusState.FLOW_DRIFT
@@ -446,6 +573,7 @@ struct TimeIslandHomePage {
         // 主体：微缩生境群岛或核心罗盘
         if (this.dualPaneMode === 'biome') {
           IslandBiomeView({
+            allTimeMinutes: this.state.allTimeMinutes,
             todayMinutes: this.state.todayTotalMinutes,
             focusState: this.state.status,
             isFlowDrift: this.state.status === FocusState.FLOW_DRIFT
@@ -795,6 +923,38 @@ struct TimeIslandHomePage {
       .border({ width: 1, color: this.state.status === FocusState.FLOW_DRIFT ? this.theme.havenAmberBorder : this.theme.borderSubtle })
 
       Blank()
+
+      // 3. 全屏沉浸微晶胶囊 (专注运行态下显现，支持一键隐去非核心元素)
+      if (this.state.status !== FocusState.IDLE) {
+        Row({ space: 4 }) {
+          Image($r('app.media.ic_explore'))
+            .width(12)
+            .height(12)
+            .fillColor(this.isZenImmersive ? this.theme.primaryAccent : this.theme.textSecondary)
+
+          Text(this.isZenImmersive ? $r('app.string.timeisland_zen_immersive_exit') : $r('app.string.timeisland_zen_immersive_enter'))
+            .fontSize(11)
+            .fontColor(this.isZenImmersive ? this.theme.primaryAccent : this.theme.textSecondary)
+            .fontWeight(FontWeight.Medium)
+        }
+        .padding({ left: 8, right: 8, top: 5, bottom: 5 })
+        .backgroundColor(this.isZenImmersive ? this.theme.primaryAccentBg : this.theme.surfaceLow)
+        .borderRadius(14)
+        .border({
+          width: 1,
+          color: this.isZenImmersive ? this.theme.primaryAccentGlow : this.theme.borderSubtle,
+          radius: 14
+        })
+        .margin({ right: 6 })
+        .onClick(() => {
+          soundEffectManager.play(SoundEffectType.PEN_CLICK);
+          hapticFeedbackHelper.trigger('tick');
+          this.isZenImmersive = !this.isZenImmersive;
+          DialogHelper.showToast(this.isZenImmersive ?
+            $r('app.string.timeisland_zen_immersive_toast_enter') :
+            $r('app.string.timeisland_zen_immersive_toast_exit'));
+        })
+      }
 
       // 避风港守护微胶囊 (支持活跃态倒计时脉动与静态展示)
       Row({ space: 5 }) {

@@ -25,6 +25,7 @@ export default class EntryFormAbility extends FormExtensionAbility {
     hilog.info(DOMAIN, TAG, 'EntryFormAbility onAddForm called');
 
     const formId = want.parameters?.[formInfo.FormParam.IDENTITY_KEY] as string;
+    const dimension = (want.parameters?.[formInfo.FormParam.DIMENSION_KEY] as number) || 2;
 
     // 1. 依据现实自然时间推断岛屿晨昏槽位与多语言标题
     const biomeInfo = widgetSyncManager.getBiomeSlotAndTitle(this.context);
@@ -48,10 +49,11 @@ export default class EntryFormAbility extends FormExtensionAbility {
       10,
       15
     );
+    initialFormData.formDimension = dimension;
 
-    // 3. 异步注册活跃卡片 ID，预约 30 分钟后定时刷新以跟随晨昏自然流转
+    // 3. 异步注册活跃卡片 ID 及其规格，预约 30 分钟后定时刷新以跟随晨昏自然流转
     if (formId) {
-      widgetSyncManager.addActiveFormId(this.context, formId).then(() => {
+      widgetSyncManager.addActiveFormId(this.context, formId, dimension).then(() => {
         // 预约下一次自然时段刷新 (30 分钟)
         formProvider.setFormNextRefreshTime(formId, 30).catch((err: Error) => {
           hilog.warn(DOMAIN, TAG, 'Failed to set next refresh time: %{public}s', err.message);

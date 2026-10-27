@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { DialogHelper, DialogAction } from '@app/common';
+import { pasteboard } from '@kit.BasicServicesKit';
+import { DialogHelper, DialogAction, DialogType } from '@app/common';
 import { ThemePalette, ThemeMode } from '../theme/ThemeTypes';
 import { themeManager } from '../theme/ThemeManager';
 import { settingsManager } from '../data/SettingsManager';
@@ -11,6 +12,11 @@ import { FeedbackHelper } from '../utils/FeedbackHelper';
 import { accountManager } from '../utils/AccountManager';
 import { timeIslandRepository } from '../data/TimeIslandRepository';
 import { GUEST_USER_ID } from '../model/UserModel';
+import { hapticFeedbackHelper } from '../utils/HapticFeedbackHelper';
+import { LegalNoticeDialog, LegalNoticeType } from '../components/LegalNoticeDialog';
+import { DataRestoreDialog } from '../components/DataRestoreDialog';
+import { calendarSyncManager } from '../utils/CalendarSyncManager';
+import { nearLinkSanctuaryManager } from '../utils/NearLinkSanctuaryManager';
 
 const DOMAIN = 0x0000;
 const TAG = 'TimeIslandSettings';
@@ -49,8 +55,17 @@ struct TimeIslandSettingsPage {
   @StorageProp('isHapticFeedbackEnabled') isHaptic: boolean = true;
   @StorageProp('isSoundAlertEnabled') isSoundAlert: boolean = true;
   @StorageProp('isBiometricEnabled') isBiometric: boolean = false;
+  @StorageProp('isCloudSyncEnabled') isCloudSync: boolean = true;
+  @StorageProp('isWidgetSyncEnabled') isWidgetSync: boolean = true;
+  @StorageProp('isCardAutoNoiseEnabled') isCardAutoNoise: boolean = true;
+  @StorageProp('isSolarTermNoticeEnabled') isSolarTermNotice: boolean = true;
+  @StorageProp('isCalendarSyncEnabled') isCalendarSync: boolean = true;
 
   @State private isThemeDialogOpen: boolean = false;
+  @State private isLegalDialogOpen: boolean = false;
+  @State private activeLegalType: LegalNoticeType = LegalNoticeType.PRIVACY;
+  @State private localRecordCount: number = 0;
+  @State private isRestoreDialogOpen: boolean = false;
   @State private biometricCapability: BiometricCapability = {
     isSupported: false,
     hasFingerprint: false,
@@ -62,6 +77,15 @@ struct TimeIslandSettingsPage {
 
   aboutToAppear(): void {
     this.biometricCapability = biometricAuthManager.checkCapability();
+    this.loadRecordCount();
+  }
+
+  private async loadRecordCount(): Promise<void> {
+    try {
+      this.localRecordCount = await timeIslandRepository.getTotalRecordCount();
+    } catch (_err) {
+      this.localRecordCount = 0;
+    }
   }
 
   build() {
@@ -91,6 +115,9 @@ struct TimeIslandSettingsPage {
             // 分组五: 触感与声音反馈
             this.buildFeedbackGroup()
 
+            // 分组五点五: 数据管理与存储 (闭环隐私承诺与数据自主权)
+            this.buildDataManagementGroup()
+
             // 分组六: 关于时光岛
             this.buildAboutGroup()
 
@@ -117,6 +144,32 @@ struct TimeIslandSettingsPage {
       })
       .width('100%')
       .height(this.isThemeDialogOpen ? '100%' : 0)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+
+      // 华为应用市场合规套件: 法务与隐私保护政策弹窗
+      LegalNoticeDialog({
+        visible: this.isLegalDialogOpen,
+        activeType: this.activeLegalType,
+        onClose: () => {
+          this.isLegalDialogOpen = false;
+        }
+      })
+      .width('100%')
+      .height(this.isLegalDialogOpen ? '100%' : 0)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+
+      // 数据导入恢复弹窗
+      DataRestoreDialog({
+        visible: this.isRestoreDialogOpen,
+        onClose: () => {
+          this.isRestoreDialogOpen = false;
+        },
+        onRestoreSuccess: (_imported: number, _skipped: number) => {
+          this.loadRecordCount();
+        }
+      })
+      .width('100%')
+      .height(this.isRestoreDialogOpen ? '100%' : 0)
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
     }
     .width('100%')
@@ -367,8 +420,83 @@ struct TimeIslandSettingsPage {
           $r('app.string.timeisland_settings_nearlink'),
           $r('app.string.timeisland_settings_nearlink_desc'),
           this.isNearlink,
+          async (val: boolean) => {
+            if (val && nearLinkSanctuaryManager.isHardwareSupported()) {
+              const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+              const granted = await nearLinkSanctuaryManager.requestNearLinkPermission(context);
+              if (granted) {
+                settingsManager.setBoolean('is_nearlink', true, 'isNearlinkEnabled');
+              } else {
+                AppStorage.setOrCreate('isNearlinkEnabled', false);
+              }
+            } else {
+              settingsManager.setBoolean('is_nearlink', val, 'isNearlinkEnabled');
+            }
+          },
+          true
+        )
+
+        // 3. 桌面卡片万物互联协同
+        this.buildSwitchItem(
+          $r('app.string.settings_widget_sync'),
+          $r('app.string.settings_widget_sync_desc'),
+          this.isWidgetSync,
           (val: boolean) => {
-            settingsManager.setBoolean('is_nearlink', val, 'isNearlinkEnabled');
+            settingsManager.setBoolean('is_widget_sync', val, 'isWidgetSyncEnabled');
+          },
+          true
+        )
+
+        // 4. 卡片起航伴随自然白噪音
+        this.buildSwitchItem(
+          $r('app.string.settings_card_auto_noise'),
+          $r('app.string.settings_card_auto_noise_desc'),
+          this.isCardAutoNoise,
+          (val: boolean) => {
+            settingsManager.setBoolean('is_card_auto_noise', val, 'isCardAutoNoiseEnabled');
+          },
+          true
+        )
+
+        // 5. 二十四节气岁时物候提醒
+        this.buildSwitchItem(
+          $r('app.string.settings_solar_term_notice'),
+          $r('app.string.settings_solar_term_notice_desc'),
+          this.isSolarTermNotice,
+          (val: boolean) => {
+            settingsManager.setBoolean('is_solar_term_notice', val, 'isSolarTermNoticeEnabled');
+          },
+          true
+        )
+
+        // 6. 系统日历心流日程同步
+        this.buildSwitchItem(
+          $r('app.string.settings_calendar_sync'),
+          $r('app.string.settings_calendar_sync_desc'),
+          this.isCalendarSync,
+          async (val: boolean) => {
+            if (val) {
+              const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+              const granted = await calendarSyncManager.requestPermission(context);
+              if (granted) {
+                settingsManager.setBoolean('is_calendar_sync', true, 'isCalendarSyncEnabled');
+              } else {
+                DialogHelper.showToast($r('app.string.settings_calendar_permission_denied'));
+                AppStorage.setOrCreate('isCalendarSyncEnabled', false);
+              }
+            } else {
+              settingsManager.setBoolean('is_calendar_sync', false, 'isCalendarSyncEnabled');
+            }
+          },
+          true
+        )
+
+        // 7. 将历史记录同步至系统日历
+        this.buildActionItem(
+          $r('app.string.settings_calendar_export'),
+          $r('app.string.settings_calendar_export_desc'),
+          () => {
+            this.handleExportAllToCalendar();
           },
           false
         )
@@ -820,6 +948,253 @@ struct TimeIslandSettingsPage {
   }
 
   /**
+   * 分组五点五: 数据管理与存储 (闭环隐私承诺与数据自主权)
+   */
+  @Builder
+  private buildDataManagementGroup() {
+    Column({ space: 12 }) {
+      Text($r('app.string.settings_group_data_management'))
+        .fontSize(12)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.theme.textSecondary)
+        .margin({ left: 4 })
+
+      Column({ space: 0 }) {
+        // 1. 本地存储概览行
+        Row() {
+          Column({ space: 3 }) {
+            Text($r('app.string.settings_data_storage_title'))
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.theme.textPrimary)
+
+            Text(this.localRecordCount > 0 ?
+              $r('app.string.settings_data_storage_count_desc', this.localRecordCount) :
+              $r('app.string.settings_data_storage_empty'))
+              .fontSize(11)
+              .fontColor(this.theme.textMuted)
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start)
+
+          Text(`${this.localRecordCount}`)
+            .fontSize(13)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.theme.primaryAccent)
+            .padding({ left: 8, right: 8, top: 2, bottom: 2 })
+            .backgroundColor(this.theme.primaryAccentBg)
+            .borderRadius(8)
+        }
+        .width('100%')
+        .padding(16)
+        .border({ width: { bottom: 1 }, color: this.theme.borderSubtle })
+
+        // 2. 华为云空间端云同步漫游开关
+        this.buildSwitchItem(
+          $r('app.string.settings_cloud_sync_title'),
+          $r('app.string.settings_cloud_sync_desc'),
+          this.isCloudSync,
+          (val: boolean) => {
+            if (val && !this.isLoggedIn) {
+              DialogHelper.showToast($r('app.string.settings_cloud_sync_require_login'));
+            }
+            settingsManager.setBoolean('is_cloud_sync', val, 'isCloudSyncEnabled');
+            if (val) {
+              DialogHelper.showToast($r('app.string.settings_cloud_sync_toast_enabled'));
+              timeIslandRepository.triggerCloudSync().catch(() => {});
+            } else {
+              DialogHelper.showToast($r('app.string.settings_cloud_sync_toast_disabled'));
+            }
+          },
+          true
+        )
+
+        // 3. 导出心流数据
+        this.buildActionItem(
+          $r('app.string.settings_data_export_title'),
+          $r('app.string.settings_data_export_desc'),
+          () => {
+            this.handleExportData();
+          },
+          true
+        )
+
+        // 3. 从备份恢复数据
+        this.buildActionItem(
+          $r('app.string.settings_data_import_title'),
+          $r('app.string.settings_data_import_desc'),
+          () => {
+            this.isRestoreDialogOpen = true;
+          },
+          true
+        )
+
+        // 4. 安全抹除所有数据 (警戒红/橙强调色)
+        Row() {
+          Column({ space: 3 }) {
+            Text($r('app.string.settings_data_wipe_title'))
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.theme.havenAmber)
+
+            Text($r('app.string.settings_data_wipe_desc'))
+              .fontSize(11)
+              .fontColor(this.theme.textMuted)
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start)
+          .margin({ right: 12 })
+
+          Image($r('app.media.ic_chevron_right'))
+            .width(18)
+            .height(18)
+            .fillColor(this.theme.havenAmber)
+        }
+        .width('100%')
+        .padding(16)
+        .onClick(() => {
+          soundEffectManager.play(SoundEffectType.PEN_CLICK);
+          hapticFeedbackHelper.trigger('tick');
+          this.handleWipeData();
+        })
+      }
+      .backgroundColor(this.theme.surfaceCard)
+      .borderRadius(16)
+      .border({ width: 1, color: this.theme.borderCard })
+      .shadow({ radius: 12, color: this.theme.shadowCard, offsetY: 2 })
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start)
+  }
+
+  /**
+   * 导出心流备份数据至剪贴板
+   */
+  private async handleExportData(): Promise<void> {
+    try {
+      if (this.localRecordCount === 0) {
+        DialogHelper.showToast($r('app.string.settings_data_export_empty'));
+        return;
+      }
+      const jsonStr = await timeIslandRepository.exportAllRecordsJson();
+      const pData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, jsonStr);
+      const pb = pasteboard.getSystemPasteboard();
+      await pb.setData(pData);
+      hapticFeedbackHelper.trigger('complete');
+      soundEffectManager.play(SoundEffectType.BUBBLE);
+      DialogHelper.showToast($r('app.string.settings_data_export_success'));
+    } catch (_err) {
+      DialogHelper.showToast($r('app.string.settings_data_export_empty'));
+    }
+  }
+
+  /**
+   * 将本地沙箱所有历史记录批量同步写入 HarmonyOS 原生系统日历
+   */
+  private async handleExportAllToCalendar(): Promise<void> {
+    if (this.localRecordCount === 0) {
+      DialogHelper.showToast($r('app.string.settings_data_export_empty'));
+      return;
+    }
+
+    let confirmTitle = 'Sync to Calendar';
+    let confirmMsg = 'Sync all records to system calendar?';
+    let confirmText = 'Confirm';
+    let cancelText = 'Cancel';
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      const rm = context.resourceManager;
+      confirmTitle = rm.getStringSync($r('app.string.settings_calendar_export_confirm_title').id);
+      confirmMsg = rm.getStringSync($r('app.string.settings_calendar_export_confirm_msg').id);
+      confirmText = rm.getStringSync($r('app.string.settings_data_wipe_dialog_confirm').id);
+      cancelText = rm.getStringSync($r('app.string.settings_data_wipe_dialog_cancel').id);
+    } catch (_e) {}
+
+    const res = await DialogHelper.showDialog({
+      type: DialogType.CONFIRM,
+      title: confirmTitle,
+      message: confirmMsg,
+      confirmText: confirmText,
+      cancelText: cancelText,
+      isDanger: false
+    });
+
+    if (res.action === DialogAction.CONFIRM) {
+      try {
+        const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+        const result = await calendarSyncManager.syncAllRecordsToCalendar(context);
+        if (result.synced > 0) {
+          hapticFeedbackHelper.trigger('complete');
+          soundEffectManager.play(SoundEffectType.BUBBLE);
+          DialogHelper.showToast($r('app.string.settings_calendar_export_success'));
+        } else {
+          DialogHelper.showToast($r('app.string.settings_data_export_empty'));
+        }
+      } catch (_err) {
+        DialogHelper.showToast($r('app.string.settings_calendar_permission_denied'));
+      }
+    }
+  }
+
+  /**
+   * 安全抹除本地所有专注历史数据 (强身份鉴权 + 危险二次弹窗)
+   */
+  private async handleWipeData(): Promise<void> {
+    if (this.localRecordCount === 0) {
+      DialogHelper.showToast($r('app.string.settings_data_export_empty'));
+      return;
+    }
+
+    // 若开启了生物特征保护，执行人脸/指纹安全鉴权
+    if (this.isBiometric) {
+      let authTitle = 'Verify Identity';
+      try {
+        const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+        authTitle = context.resourceManager.getStringSync($r('app.string.settings_data_wipe_auth_prompt').id);
+      } catch (_e) {
+        authTitle = 'Verify Identity';
+      }
+      const passed = await biometricAuthManager.authenticate(authTitle);
+      if (!passed) {
+        DialogHelper.showToast($r('app.string.timeisland_toast_biometric_failed'));
+        return;
+      }
+    }
+
+    let confirmTitle = 'Clear Data';
+    let confirmMsg = 'Are you sure?';
+    let confirmText = 'Confirm';
+    let cancelText = 'Cancel';
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      const rm = context.resourceManager;
+      confirmTitle = rm.getStringSync($r('app.string.settings_data_wipe_dialog_title').id);
+      confirmMsg = rm.getStringSync($r('app.string.settings_data_wipe_dialog_msg').id);
+      confirmText = rm.getStringSync($r('app.string.settings_data_wipe_dialog_confirm').id);
+      cancelText = rm.getStringSync($r('app.string.settings_data_wipe_dialog_cancel').id);
+    } catch (_e) {}
+
+    const res = await DialogHelper.showDialog({
+      type: DialogType.CONFIRM,
+      title: confirmTitle,
+      message: confirmMsg,
+      confirmText: confirmText,
+      cancelText: cancelText,
+      isDanger: true
+    });
+
+    if (res.action === DialogAction.CONFIRM) {
+      await timeIslandRepository.wipeAllRecords();
+      this.localRecordCount = 0;
+      hapticFeedbackHelper.trigger('warning');
+      soundEffectManager.play(SoundEffectType.SWITCH_CLOSE);
+      DialogHelper.showToast($r('app.string.settings_data_wipe_success'));
+    }
+  }
+
+  /**
    * 分组六: 关于时光岛
    */
   @Builder
@@ -859,34 +1234,48 @@ struct TimeIslandSettingsPage {
         .padding(16)
         .border({ width: { bottom: 1 }, color: this.theme.borderSubtle })
 
-        // 2. 建议与灵感反馈入口 (保留副标题小字)
-        Row() {
-          Column({ space: 3 }) {
-            Text($r('app.string.timeisland_settings_feedback_title'))
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.theme.textPrimary)
-            Text($r('app.string.timeisland_settings_feedback_desc'))
-              .fontSize(11)
-              .fontColor(this.theme.textMuted)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-          }
-          .layoutWeight(1)
-          .alignItems(HorizontalAlign.Start)
-          .margin({ right: 12 })
+        // 2. 建议与灵感反馈入口
+        this.buildActionItem(
+          $r('app.string.timeisland_settings_feedback_title'),
+          $r('app.string.timeisland_settings_feedback_desc'),
+          () => {
+            FeedbackHelper.openFeedback(this.getUIContext());
+          },
+          true
+        )
 
-          Image($r('app.media.ic_chevron_right'))
-            .width(18)
-            .height(18)
-            .fillColor(this.theme.textSecondary)
-        }
-        .width('100%')
-        .padding(16)
-        .onClick(() => {
-          soundEffectManager.play(SoundEffectType.PEN_CLICK);
-          FeedbackHelper.openFeedback(this.getUIContext());
-        })
+        // 3. 用户服务协议
+        this.buildActionItem(
+          $r('app.string.timeisland_settings_user_agreement_title'),
+          $r('app.string.timeisland_settings_user_agreement_desc'),
+          () => {
+            this.activeLegalType = LegalNoticeType.AGREEMENT;
+            this.isLegalDialogOpen = true;
+          },
+          true
+        )
+
+        // 4. 隐私保护政策 (华为应用市场重点合规项)
+        this.buildActionItem(
+          $r('app.string.timeisland_settings_privacy_policy_title'),
+          $r('app.string.timeisland_settings_privacy_policy_desc'),
+          () => {
+            this.activeLegalType = LegalNoticeType.PRIVACY;
+            this.isLegalDialogOpen = true;
+          },
+          true
+        )
+
+        // 5. 开源许可与致谢
+        this.buildActionItem(
+          $r('app.string.timeisland_settings_open_source_title'),
+          $r('app.string.timeisland_settings_open_source_desc'),
+          () => {
+            this.activeLegalType = LegalNoticeType.OPEN_SOURCE;
+            this.isLegalDialogOpen = true;
+          },
+          false
+        )
       }
       .backgroundColor(this.theme.surfaceCard)
       .borderRadius(16)
@@ -895,6 +1284,47 @@ struct TimeIslandSettingsPage {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
+  }
+
+  /**
+   * 通用导航跳转条目抽取组件
+   */
+  @Builder
+  private buildActionItem(
+    title: Resource,
+    desc: Resource,
+    onClick: () => void,
+    hasDivider: boolean
+  ) {
+    Row() {
+      Column({ space: 3 }) {
+        Text(title)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.theme.textPrimary)
+        Text(desc)
+          .fontSize(11)
+          .fontColor(this.theme.textMuted)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start)
+      .margin({ right: 12 })
+
+      Image($r('app.media.ic_chevron_right'))
+        .width(18)
+        .height(18)
+        .fillColor(this.theme.textSecondary)
+    }
+    .width('100%')
+    .padding(16)
+    .border(hasDivider ? { width: { bottom: 1 }, color: this.theme.borderSubtle } : undefined)
+    .onClick(() => {
+      soundEffectManager.play(SoundEffectType.PEN_CLICK);
+      hapticFeedbackHelper.trigger('tick');
+      onClick();
+    })
   }
 
   /**

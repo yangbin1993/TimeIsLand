@@ -2,6 +2,7 @@ import { formBindingData, formProvider } from '@kit.FormKit';
 import { preferences } from '@kit.ArkData';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Configuration } from '@kit.AbilityKit';
+import { SolarTermHelper } from './SolarTermHelper';
 
 const DOMAIN = 0x0000;
 const TAG = 'WidgetSyncManager';
@@ -9,7 +10,10 @@ const PREF_WIDGET_SYNC = 'timeisland_widget_sync';
 const KEY_ACTIVE_FORMS = 'active_forms';
 const KEY_TODAY_MINUTES = 'today_minutes';
 const KEY_TODAY_COUNT = 'today_count';
+const KEY_ALL_TIME_MINUTES = 'all_time_minutes';
+const KEY_STREAK_DAYS = 'streak_days';
 const KEY_CURRENT_TAG = 'current_tag';
+const KEY_IS_NEARLINK_ACTIVE = 'is_nearlink_active';
 
 /**
  * 晨昏槽位与多语言标题模型
@@ -20,15 +24,23 @@ export interface BiomeSlotInfo {
 }
 
 /**
- * 桌面卡片绑定的强类型数据结构
+ * 桌面卡片绑定的强类型数据结构 (全面支持万物互联、生境境界与节气朱印)
  */
 export class IslandCardFormData {
+  public formDimension: number = 2; // 2: 2x2, 3: 2x4
   public todayMinutes: number = 0;
   public todayCompletedCount: number = 0;
+  public allTimeMinutes: number = 0;
   public currentTag: string = '';
   public biomeSlot: string = 'DAY';
   public biomeTitle: string = '';
   public lakeStoragePercent: number = 50;
+  public realmName: string = '';
+  public realmLevel: number = 1;
+  public solarTermName: string = '';
+  public solarTermSeal: string = '';
+  public isNearLinkActive: boolean = false;
+  public streakDays: number = 0;
   public defaultDuration: number = 15;
 
   constructor(
@@ -101,20 +113,26 @@ export class WidgetSyncManager {
   /**
    * 构造最新的卡片视图绑定数据实体
    */
-  public async buildLatestFormData(context: Context): Promise<IslandCardFormData> {
+  public async buildLatestFormData(context: Context, dimension: number = 2): Promise<IslandCardFormData> {
     const biomeInfo = this.getBiomeSlotAndTitle(context);
     const biomeSlot = biomeInfo.slot;
     const biomeTitle = biomeInfo.title;
 
     let todayMins = 0;
     let todayCount = 0;
+    let allTimeMins = 0;
+    let streakDays = 0;
     let currentTag = '';
+    let isNearLinkActive = false;
 
     try {
       const pref = await preferences.getPreferences(context, PREF_WIDGET_SYNC);
       todayMins = await pref.get(KEY_TODAY_MINUTES, 0) as number;
       todayCount = await pref.get(KEY_TODAY_COUNT, 0) as number;
+      allTimeMins = await pref.get(KEY_ALL_TIME_MINUTES, 0) as number;
+      streakDays = await pref.get(KEY_STREAK_DAYS, 0) as number;
       currentTag = await pref.get(KEY_CURRENT_TAG, '') as string;
+      isNearLinkActive = await pref.get(KEY_IS_NEARLINK_ACTIVE, false) as boolean;
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'Failed to read widget sync preference: %{public}s', JSON.stringify(err));
     }
@@ -127,10 +145,36 @@ export class WidgetSyncManager {
       }
     }
 
+    // 节气与印章推算
+    let solarTermName = '';
+    let solarTermSeal = '';
+    try {
+      const termId = SolarTermHelper.getCurrentTermId();
+      const allTerms = SolarTermHelper.getAllTerms();
+      const currentTerm = allTerms.find(t => t.id === termId);
+      if (currentTerm) {
+        solarTermName = context.resourceManager.getStringSync(currentTerm.nameRes.id);
+        solarTermSeal = context.resourceManager.getStringSync(currentTerm.sealRes.id);
+      }
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, 'Failed to resolve solar term strings: %{public}s', JSON.stringify(err));
+    }
+
+    // 生境四大境界计算
+    let realmName = '';
+    let realmLevel = 1;
+    try {
+      const realmInfo = SolarTermHelper.computeRealm(allTimeMins);
+      realmName = context.resourceManager.getStringSync(realmInfo.nameRes.id);
+      realmLevel = realmInfo.level;
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, 'Failed to resolve realm strings: %{public}s', JSON.stringify(err));
+    }
+
     // 湖泊水位：基准 120 分钟满蓄 (10% ~ 100%)
     const lakeStoragePercent = Math.min(100, Math.max(10, Math.round((todayMins / 120) * 100)));
 
-    return new IslandCardFormData(
+    const formData = new IslandCardFormData(
       todayMins,
       todayCount,
       currentTag,
@@ -139,12 +183,22 @@ export class WidgetSyncManager {
       lakeStoragePercent,
       15
     );
+    formData.formDimension = dimension;
+    formData.allTimeMinutes = allTimeMins;
+    formData.realmName = realmName;
+    formData.realmLevel = realmLevel;
+    formData.solarTermName = solarTermName;
+    formData.solarTermSeal = solarTermSeal;
+    formData.isNearLinkActive = isNearLinkActive;
+    formData.streakDays = streakDays;
+
+    return formData;
   }
 
   /**
-   * 注册活跃的桌面卡片 ID
+   * 注册活跃的桌面卡片 ID 及其规格
    */
-  public async addActiveFormId(context: Context, formId: string): Promise<void> {
+  public async addActiveFormId(context: Context, formId: string, dimension: number = 2): Promise<void> {
     try {
       const pref = await preferences.getPreferences(context, PREF_WIDGET_SYNC);
       const rawList = await pref.get(KEY_ACTIVE_FORMS, '[]') as string;
@@ -152,8 +206,9 @@ export class WidgetSyncManager {
       if (!ids.includes(formId)) {
         ids.push(formId);
         await pref.put(KEY_ACTIVE_FORMS, JSON.stringify(ids));
-        await pref.flush();
       }
+      await pref.put(`form_dim_${formId}`, dimension);
+      await pref.flush();
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'Failed to add active form ID: %{public}s', JSON.stringify(err));
     }
@@ -169,6 +224,7 @@ export class WidgetSyncManager {
       let ids: string[] = JSON.parse(rawList) as string[];
       ids = ids.filter(id => id !== formId);
       await pref.put(KEY_ACTIVE_FORMS, JSON.stringify(ids));
+      await pref.delete(`form_dim_${formId}`);
       await pref.flush();
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'Failed to remove active form ID: %{public}s', JSON.stringify(err));
@@ -193,10 +249,12 @@ export class WidgetSyncManager {
    */
   public async updateSingleForm(context: Context, formId: string): Promise<void> {
     try {
-      const formData = await this.buildLatestFormData(context);
+      const pref = await preferences.getPreferences(context, PREF_WIDGET_SYNC);
+      const dimension = await pref.get(`form_dim_${formId}`, 2) as number;
+      const formData = await this.buildLatestFormData(context, dimension);
       const binding = formBindingData.createFormBindingData(formData);
       await formProvider.updateForm(formId, binding);
-      hilog.info(DOMAIN, TAG, `Form updated: id=${formId}, slot=${formData.biomeSlot}, mins=${formData.todayMinutes}`);
+      hilog.info(DOMAIN, TAG, `Form updated: id=${formId}, dim=${dimension}, slot=${formData.biomeSlot}, mins=${formData.todayMinutes}`);
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'Failed to update form %{public}s: %{public}s', formId, JSON.stringify(err));
     }
@@ -229,13 +287,23 @@ export class WidgetSyncManager {
     context: Context,
     todayMinutes: number,
     todayCount: number,
-    currentTagName: string
+    currentTagName: string,
+    allTimeMinutes: number = 0,
+    streakDays: number = 0,
+    isNearLinkActive: boolean = false
   ): Promise<void> {
     try {
       const pref = await preferences.getPreferences(context, PREF_WIDGET_SYNC);
       await pref.put(KEY_TODAY_MINUTES, todayMinutes);
       await pref.put(KEY_TODAY_COUNT, todayCount);
       await pref.put(KEY_CURRENT_TAG, currentTagName);
+      if (allTimeMinutes > 0) {
+        await pref.put(KEY_ALL_TIME_MINUTES, allTimeMinutes);
+      }
+      if (streakDays > 0) {
+        await pref.put(KEY_STREAK_DAYS, streakDays);
+      }
+      await pref.put(KEY_IS_NEARLINK_ACTIVE, isNearLinkActive);
       await pref.flush();
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'Failed to persist focus data to widget preference: %{public}s', JSON.stringify(err));

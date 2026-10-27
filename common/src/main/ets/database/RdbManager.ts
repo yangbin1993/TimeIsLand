@@ -111,6 +111,27 @@ export class RdbManager {
     }
   }
 
+  /**
+   * 触发端云增量同步 (当登录华为账号且网络就绪时由上层调度)
+   */
+  public async syncCloud(mode: relationalStore.SyncMode = relationalStore.SyncMode.SYNC_MODE_TIME_FIRST): Promise<boolean> {
+    try {
+      if (!this.rdbStore) {
+        return false;
+      }
+      if (typeof this.rdbStore.cloudSync === 'function') {
+        await this.rdbStore.cloudSync(mode, (progressDetails: relationalStore.ProgressDetails) => {
+          hilog.info(DOMAIN, TAG, `Cloud sync progress: ${JSON.stringify(progressDetails)}`);
+        });
+        return true;
+      }
+      return false;
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, `Cloud sync skipped or running in mock environment: ${(err as Error).message}`);
+      return false;
+    }
+  }
+
   // ==================== 私有初始化方法 ====================
 
   /**
@@ -127,7 +148,7 @@ export class RdbManager {
     };
 
     const store = await relationalStore.getRdbStore(this.context, storeConfig);
-    hilog.info(DOMAIN, TAG, `RdbStore opened: ${this.config.name}`);
+    hilog.info(DOMAIN, TAG, `RdbStore opened: ${this.config.name}, isCloudSync=${this.config.isCloudSync}`);
 
     // 执行版本管理（建表 + Migration）
     const currentVersion = store.version;

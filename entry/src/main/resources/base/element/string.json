@@ -1459,6 +1459,810 @@
     {
       "name": "timeisland_feedback_footer_note",
       "value": "免登录直连 · 您的意见将秒级送达开发者微信"
+    },
+    {
+      "name": "timeisland_settings_user_agreement_title",
+      "value": "用户服务协议"
+    },
+    {
+      "name": "timeisland_settings_user_agreement_desc",
+      "value": "阅读时光岛服务准则与使用规范"
+    },
+    {
+      "name": "timeisland_settings_privacy_policy_title",
+      "value": "隐私保护政策"
+    },
+    {
+      "name": "timeisland_settings_privacy_policy_desc",
+      "value": "纯端私有沙箱隔离与数据自主权说明"
+    },
+    {
+      "name": "timeisland_settings_open_source_title",
+      "value": "开源许可与致谢"
+    },
+    {
+      "name": "timeisland_settings_open_source_desc",
+      "value": "致敬开放开源生态与东方禅意灵感"
+    },
+    {
+      "name": "timeisland_legal_dialog_title",
+      "value": "法务与合规中心"
+    },
+    {
+      "name": "timeisland_legal_tab_agreement",
+      "value": "用户协议"
+    },
+    {
+      "name": "timeisland_legal_tab_privacy",
+      "value": "隐私政策"
+    },
+    {
+      "name": "timeisland_legal_tab_opensource",
+      "value": "开源许可"
+    },
+    {
+      "name": "timeisland_legal_btn_confirm",
+      "value": "已充分阅读并知晓"
+    },
+    {
+      "name": "timeisland_legal_update_time",
+      "value": "生效与更新日期：2026年10月"
+    },
+    {
+      "name": "timeisland_agreement_content",
+      "value": "【特别提示】\n欢迎使用时光岛（TimeIsland）。在开启您的沉浸心流之旅前，请仔细阅读本《用户服务协议》。\n\n一、服务性质与宗旨\n时光岛是一款基于心流理论与 HarmonyOS NEXT 原生架构打造的专注与时间能量管理工具。旨在为用户提供纯粹、沉浸、无干扰的专注与呼吸空间。\n\n二、用户行为规范\n1. 您应当合法、合规地使用本应用，不得利用本应用从事任何违反法律法规或侵犯他人合法权益的活动。\n2. 时光岛提倡身心自律与高效专注，本应用所提供的专注记录、生境白噪音仅供个人日常效率与身心舒缓参考。\n\n三、知识产权声明\n时光岛内包含的所有视觉设计（包括但不限于岛屿生境微气候动效、环形罗盘、微晶磨砂质感）、原创音效、软件代码与商标版权均归开发者合法所有。\n\n四、服务变更与终止\n我们持续致力于优化应用性能与禅意体验，保留在必要时调整或升级应用功能的权利。如您对本协议条款有任何疑问，可通过应用内建议通道或开发者邮箱与我们取得联系。"
+    },
+    {
+      "name": "timeisland_privacy_content",
+      "value": "【特别承诺：100% 纯端私有沙箱存储 · 零个人隐私上传】\n时光岛高度尊重并坚定守护您的个人隐私安全。本隐私政策向您清晰说明我们对数据的处理原则。\n\n一、我们如何收集与使用信息\n1. 专注与时间数据：您在应用中产生的所有专注时长、标签分类、打卡历史均通过 SQLite 存储在设备私有私密沙箱内。我们绝不会将您的专注记录上传至任何外部服务器。\n2. 偏好配置：您的主题配色、白噪音音量、避风港时长等设置均以键值对保存在本地 Preferences 中。\n3. 用户主动反馈：仅在您使用「建议与灵感反馈」功能并主动点击投递时，我们才会传输您在界面输入的反馈文本及选填联系方式，用于产品改进与回复。\n\n二、权限调用声明\n本应用遵循“权限最小化”原则，绝无多余索权：\n1. 触感微振动 (VIBRATE)：用于为按键交互、计时完成提供细腻触觉反馈，不收集任何用户数据；\n2. 星闪近场 (ACCESS_NEARLINK)：仅用于近场双子岛伴读设备的无声发现结对，传输仅在两台设备近场直接完成；\n3. 网络访问 (INTERNET)：仅用于用户主动投递反馈及 APMS 基础质量诊断，绝不在后台静默收集用户隐私。\n\n三、华为生态协同与第三方 Kit\n1. 华为账号 (AccountKit)：用于在本地建立数据归属与迁移映射，无需上传外部服务器；\n2. 桌面元服务 (FormKit)：仅在本地广播通知桌面卡片刷新水位与晨昏微气候；\n3. 性能监控 (APMS)：仅收集应用启动性能与页面帧率指标，不涉及任何可识别个人身份的信息。\n\n四、您的数据控制权\n您对保存在本设备上的所有数据拥有绝对控制权。您可随时在「设置 - 清空缓存与数据」中彻底抹除所有历史记录。卸载本应用将自动完全销毁私有沙箱内的所有残留数据。\n\n五、开发者联系方式\n如有任何隐私疑虑，欢迎致信开发者邮箱：timeisland_feedback@163.com"
+    },
+    {
+      "name": "timeisland_opensource_content",
+      "value": "时光岛遵循开放共享的开源精神，在构建现代化鸿蒙原生应用的过程中，离不开以下优秀开源技术与开源协议的支持：\n\n1. OpenHarmony / HarmonyOS NEXT SDK\n- 协议：Apache License 2.0\n- 范围：ArkUI 声明式组件、ArkTS 运行时及官方 Kit 系统能力\n\n2. Clean Architecture & MVI Pattern Implementation\n- 协议：MIT License\n- 范围：单向事件流动状态机与轻量级依赖注入基座\n\n3. Pure Vector Graphic Icons & Sound Wave Assets\n- 协议：CC BY 4.0 / MIT\n- 鸣谢：开源矢量图标库与自然环境音景开源样本\n\n【致谢】\n感谢所有参与时光岛早期测试、反馈优化并提出宝贵建议的鸿蒙开发者与心流探索者。愿时光岛陪伴您度过每一个专注与宁静的时刻。"
+    },
+    {
+      "name": "settings_group_data_management",
+      "value": "数据管理与存储"
+    },
+    {
+      "name": "settings_data_storage_title",
+      "value": "本地专注数据"
+    },
+    {
+      "name": "settings_data_storage_desc_prefix",
+      "value": "已存储 "
+    },
+    {
+      "name": "settings_data_storage_desc_suffix",
+      "value": " 条心流记录 · 100% 离线私有沙箱"
+    },
+    {
+      "name": "settings_data_storage_empty",
+      "value": "暂无专注记录 · 100% 离线私有沙箱"
+    },
+    {
+      "name": "settings_data_export_title",
+      "value": "导出心流数据"
+    },
+    {
+      "name": "settings_data_export_desc",
+      "value": "将所有专注历史记录汇总并导出为结构化 JSON 备份"
+    },
+    {
+      "name": "settings_data_export_success",
+      "value": "已复制心流备份数据至剪贴板"
+    },
+    {
+      "name": "settings_data_export_empty",
+      "value": "当前暂无可导出的专注记录"
+    },
+    {
+      "name": "settings_data_wipe_title",
+      "value": "安全抹除所有数据"
+    },
+    {
+      "name": "settings_data_wipe_desc",
+      "value": "彻底清空本地私有数据库中的历史专注明细（不可恢复）"
+    },
+    {
+      "name": "settings_data_wipe_dialog_title",
+      "value": "清空所有专注历史？"
+    },
+    {
+      "name": "settings_data_wipe_dialog_msg",
+      "value": "此操作将彻底删除本地沙箱中保存的全部专注明细与打卡流水记录，此操作不可逆。是否确认彻底抹除？"
+    },
+    {
+      "name": "settings_data_wipe_dialog_confirm",
+      "value": "彻底抹除"
+    },
+    {
+      "name": "settings_data_wipe_dialog_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "settings_data_wipe_auth_prompt",
+      "value": "请验证身份以确认清空本地数据"
+    },
+    {
+      "name": "settings_data_wipe_success",
+      "value": "已安全抹除所有本地专注历史记录"
+    },
+    {
+      "name": "timeisland_zen_immersive_enter",
+      "value": "全屏沉浸"
+    },
+    {
+      "name": "timeisland_zen_immersive_exit",
+      "value": "退出沉浸"
+    },
+    {
+      "name": "timeisland_zen_immersive_toast_enter",
+      "value": "已进入纯净沉浸空间"
+    },
+    {
+      "name": "timeisland_zen_immersive_toast_exit",
+      "value": "已恢复全功能罗盘"
+    },
+    {
+      "name": "reflection_dialog_title",
+      "value": "心流结夏 · 灵感复盘"
+    },
+    {
+      "name": "reflection_dialog_subtitle",
+      "value": "记下一瞬清明，封存本次心流"
+    },
+    {
+      "name": "reflection_dialog_rating_label",
+      "value": "心流气韵"
+    },
+    {
+      "name": "reflection_dialog_rating_1",
+      "value": "微澜"
+    },
+    {
+      "name": "reflection_dialog_rating_2",
+      "value": "渐入"
+    },
+    {
+      "name": "reflection_dialog_rating_3",
+      "value": "澄怀"
+    },
+    {
+      "name": "reflection_dialog_rating_4",
+      "value": "静照"
+    },
+    {
+      "name": "reflection_dialog_rating_5",
+      "value": "合道"
+    },
+    {
+      "name": "reflection_dialog_note_label",
+      "value": "当下一悟"
+    },
+    {
+      "name": "reflection_dialog_note_placeholder",
+      "value": "记录一句话灵感随笔或阶段顿悟..."
+    },
+    {
+      "name": "reflection_dialog_btn_save",
+      "value": "封存心流"
+    },
+    {
+      "name": "reflection_dialog_btn_skip",
+      "value": "稍后再记"
+    },
+    {
+      "name": "reflection_dialog_toast_saved",
+      "value": "心流灵感已封存归档"
+    },
+    {
+      "name": "timeisland_stats_note_tag",
+      "value": "心流随笔"
+    },
+    {
+      "name": "settings_data_import_title",
+      "value": "从备份恢复数据"
+    },
+    {
+      "name": "settings_data_import_desc",
+      "value": "通过粘贴备份 JSON 还原历史专注记录"
+    },
+    {
+      "name": "settings_data_import_dialog_title",
+      "value": "恢复专注历史备份"
+    },
+    {
+      "name": "settings_data_import_dialog_subtitle",
+      "value": "请在下方粘贴导出的 TimeIsland JSON 备份文本"
+    },
+    {
+      "name": "settings_data_import_dialog_placeholder",
+      "value": "在此粘贴 {\"appName\":\"TimeIsland\", ...} 数据"
+    },
+    {
+      "name": "settings_data_import_dialog_confirm",
+      "value": "验证并恢复"
+    },
+    {
+      "name": "settings_data_import_dialog_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "settings_data_import_err_empty",
+      "value": "请先粘贴有效的备份数据"
+    },
+    {
+      "name": "settings_data_import_err_format",
+      "value": "备份格式无效，未识别到 TimeIsland 记录"
+    },
+    {
+      "name": "settings_data_import_success",
+      "value": "数据恢复完成"
+    },
+    {
+      "name": "settings_data_storage_count_format",
+      "value": "%d 条心流记录 · 100% 离线私有沙箱"
+    },
+    {
+      "name": "settings_cloud_sync_title",
+      "value": "华为云空间同步漫游"
+    },
+    {
+      "name": "settings_cloud_sync_desc",
+      "value": "通过华为账号在手机、折叠屏与平板间自动同步配置与专注流水"
+    },
+    {
+      "name": "settings_cloud_sync_toast_enabled",
+      "value": "已开启多设备端云同步协同"
+    },
+    {
+      "name": "settings_cloud_sync_toast_disabled",
+      "value": "已关闭端云同步协同"
+    },
+    {
+      "name": "settings_cloud_sync_require_login",
+      "value": "请先登录华为账号以开启云端同步漫游"
+    },
+    {
+      "name": "biome_tab_biome",
+      "value": "生境演化"
+    },
+    {
+      "name": "biome_tab_seals",
+      "value": "二十四节气图鉴"
+    },
+    {
+      "name": "biome_realm_title",
+      "value": "生境境界演进"
+    },
+    {
+      "name": "biome_realm_progress_format",
+      "value": "累计心流 %d / %d 分钟"
+    },
+    {
+      "name": "biome_realm_max_level",
+      "value": "已达最高合道境界"
+    },
+    {
+      "name": "biome_realm_1_name",
+      "value": "初生 · 荒渚微澜"
+    },
+    {
+      "name": "biome_realm_1_desc",
+      "value": "初登孤屿，微澜轻拍，万物初生"
+    },
+    {
+      "name": "biome_realm_2_name",
+      "value": "筑基 · 空山幽径"
+    },
+    {
+      "name": "biome_realm_2_desc",
+      "value": "空山新雨，翠峦叠嶂，溪流汇聚"
+    },
+    {
+      "name": "biome_realm_3_name",
+      "value": "聚气 · 幽篁深境"
+    },
+    {
+      "name": "biome_realm_3_desc",
+      "value": "竹海拂风，静水照心，生机盎然"
+    },
+    {
+      "name": "biome_realm_4_name",
+      "value": "合道 · 蓬莱雪境"
+    },
+    {
+      "name": "biome_realm_4_desc",
+      "value": "云海千寻，雪山云隐，万籁空明"
+    },
+    {
+      "name": "biome_seal_dialog_title",
+      "value": "岁时节气 · 东方朱印"
+    },
+    {
+      "name": "biome_seal_dialog_unlocked",
+      "value": "已点亮节气印章"
+    },
+    {
+      "name": "biome_seal_dialog_locked",
+      "value": "待节气历练点亮"
+    },
+    {
+      "name": "biome_seal_current_term",
+      "value": "当令节气"
+    },
+    {
+      "name": "biome_seal_dialog_btn_close",
+      "value": "封存印记"
+    },
+    {
+      "name": "biome_seals_count_format",
+      "value": "已点亮 %d / 24 节气印章"
+    },
+    {
+      "name": "solar_term_1_name",
+      "value": "立春"
+    },
+    {
+      "name": "solar_term_1_seal",
+      "value": "阳和启蛰"
+    },
+    {
+      "name": "solar_term_1_poem",
+      "value": "东风带雨逐西风，大地阳和暖气生。"
+    },
+    {
+      "name": "solar_term_2_name",
+      "value": "雨水"
+    },
+    {
+      "name": "solar_term_2_seal",
+      "value": "润物无声"
+    },
+    {
+      "name": "solar_term_2_poem",
+      "value": "随风潜入夜，润物细无声。"
+    },
+    {
+      "name": "solar_term_3_name",
+      "value": "惊蛰"
+    },
+    {
+      "name": "solar_term_3_seal",
+      "value": "春雷微萌"
+    },
+    {
+      "name": "solar_term_3_poem",
+      "value": "微雨众卉新，一雷惊蛰始。"
+    },
+    {
+      "name": "solar_term_4_name",
+      "value": "春分"
+    },
+    {
+      "name": "solar_term_4_seal",
+      "value": "玄鸟至来"
+    },
+    {
+      "name": "solar_term_4_poem",
+      "value": "春分麦齐秀，杨柳绿如烟。"
+    },
+    {
+      "name": "solar_term_5_name",
+      "value": "清明"
+    },
+    {
+      "name": "solar_term_5_seal",
+      "value": "天朗气清"
+    },
+    {
+      "name": "solar_term_5_poem",
+      "value": "风落梨花雪，清明景物芳。"
+    },
+    {
+      "name": "solar_term_6_name",
+      "value": "谷雨"
+    },
+    {
+      "name": "solar_term_6_seal",
+      "value": "时雨百谷"
+    },
+    {
+      "name": "solar_term_6_poem",
+      "value": "谷雨收寒气，清风催早茶。"
+    },
+    {
+      "name": "solar_term_7_name",
+      "value": "立夏"
+    },
+    {
+      "name": "solar_term_7_seal",
+      "value": "天地纯茂"
+    },
+    {
+      "name": "solar_term_7_poem",
+      "value": "绿树阴浓夏日长，楼台倒影入池塘。"
+    },
+    {
+      "name": "solar_term_8_name",
+      "value": "小满"
+    },
+    {
+      "name": "solar_term_8_seal",
+      "value": "物致于此"
+    },
+    {
+      "name": "solar_term_8_poem",
+      "value": "夜莺啼绿柳，皓月醒长空。最是一年小满时。"
+    },
+    {
+      "name": "solar_term_9_name",
+      "value": "芒种"
+    },
+    {
+      "name": "solar_term_9_seal",
+      "value": "时丰稼穑"
+    },
+    {
+      "name": "solar_term_9_poem",
+      "value": "芒种插秧忙，青草池塘处处蛙。"
+    },
+    {
+      "name": "solar_term_10_name",
+      "value": "夏至"
+    },
+    {
+      "name": "solar_term_10_seal",
+      "value": "日北至极"
+    },
+    {
+      "name": "solar_term_10_poem",
+      "value": "昼晷已云极，宵漏自此长。"
+    },
+    {
+      "name": "solar_term_11_name",
+      "value": "小暑"
+    },
+    {
+      "name": "solar_term_11_seal",
+      "value": "温风徐至"
+    },
+    {
+      "name": "solar_term_11_poem",
+      "value": "风动竹林清，静坐不知暑。"
+    },
+    {
+      "name": "solar_term_12_name",
+      "value": "大暑"
+    },
+    {
+      "name": "solar_term_12_seal",
+      "value": "炎阳炽盛"
+    },
+    {
+      "name": "solar_term_12_poem",
+      "value": "赤日几时过，清风何处寻。深潜心流自生凉。"
+    },
+    {
+      "name": "solar_term_13_name",
+      "value": "立秋"
+    },
+    {
+      "name": "solar_term_13_seal",
+      "value": "凉风始至"
+    },
+    {
+      "name": "solar_term_13_poem",
+      "value": "睡起秋声无觅处，满阶梧叶月明中。"
+    },
+    {
+      "name": "solar_term_14_name",
+      "value": "处暑"
+    },
+    {
+      "name": "solar_term_14_seal",
+      "value": "暑气渐止"
+    },
+    {
+      "name": "solar_term_14_poem",
+      "value": "离离暑云散，袅袅凉风起。"
+    },
+    {
+      "name": "solar_term_15_name",
+      "value": "白露"
+    },
+    {
+      "name": "solar_term_15_seal",
+      "value": "白露凝珠"
+    },
+    {
+      "name": "solar_term_15_poem",
+      "value": "蒹葭苍苍，白露为霜。所谓伊人，在水一方。"
+    },
+    {
+      "name": "solar_term_16_name",
+      "value": "秋分"
+    },
+    {
+      "name": "solar_term_16_seal",
+      "value": "雷始收声"
+    },
+    {
+      "name": "solar_term_16_poem",
+      "value": "阴阳相半日，清气溢乾坤。"
+    },
+    {
+      "name": "solar_term_17_name",
+      "value": "寒露"
+    },
+    {
+      "name": "solar_term_17_seal",
+      "value": "露气寒凉"
+    },
+    {
+      "name": "solar_term_17_poem",
+      "value": "空庭得秋长漫漫，寒露入暮愁衣单。"
+    },
+    {
+      "name": "solar_term_18_name",
+      "value": "霜降"
+    },
+    {
+      "name": "solar_term_18_seal",
+      "value": "草木黄落"
+    },
+    {
+      "name": "solar_term_18_poem",
+      "value": "秋深山气润，霜落晚枫红。"
+    },
+    {
+      "name": "solar_term_19_name",
+      "value": "立冬"
+    },
+    {
+      "name": "solar_term_19_seal",
+      "value": "水始冰凝"
+    },
+    {
+      "name": "solar_term_19_poem",
+      "value": "冻笔新诗懒写，寒炉美酒时温。"
+    },
+    {
+      "name": "solar_term_20_name",
+      "value": "小雪"
+    },
+    {
+      "name": "solar_term_20_seal",
+      "value": "寒气方盛"
+    },
+    {
+      "name": "solar_term_20_poem",
+      "value": "莫怪虹无影，如今小雪时。"
+    },
+    {
+      "name": "solar_term_21_name",
+      "value": "大雪"
+    },
+    {
+      "name": "solar_term_21_seal",
+      "value": "万山积素"
+    },
+    {
+      "name": "solar_term_21_poem",
+      "value": "大雪飞满天，孤舟蓑笠翁。"
+    },
+    {
+      "name": "solar_term_22_name",
+      "value": "冬至"
+    },
+    {
+      "name": "solar_term_22_seal",
+      "value": "日南至极"
+    },
+    {
+      "name": "solar_term_22_poem",
+      "value": "天时人事日相催，冬至阳生春又来。"
+    },
+    {
+      "name": "solar_term_23_name",
+      "value": "小寒"
+    },
+    {
+      "name": "solar_term_23_seal",
+      "value": "雁北回归"
+    },
+    {
+      "name": "solar_term_23_poem",
+      "value": "小寒料峭，蜡梅香动数枝开。"
+    },
+    {
+      "name": "solar_term_24_name",
+      "value": "大寒"
+    },
+    {
+      "name": "solar_term_24_seal",
+      "value": "坚冰深冻"
+    },
+    {
+      "name": "solar_term_24_poem",
+      "value": "大寒已极，春气萌动。心流如泉，温润自存。"
+    },
+    {
+      "name": "biome_month_1",
+      "value": "1月"
+    },
+    {
+      "name": "biome_month_2",
+      "value": "2月"
+    },
+    {
+      "name": "biome_month_3",
+      "value": "3月"
+    },
+    {
+      "name": "biome_month_4",
+      "value": "4月"
+    },
+    {
+      "name": "biome_month_5",
+      "value": "5月"
+    },
+    {
+      "name": "biome_month_6",
+      "value": "6月"
+    },
+    {
+      "name": "biome_month_7",
+      "value": "7月"
+    },
+    {
+      "name": "biome_month_8",
+      "value": "8月"
+    },
+    {
+      "name": "biome_month_9",
+      "value": "9月"
+    },
+    {
+      "name": "biome_month_10",
+      "value": "10月"
+    },
+    {
+      "name": "biome_month_11",
+      "value": "11月"
+    },
+    {
+      "name": "biome_month_12",
+      "value": "12月"
+    },
+    {
+      "name": "widget_start_45m",
+      "value": "启航 45m"
+    },
+    {
+      "name": "widget_quick_start_toast",
+      "value": "桌面起航 · 开启专注心流"
+    },
+    {
+      "name": "widget_toast_already_focusing",
+      "value": "当前专注进行中，已保持心流状态"
+    },
+    {
+      "name": "widget_nearlink_ready",
+      "value": "星闪伴读就绪"
+    },
+    {
+      "name": "widget_nearlink_idle",
+      "value": "独处静照"
+    },
+    {
+      "name": "widget_streak_days",
+      "value": "天连续打卡"
+    },
+    {
+      "name": "widget_realm_prefix",
+      "value": "境界"
+    },
+    {
+      "name": "widget_card_title_2x4",
+      "value": "时光岛 · 万物互联中枢"
+    },
+    {
+      "name": "settings_widget_sync",
+      "value": "桌面卡片万物互联协同"
+    },
+    {
+      "name": "settings_widget_sync_desc",
+      "value": "允许桌面 2x2/2x4 卡片免开应用极速起航，实时透视晨昏生境与星闪伴读"
+    },
+    {
+      "name": "settings_card_auto_noise",
+      "value": "卡片起航伴随自然白噪音"
+    },
+    {
+      "name": "settings_card_auto_noise_desc",
+      "value": "从桌面卡片一键起航时，自动播放上一次精选的自然声景"
+    },
+    {
+      "name": "settings_solar_term_notice",
+      "value": "二十四节气岁时物候提醒"
+    },
+    {
+      "name": "settings_solar_term_notice_desc",
+      "value": "节气交节当日提醒当令物候诗语与点亮篆刻朱印"
+    },
+    {
+      "name": "settings_data_storage_count_desc",
+      "value": "%d 条心流记录 · 100% 离线私有沙箱"
+    },
+    {
+      "name": "calendar_permission_reason",
+      "value": "用于将时光岛专注心流历程与复盘日志同步沉淀至系统日历日程"
+    },
+    {
+      "name": "settings_calendar_sync",
+      "value": "系统日历心流日程同步"
+    },
+    {
+      "name": "settings_calendar_sync_desc",
+      "value": "每次专注达成后，自动将起止时间、标签与心得沉淀为系统日历事件"
+    },
+    {
+      "name": "settings_calendar_export",
+      "value": "将历史记录同步至系统日历"
+    },
+    {
+      "name": "settings_calendar_export_desc",
+      "value": "一键将本地沙箱所有历史专注记录批量创建为系统日历日程"
+    },
+    {
+      "name": "settings_calendar_export_confirm_title",
+      "value": "同步历史至系统日历"
+    },
+    {
+      "name": "settings_calendar_export_confirm_msg",
+      "value": "即将把本地心流记录同步写入系统日历，是否继续？"
+    },
+    {
+      "name": "settings_calendar_export_success",
+      "value": "成功将心流记录同步写入系统日历"
+    },
+    {
+      "name": "settings_calendar_permission_denied",
+      "value": "日历写入权限未授予，无法同步日程"
+    },
+    {
+      "name": "calendar_event_title_prefix",
+      "value": "[时光岛]"
+    },
+    {
+      "name": "calendar_event_desc_source",
+      "value": "来源：HarmonyOS NEXT 时光岛"
+    },
+    {
+      "name": "permission_guide_title",
+      "value": "权限申请提示"
+    },
+    {
+      "name": "permission_guide_go_settings",
+      "value": "前往设置"
+    },
+    {
+      "name": "permission_guide_cancel",
+      "value": "暂不开启"
+    },
+    {
+      "name": "permission_calendar_denied_guide",
+      "value": "时光岛需要系统日历读写权限，以便在心流达成时自动记录您的专注历程与随笔心得。是否前往系统设置开启？"
+    },
+    {
+      "name": "permission_nearlink_denied_guide",
+      "value": "时光岛需要星闪近场通信权限，以支持设备近场碰一碰与双子岛同频自习室。是否前往系统设置开启？"
+    },
+    {
+      "name": "permission_biometric_denied_guide",
+      "value": "时光岛需要生物特征认证权限以提供人脸/指纹安全锁屏守护。是否前往系统设置开启？"
     }
   ]
 }
