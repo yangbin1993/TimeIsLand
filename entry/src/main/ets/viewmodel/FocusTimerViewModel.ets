@@ -1,6 +1,17 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BaseMviViewModel, AppLifecycleManager, AppForegroundState, ForegroundListener } from '@app/common';
-import { FocusState, FocusTag, FocusRecordEntity } from '../model/FocusTypes';
+import {
+  FocusState,
+  FocusTag,
+  FocusRecordEntity,
+  TAG_COLOR_WORK,
+  TAG_COLOR_STUDY,
+  TAG_COLOR_READING,
+  TAG_COLOR_THINKING,
+  TAG_COLOR_SPORT,
+  TAG_COLOR_MEDITATION,
+  TAG_COLOR_CREATIVE
+} from '../model/FocusTypes';
 import { timeIslandRepository, TimeIslandRepository } from '../data/TimeIslandRepository';
 import { liveViewHelper } from '../utils/LiveViewHelper';
 
@@ -224,13 +235,13 @@ export class FocusTimerViewModel extends BaseMviViewModel<FocusTimerState, Focus
       // 预览器环境优雅降级：注入默认展示数据，避免Node服务崩溃
       if (this.state.tags.length === 0) {
         const defaultTags: FocusTag[] = [
-          { id: 1, name: '工作', colorHex: '#4EDEA3', iconName: 'code', isSystem: true },
-          { id: 2, name: '学习', colorHex: '#50E3C2', iconName: 'book', isSystem: true },
-          { id: 3, name: '阅读', colorHex: '#60A5FA', iconName: 'reader', isSystem: true },
-          { id: 4, name: '思考', colorHex: '#9013FE', iconName: 'brain', isSystem: true },
-          { id: 5, name: '运动', colorHex: '#7ED321', iconName: 'sport', isSystem: true },
-          { id: 6, name: '冥想', colorHex: '#FBBF24', iconName: 'spa', isSystem: true },
-          { id: 7, name: '创作', colorHex: '#ACC7FF', iconName: 'brush', isSystem: true }
+          { id: 1, name: '工作', colorHex: TAG_COLOR_WORK, iconName: 'code', isSystem: true },
+          { id: 2, name: '学习', colorHex: TAG_COLOR_STUDY, iconName: 'book', isSystem: true },
+          { id: 3, name: '阅读', colorHex: TAG_COLOR_READING, iconName: 'reader', isSystem: true },
+          { id: 4, name: '思考', colorHex: TAG_COLOR_THINKING, iconName: 'brain', isSystem: true },
+          { id: 5, name: '运动', colorHex: TAG_COLOR_SPORT, iconName: 'sport', isSystem: true },
+          { id: 6, name: '冥想', colorHex: TAG_COLOR_MEDITATION, iconName: 'spa', isSystem: true },
+          { id: 7, name: '创作', colorHex: TAG_COLOR_CREATIVE, iconName: 'brush', isSystem: true }
         ];
         this.state.tags = defaultTags;
         this.state.currentTag = defaultTags[0];

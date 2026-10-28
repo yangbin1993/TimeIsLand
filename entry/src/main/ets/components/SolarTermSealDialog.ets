@@ -32,7 +32,7 @@ export struct SolarTermSealDialog {
         Column()
           .width('100%')
           .height('100%')
-          .backgroundColor(this.currentMode === ThemeMode.LIGHT ? 'rgba(15, 23, 42, 0.52)' : 'rgba(0, 0, 0, 0.78)')
+          .backgroundColor(this.currentMode === ThemeMode.LIGHT ? $r('app.color.timeisland_dialog_mask_light') : $r('app.color.timeisland_dialog_mask_dark'))
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
           .onClick(() => {
             this.handleClose();
@@ -67,17 +67,17 @@ export struct SolarTermSealDialog {
               Text(this.item.sealRes)
                 .fontSize(20)
                 .fontWeight(FontWeight.Bold)
-                .fontColor('#FDE047')
+                .fontColor($r('app.color.timeisland_seal_gold'))
                 .letterSpacing(4)
                 .textAlign(TextAlign.Center)
             }
             .width(130)
             .height(130)
             .justifyContent(FlexAlign.Center)
-            .backgroundColor('#991B1B')
+            .backgroundColor($r('app.color.timeisland_seal_cinnabar'))
             .borderRadius(14)
-            .border({ width: 3, color: '#FBBF24', radius: 14 })
-            .shadow({ radius: 16, color: 'rgba(153, 27, 27, 0.45)', offsetY: 4 })
+            .border({ width: 3, color: $r('app.color.timeisland_seal_gold_border'), radius: 14 })
+            .shadow({ radius: 16, color: $r('app.color.timeisland_seal_shadow'), offsetY: 4 })
           }
           .padding({ top: 6, bottom: 6 })
 
@@ -116,7 +116,7 @@ export struct SolarTermSealDialog {
             Text($r('app.string.biome_seal_dialog_btn_close'))
               .fontSize(14)
               .fontWeight(FontWeight.Medium)
-              .fontColor('#FFFFFF')
+              .fontColor(this.theme.textInverse)
           }
           .width('100%')
           .height(40)

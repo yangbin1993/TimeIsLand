@@ -561,7 +561,7 @@ export struct IslandBiomeView {
             .fontColor(this.theme.textSecondary)
         }
         .padding({ left: 12, right: 12, top: 4, bottom: 4 })
-        .backgroundColor('rgba(0, 0, 0, 0.4)')
+        .backgroundColor($r('app.color.timeisland_seal_mask'))
         .borderRadius(12)
         .margin({ bottom: 10 })
       }
@@ -644,15 +644,15 @@ export struct IslandBiomeView {
                   Text(item.nameRes)
                     .fontSize(14)
                     .fontWeight(FontWeight.Bold)
-                    .fontColor('#FDE047')
+                    .fontColor($r('app.color.timeisland_seal_gold'))
                     .letterSpacing(1)
                 }
                 .width(48)
                 .height(48)
                 .justifyContent(FlexAlign.Center)
-                .backgroundColor('#991B1B')
+                .backgroundColor($r('app.color.timeisland_seal_cinnabar'))
                 .borderRadius(8)
-                .border({ width: 1.5, color: '#FBBF24', radius: 8 })
+                .border({ width: 1.5, color: $r('app.color.timeisland_seal_gold_border'), radius: 8 })
 
                 // 当令节气高光标识
                 if (item.id === this.currentTermId) {

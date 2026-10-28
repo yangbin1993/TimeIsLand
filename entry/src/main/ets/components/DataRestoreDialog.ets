@@ -70,7 +70,7 @@ export struct DataRestoreDialog {
         Column()
           .width('100%')
           .height('100%')
-          .backgroundColor(this.currentMode === ThemeMode.LIGHT ? 'rgba(15, 23, 42, 0.48)' : 'rgba(0, 0, 0, 0.75)')
+          .backgroundColor(this.currentMode === ThemeMode.LIGHT ? $r('app.color.timeisland_dialog_mask_light') : $r('app.color.timeisland_dialog_mask_dark'))
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
           .onClick(() => {
             this.handleClose();
@@ -137,7 +137,7 @@ export struct DataRestoreDialog {
               Text(this.isProcessing ? '...' : $r('app.string.settings_data_import_dialog_confirm'))
                 .fontSize(14)
                 .fontWeight(FontWeight.Medium)
-                .fontColor('#FFFFFF')
+                .fontColor(this.theme.textInverse)
             }
             .layoutWeight(1)
             .height(40)

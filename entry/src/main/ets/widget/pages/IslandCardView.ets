@@ -27,16 +27,16 @@ struct IslandCardView {
   /**
    * 依据晨昏获取卡片微气候渐变色
    */
-  private getBackgroundGradient(): string[] {
+  private getBackgroundGradient(): Resource[] {
     if (this.biomeSlot === 'DAWN') {
-      return ['#1F1A2C', '#332438'];
+      return [$r('app.color.timeisland_widget_dawn_bg_start'), $r('app.color.timeisland_widget_dawn_bg_end')];
     } else if (this.biomeSlot === 'DAY') {
-      return ['#132438', '#1D3B54'];
+      return [$r('app.color.timeisland_widget_day_bg_start'), $r('app.color.timeisland_widget_day_bg_end')];
     } else if (this.biomeSlot === 'DUSK') {
-      return ['#2B1B2A', '#3D253B'];
+      return [$r('app.color.timeisland_widget_dusk_bg_start'), $r('app.color.timeisland_widget_dusk_bg_end')];
     }
     // NIGHT
-    return ['#0D131F', '#161F30'];
+    return [$r('app.color.timeisland_widget_night_bg_start'), $r('app.color.timeisland_widget_night_bg_end')];
   }
 
   /**
@@ -84,7 +84,7 @@ struct IslandCardView {
       Circle()
         .width(180)
         .height(180)
-        .fill(this.biomeSlot === 'NIGHT' ? '#1A3350' : '#2A4A68')
+        .fill(this.biomeSlot === 'NIGHT' ? $r('app.color.timeisland_widget_glow_night') : $r('app.color.timeisland_widget_glow_day'))
         .opacity(0.3)
         .blur(40)
         .position({ x: -20, y: -20 })
@@ -98,7 +98,7 @@ struct IslandCardView {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#0F172A')
+    .backgroundColor($r('app.color.timeisland_widget_bg_base'))
   }
 
   /**
@@ -113,14 +113,14 @@ struct IslandCardView {
           Circle()
             .width(6)
             .height(6)
-            .fill(this.biomeSlot === 'DAWN' ? '#FBBF24' : (this.biomeSlot === 'DAY' ? '#38BDF8' : '#A78BFA'))
+            .fill(this.biomeSlot === 'DAWN' ? $r('app.color.timeisland_widget_dawn_dot') : (this.biomeSlot === 'DAY' ? $r('app.color.timeisland_widget_day_dot') : $r('app.color.timeisland_widget_dusk_dot')))
           Text(this.biomeTitle)
             .fontSize(11)
-            .fontColor('#CCFFFFFF')
+            .fontColor($r('app.color.timeisland_widget_text_high'))
             .fontWeight(FontWeight.Medium)
         }
         .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-        .backgroundColor('#22FFFFFF')
+        .backgroundColor($r('app.color.timeisland_widget_pill_bg'))
         .borderRadius(12)
 
         Blank()
@@ -129,12 +129,12 @@ struct IslandCardView {
         if (this.solarTermName) {
           Text(this.solarTermName)
             .fontSize(10)
-            .fontColor('#FDE047')
+            .fontColor($r('app.color.timeisland_seal_gold'))
             .fontWeight(FontWeight.Bold)
             .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-            .backgroundColor('#991B1B')
+            .backgroundColor($r('app.color.timeisland_seal_cinnabar'))
             .borderRadius(4)
-            .border({ width: 1, color: '#FBBF24' })
+            .border({ width: 1, color: $r('app.color.timeisland_seal_gold_border') })
         }
       }
       .width('100%')
@@ -147,11 +147,11 @@ struct IslandCardView {
           Row({ space: 4 }) {
             Text(`${this.todayMinutes}`)
               .fontSize(30)
-              .fontColor('#FFFFFF')
+              .fontColor($r('app.color.timeisland_pure_white'))
               .fontWeight(FontWeight.Bold)
             Text($r('app.string.widget_minutes_unit'))
               .fontSize(11)
-              .fontColor('#80FFFFFF')
+              .fontColor($r('app.color.timeisland_widget_text_mid'))
               .alignSelf(ItemAlign.End)
               .margin({ bottom: 5 })
           }
@@ -160,7 +160,7 @@ struct IslandCardView {
           if (this.realmName) {
             Text(`Lv.${this.realmLevel} ${this.realmName}`)
               .fontSize(10)
-              .fontColor('#4EDEA3')
+              .fontColor($r('app.color.timeisland_emerald'))
               .fontWeight(FontWeight.Medium)
           }
         }
@@ -173,8 +173,8 @@ struct IslandCardView {
           Progress({ value: this.lakeStoragePercent, total: 100, type: ProgressType.Ring })
             .width(42)
             .height(42)
-            .color('#4EDEA3')
-            .backgroundColor('#20FFFFFF')
+            .color($r('app.color.timeisland_emerald'))
+            .backgroundColor($r('app.color.timeisland_widget_pill_bg_subtle'))
             .style({ strokeWidth: 4 })
 
           Text('🌊')
@@ -193,13 +193,13 @@ struct IslandCardView {
               .fontSize(11)
             Text($r('app.string.widget_start_15m'))
               .fontSize(11)
-              .fontColor('#0A1520')
+              .fontColor($r('app.color.timeisland_pure_black'))
               .fontWeight(FontWeight.Bold)
           }
           .padding({ left: 8, right: 8, top: 5, bottom: 5 })
         }
         .layoutWeight(1)
-        .backgroundColor('#4EDEA3')
+        .backgroundColor($r('app.color.timeisland_emerald'))
         .onClick(() => {
           this.startQuickFocus(15);
         })
@@ -210,13 +210,13 @@ struct IslandCardView {
               .fontSize(11)
             Text($r('app.string.widget_start_25m'))
               .fontSize(11)
-              .fontColor('#FFFFFF')
+              .fontColor($r('app.color.timeisland_pure_white'))
               .fontWeight(FontWeight.Medium)
           }
           .padding({ left: 8, right: 8, top: 5, bottom: 5 })
         }
         .layoutWeight(1)
-        .backgroundColor('#26FFFFFF')
+        .backgroundColor($r('app.color.timeisland_widget_pill_bg_active'))
         .onClick(() => {
           this.startQuickFocus(25);
         })
@@ -242,14 +242,14 @@ struct IslandCardView {
             Circle()
               .width(6)
               .height(6)
-              .fill(this.biomeSlot === 'DAWN' ? '#FBBF24' : (this.biomeSlot === 'DAY' ? '#38BDF8' : '#A78BFA'))
+              .fill(this.biomeSlot === 'DAWN' ? $r('app.color.timeisland_widget_dawn_dot') : (this.biomeSlot === 'DAY' ? $r('app.color.timeisland_widget_day_dot') : $r('app.color.timeisland_widget_dusk_dot')))
             Text(this.biomeTitle)
               .fontSize(11)
-              .fontColor('#CCFFFFFF')
+              .fontColor($r('app.color.timeisland_widget_text_high'))
               .fontWeight(FontWeight.Medium)
           }
           .padding({ left: 6, right: 6, top: 3, bottom: 3 })
-          .backgroundColor('#22FFFFFF')
+          .backgroundColor($r('app.color.timeisland_widget_pill_bg'))
           .borderRadius(10)
 
           Blank()
@@ -258,10 +258,10 @@ struct IslandCardView {
           if (this.realmName) {
             Text(`Lv.${this.realmLevel} ${this.realmName}`)
               .fontSize(10)
-              .fontColor('#4EDEA3')
+              .fontColor($r('app.color.timeisland_emerald'))
               .fontWeight(FontWeight.Bold)
               .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-              .backgroundColor('#1A4EDEA3')
+              .backgroundColor($r('app.color.timeisland_widget_quick_start_bg'))
               .borderRadius(6)
           }
         }
@@ -274,11 +274,11 @@ struct IslandCardView {
           Row({ space: 3 }) {
             Text(`${this.todayMinutes}`)
               .fontSize(28)
-              .fontColor('#FFFFFF')
+              .fontColor($r('app.color.timeisland_pure_white'))
               .fontWeight(FontWeight.Bold)
             Text($r('app.string.widget_minutes_unit'))
               .fontSize(11)
-              .fontColor('#80FFFFFF')
+              .fontColor($r('app.color.timeisland_widget_text_mid'))
               .alignSelf(ItemAlign.End)
               .margin({ bottom: 4 })
           }
@@ -292,13 +292,13 @@ struct IslandCardView {
               Text(`${this.streakDays}`)
                 .fontSize(11)
                 .fontWeight(FontWeight.Bold)
-                .fontColor('#F59E0B')
+                .fontColor($r('app.color.timeisland_widget_streak_text'))
               Text($r('app.string.widget_streak_days'))
                 .fontSize(9)
-                .fontColor('#CCFFFFFF')
+                .fontColor($r('app.color.timeisland_widget_text_high'))
             }
             .padding({ left: 6, right: 6, top: 3, bottom: 3 })
-            .backgroundColor('#1AF59E0B')
+            .backgroundColor($r('app.color.timeisland_widget_streak_chip_bg'))
             .borderRadius(8)
           }
         }
@@ -312,19 +312,19 @@ struct IslandCardView {
           Row() {
             Text($r('app.string.widget_lake_storage_text'))
               .fontSize(10)
-              .fontColor('#80FFFFFF')
+              .fontColor($r('app.color.timeisland_widget_text_mid'))
             Blank()
             Text(`${this.lakeStoragePercent}%`)
               .fontSize(10)
-              .fontColor('#4EDEA3')
+              .fontColor($r('app.color.timeisland_emerald'))
               .fontWeight(FontWeight.Medium)
           }
           .width('100%')
 
           Progress({ value: this.lakeStoragePercent, total: 100, type: ProgressType.Linear })
             .width('100%')
-            .color('#4EDEA3')
-            .backgroundColor('#22FFFFFF')
+            .color($r('app.color.timeisland_emerald'))
+            .backgroundColor($r('app.color.timeisland_widget_pill_bg'))
             .style({ strokeWidth: 4 })
         }
         .width('100%')
@@ -340,7 +340,7 @@ struct IslandCardView {
       Column()
         .width(1)
         .height('85%')
-        .backgroundColor('#22FFFFFF')
+        .backgroundColor($r('app.color.timeisland_widget_pill_bg'))
         .alignSelf(ItemAlign.Center)
 
       // 2. 右侧万物互联与多档起航中枢 (50%)
@@ -352,17 +352,17 @@ struct IslandCardView {
             Row({ space: 4 }) {
               Text('❖')
                 .fontSize(8)
-                .fontColor('#FDE047')
+                .fontColor($r('app.color.timeisland_seal_gold'))
               Text(this.solarTermSeal || this.solarTermName)
                 .fontSize(10)
                 .fontWeight(FontWeight.Bold)
-                .fontColor('#FDE047')
+                .fontColor($r('app.color.timeisland_seal_gold'))
                 .letterSpacing(1)
             }
             .padding({ left: 6, right: 6, top: 3, bottom: 3 })
-            .backgroundColor('#991B1B')
+            .backgroundColor($r('app.color.timeisland_seal_cinnabar'))
             .borderRadius(4)
-            .border({ width: 1, color: '#FBBF24' })
+            .border({ width: 1, color: $r('app.color.timeisland_seal_gold_border') })
           }
 
           Blank()
@@ -372,16 +372,16 @@ struct IslandCardView {
             Circle()
               .width(5)
               .height(5)
-              .fill(this.isNearLinkActive ? '#10B981' : '#60A5FA')
+              .fill(this.isNearLinkActive ? $r('app.color.timeisland_widget_nearlink_active_dot') : $r('app.color.timeisland_widget_nearlink_idle_dot'))
             Text(this.isNearLinkActive ? $r('app.string.widget_nearlink_ready') : $r('app.string.widget_nearlink_idle'))
               .fontSize(9)
-              .fontColor(this.isNearLinkActive ? '#34D399' : '#93C5FD')
+              .fontColor(this.isNearLinkActive ? $r('app.color.timeisland_widget_nearlink_active_text') : $r('app.color.timeisland_widget_nearlink_idle_text'))
               .fontWeight(FontWeight.Medium)
           }
           .padding({ left: 6, right: 6, top: 3, bottom: 3 })
-          .backgroundColor('#1A0F172A')
+          .backgroundColor($r('app.color.timeisland_widget_nearlink_chip_bg'))
           .borderRadius(10)
-          .border({ width: 1, color: this.isNearLinkActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(96, 165, 250, 0.3)' })
+          .border({ width: 1, color: this.isNearLinkActive ? $r('app.color.timeisland_widget_nearlink_border_active') : $r('app.color.timeisland_widget_nearlink_border_idle') })
         }
         .width('100%')
 
@@ -392,9 +392,9 @@ struct IslandCardView {
           if (this.currentTag) {
             Text(this.currentTag)
               .fontSize(10)
-              .fontColor('#4EDEA3')
+              .fontColor($r('app.color.timeisland_emerald'))
               .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-              .backgroundColor('#1A4EDEA3')
+              .backgroundColor($r('app.color.timeisland_widget_quick_start_bg'))
               .borderRadius(6)
           }
         }
@@ -407,12 +407,12 @@ struct IslandCardView {
           Button({ type: ButtonType.Capsule, stateEffect: true }) {
             Text($r('app.string.widget_start_15m'))
               .fontSize(10)
-              .fontColor('#0A1520')
+              .fontColor($r('app.color.timeisland_pure_black'))
               .fontWeight(FontWeight.Bold)
               .padding({ left: 6, right: 6, top: 6, bottom: 6 })
           }
           .layoutWeight(1)
-          .backgroundColor('#4EDEA3')
+          .backgroundColor($r('app.color.timeisland_emerald'))
           .onClick(() => {
             this.startQuickFocus(15);
           })
@@ -420,12 +420,12 @@ struct IslandCardView {
           Button({ type: ButtonType.Capsule, stateEffect: true }) {
             Text($r('app.string.widget_start_25m'))
               .fontSize(10)
-              .fontColor('#FFFFFF')
+              .fontColor($r('app.color.timeisland_pure_white'))
               .fontWeight(FontWeight.Medium)
               .padding({ left: 6, right: 6, top: 6, bottom: 6 })
           }
           .layoutWeight(1)
-          .backgroundColor('#26FFFFFF')
+          .backgroundColor($r('app.color.timeisland_widget_pill_bg_active'))
           .onClick(() => {
             this.startQuickFocus(25);
           })
@@ -433,12 +433,12 @@ struct IslandCardView {
           Button({ type: ButtonType.Capsule, stateEffect: true }) {
             Text($r('app.string.widget_start_45m'))
               .fontSize(10)
-              .fontColor('#FFFFFF')
+              .fontColor($r('app.color.timeisland_pure_white'))
               .fontWeight(FontWeight.Medium)
               .padding({ left: 6, right: 6, top: 6, bottom: 6 })
           }
           .layoutWeight(1)
-          .backgroundColor('#26FFFFFF')
+          .backgroundColor($r('app.color.timeisland_widget_pill_bg_active'))
           .onClick(() => {
             this.startQuickFocus(45);
           })

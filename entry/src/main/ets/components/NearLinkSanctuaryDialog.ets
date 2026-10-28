@@ -77,7 +77,7 @@ export struct NearLinkSanctuaryView {
           .width(6)
           .height(6)
           .borderRadius(3)
-          .backgroundColor(nearLinkSanctuaryManager.isHardwareSupported() ? '#4EDEA3' : '#FBBF24')
+          .backgroundColor(nearLinkSanctuaryManager.isHardwareSupported() ? this.theme.primaryAccent : this.theme.havenAmber)
 
         Text(nearLinkSanctuaryManager.isHardwareSupported() ? $r('app.string.nearlink_hw_ready') : $r('app.string.nearlink_sandbox_mode'))
           .fontSize(11)
@@ -108,11 +108,11 @@ export struct NearLinkSanctuaryView {
               Image($r('app.media.ic_nearlink'))
                 .width(16)
                 .height(16)
-                .fillColor('#0A1520')
+                .fillColor(this.theme.textInverse)
               Text($r('app.string.nearlink_btn_touch_start'))
                 .fontSize(13)
                 .fontWeight(FontWeight.Bold)
-                .fontColor('#0A1520')
+                .fontColor(this.theme.textInverse)
             }
             .padding({ left: 18, right: 18, top: 10, bottom: 10 })
           }
@@ -171,7 +171,7 @@ export struct NearLinkSanctuaryView {
                 .fontColor(this.theme.textPrimary)
               Text($r('app.string.nearlink_status_focusing'))
                 .fontSize(10)
-                .fontColor('#4EDEA3')
+                .fontColor(this.theme.primaryAccent)
             }
             .padding(12)
             .backgroundColor(this.theme.surfaceLow)
@@ -246,10 +246,10 @@ export struct NearLinkSanctuaryView {
             Button({ type: ButtonType.Capsule, stateEffect: true }) {
               Text($r('app.string.nearlink_btn_disconnect'))
                 .fontSize(12)
-                .fontColor('#F87171')
+                .fontColor($r('app.color.timeisland_status_danger'))
                 .padding({ left: 14, right: 14, top: 8, bottom: 8 })
             }
-            .backgroundColor('#1AF87171')
+            .backgroundColor($r('app.color.timeisland_status_danger_bg'))
             .onClick(() => {
               this.disconnect();
             })

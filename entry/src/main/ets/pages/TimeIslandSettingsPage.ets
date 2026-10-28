@@ -909,10 +909,10 @@ struct TimeIslandSettingsPage {
         Row({ space: 8 }) {
           // 四色生境微晶色彩原石
           Row({ space: 4 }) {
-            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#10B981')
-            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#38BDF8')
-            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#F59E0B')
-            Row().width(7).height(7).borderRadius(3.5).backgroundColor('#A855F7')
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor($r('app.color.timeisland_gem_green'))
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor($r('app.color.timeisland_gem_blue'))
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor($r('app.color.timeisland_gem_amber'))
+            Row().width(7).height(7).borderRadius(3.5).backgroundColor($r('app.color.timeisland_gem_purple'))
           }
           .padding({ left: 6, right: 6, top: 4, bottom: 4 })
           .backgroundColor(this.theme.surfaceLowest)

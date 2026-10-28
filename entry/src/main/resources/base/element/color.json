@@ -163,6 +163,342 @@
     {
       "name": "timeisland_glow_text",
       "value": "#30FFFFFF"
+    },
+    {
+      "name": "timeisland_dialog_mask_light",
+      "value": "#7A0F172A"
+    },
+    {
+      "name": "timeisland_dialog_mask_dark",
+      "value": "#BF000000"
+    },
+    {
+      "name": "timeisland_pure_white",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "timeisland_pure_black",
+      "value": "#000000"
+    },
+    {
+      "name": "timeisland_transparent",
+      "value": "#00000000"
+    },
+    {
+      "name": "timeisland_seal_cinnabar",
+      "value": "#991B1B"
+    },
+    {
+      "name": "timeisland_seal_gold",
+      "value": "#FDE047"
+    },
+    {
+      "name": "timeisland_seal_gold_border",
+      "value": "#FBBF24"
+    },
+    {
+      "name": "timeisland_seal_shadow",
+      "value": "#73991B1B"
+    },
+    {
+      "name": "timeisland_seal_mask",
+      "value": "#66000000"
+    },
+    {
+      "name": "timeisland_season_spring",
+      "value": "#10B981"
+    },
+    {
+      "name": "timeisland_season_summer",
+      "value": "#EF4444"
+    },
+    {
+      "name": "timeisland_season_autumn",
+      "value": "#F59E0B"
+    },
+    {
+      "name": "timeisland_season_winter",
+      "value": "#60A5FA"
+    },
+    {
+      "name": "timeisland_gem_green",
+      "value": "#10B981"
+    },
+    {
+      "name": "timeisland_gem_blue",
+      "value": "#38BDF8"
+    },
+    {
+      "name": "timeisland_gem_amber",
+      "value": "#F59E0B"
+    },
+    {
+      "name": "timeisland_gem_purple",
+      "value": "#A855F7"
+    },
+    {
+      "name": "timeisland_status_danger",
+      "value": "#F87171"
+    },
+    {
+      "name": "timeisland_status_danger_bg",
+      "value": "#1AF87171"
+    },
+    {
+      "name": "timeisland_toggle_track_off",
+      "value": "#475569"
+    },
+    {
+      "name": "timeisland_sound_tide_bg",
+      "value": "#800A192F"
+    },
+    {
+      "name": "timeisland_sound_rain_bg",
+      "value": "#8006281E"
+    },
+    {
+      "name": "timeisland_sound_spring_bg",
+      "value": "#800A2319"
+    },
+    {
+      "name": "timeisland_sound_card_dark_mask",
+      "value": "#B80F131C"
+    },
+    {
+      "name": "timeisland_sound_border_idle",
+      "value": "#1FFFFFFF"
+    },
+    {
+      "name": "timeisland_sound_glow_active",
+      "value": "#734EDEA3"
+    },
+    {
+      "name": "timeisland_sound_text_shadow",
+      "value": "#CC000000"
+    },
+    {
+      "name": "timeisland_overlay_capsule_active",
+      "value": "#40FFFFFF"
+    },
+    {
+      "name": "timeisland_overlay_capsule_running",
+      "value": "#26FFFFFF"
+    },
+    {
+      "name": "timeisland_overlay_capsule_idle",
+      "value": "#33000000"
+    },
+    {
+      "name": "timeisland_overlay_capsule_bar",
+      "value": "#73FFFFFF"
+    },
+    {
+      "name": "timeisland_widget_dawn_bg_start",
+      "value": "#1F1A2C"
+    },
+    {
+      "name": "timeisland_widget_dawn_bg_end",
+      "value": "#332438"
+    },
+    {
+      "name": "timeisland_widget_day_bg_start",
+      "value": "#132438"
+    },
+    {
+      "name": "timeisland_widget_day_bg_end",
+      "value": "#1D3B54"
+    },
+    {
+      "name": "timeisland_widget_dusk_bg_start",
+      "value": "#2B1B2A"
+    },
+    {
+      "name": "timeisland_widget_dusk_bg_end",
+      "value": "#3D253B"
+    },
+    {
+      "name": "timeisland_widget_night_bg_start",
+      "value": "#0D131F"
+    },
+    {
+      "name": "timeisland_widget_night_bg_end",
+      "value": "#161F30"
+    },
+    {
+      "name": "timeisland_widget_sea_night",
+      "value": "#1A3350"
+    },
+    {
+      "name": "timeisland_widget_sea_day",
+      "value": "#2A4A68"
+    },
+    {
+      "name": "timeisland_widget_bg_dark",
+      "value": "#0F172A"
+    },
+    {
+      "name": "timeisland_widget_text_high",
+      "value": "#CCFFFFFF"
+    },
+    {
+      "name": "timeisland_widget_text_mid",
+      "value": "#80FFFFFF"
+    },
+    {
+      "name": "timeisland_widget_pill_bg",
+      "value": "#22FFFFFF"
+    },
+    {
+      "name": "timeisland_widget_pill_bg_light",
+      "value": "#26FFFFFF"
+    },
+    {
+      "name": "timeisland_widget_pill_track",
+      "value": "#20FFFFFF"
+    },
+    {
+      "name": "timeisland_widget_btn_text_dark",
+      "value": "#0A1520"
+    },
+    {
+      "name": "timeisland_widget_nearlink_active_glow",
+      "value": "#6610B981"
+    },
+    {
+      "name": "timeisland_widget_nearlink_idle_glow",
+      "value": "#4D60A5FA"
+    },
+    {
+      "name": "timeisland_widget_nearlink_bg",
+      "value": "#1A0F172A"
+    },
+    {
+      "name": "timeisland_widget_nearlink_green_text",
+      "value": "#34D399"
+    },
+    {
+      "name": "timeisland_widget_nearlink_blue_text",
+      "value": "#93C5FD"
+    },
+    {
+      "name": "timeisland_widget_streak_amber",
+      "value": "#F59E0B"
+    },
+    {
+      "name": "timeisland_widget_streak_bg",
+      "value": "#1AF59E0B"
+    },
+    {
+      "name": "timeisland_widget_active_green_bg",
+      "value": "#1A4EDEA3"
+    },
+    {
+      "name": "timeisland_widget_purple_accent",
+      "value": "#A78BFA"
+    },
+    {
+      "name": "timeisland_widget_blue_accent",
+      "value": "#38BDF8"
+    },
+    {
+      "name": "timeisland_tag_work",
+      "value": "#4EDEA3"
+    },
+    {
+      "name": "timeisland_tag_study",
+      "value": "#50E3C2"
+    },
+    {
+      "name": "timeisland_tag_read",
+      "value": "#60A5FA"
+    },
+    {
+      "name": "timeisland_tag_think",
+      "value": "#9013FE"
+    },
+    {
+      "name": "timeisland_tag_sport",
+      "value": "#7ED321"
+    },
+    {
+      "name": "timeisland_tag_meditate",
+      "value": "#FBBF24"
+    },
+    {
+      "name": "timeisland_tag_create",
+      "value": "#ACC7FF"
+    },
+    {
+      "name": "timeisland_widget_bg_base",
+      "value": "#0F172A"
+    },
+    {
+      "name": "timeisland_widget_glow_night",
+      "value": "#1A3350"
+    },
+    {
+      "name": "timeisland_widget_glow_day",
+      "value": "#2A4A68"
+    },
+    {
+      "name": "timeisland_widget_dawn_dot",
+      "value": "#FBBF24"
+    },
+    {
+      "name": "timeisland_widget_day_dot",
+      "value": "#38BDF8"
+    },
+    {
+      "name": "timeisland_widget_dusk_dot",
+      "value": "#A78BFA"
+    },
+    {
+      "name": "timeisland_widget_pill_bg_subtle",
+      "value": "#20FFFFFF"
+    },
+    {
+      "name": "timeisland_widget_pill_bg_active",
+      "value": "#26FFFFFF"
+    },
+    {
+      "name": "timeisland_widget_quick_start_bg",
+      "value": "#1A4EDEA3"
+    },
+    {
+      "name": "timeisland_widget_streak_chip_bg",
+      "value": "#1AF59E0B"
+    },
+    {
+      "name": "timeisland_widget_streak_text",
+      "value": "#F59E0B"
+    },
+    {
+      "name": "timeisland_widget_nearlink_chip_bg",
+      "value": "#1A0F172A"
+    },
+    {
+      "name": "timeisland_widget_nearlink_border_active",
+      "value": "#6610B981"
+    },
+    {
+      "name": "timeisland_widget_nearlink_border_idle",
+      "value": "#4D60A5FA"
+    },
+    {
+      "name": "timeisland_widget_nearlink_active_dot",
+      "value": "#10B981"
+    },
+    {
+      "name": "timeisland_widget_nearlink_idle_dot",
+      "value": "#60A5FA"
+    },
+    {
+      "name": "timeisland_widget_nearlink_active_text",
+      "value": "#34D399"
+    },
+    {
+      "name": "timeisland_widget_nearlink_idle_text",
+      "value": "#93C5FD"
     }
   ]
 }

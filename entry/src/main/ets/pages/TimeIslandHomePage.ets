@@ -1008,7 +1008,7 @@ struct TimeIslandHomePage {
               .width(5)
               .height(5)
               .borderRadius(2.5)
-              .backgroundColor(this.isSoundDrawerOpen ? this.theme.primaryAccent : '#475569')
+              .backgroundColor(this.isSoundDrawerOpen ? this.theme.primaryAccent : $r('app.color.timeisland_toggle_track_off'))
               .shadow(this.isSoundDrawerOpen ? { radius: 6, color: this.theme.primaryGlow, offsetY: 0 } : { radius: 0, color: Color.Transparent })
               .margin({ top: 5 })
 
@@ -1053,7 +1053,7 @@ struct TimeIslandHomePage {
             .width('80%')
             .height(1.5)
             .borderRadius(1)
-            .backgroundColor('rgba(255, 255, 255, 0.45)')
+            .backgroundColor($r('app.color.timeisland_overlay_capsule_bar'))
             .margin({ top: 1 })
 
           // 核心按键内容
@@ -1064,7 +1064,7 @@ struct TimeIslandHomePage {
                 .width(32)
                 .height(32)
                 .borderRadius(16)
-                .backgroundColor(this.state.status === FocusState.FLOW_DRIFT ? 'rgba(255, 255, 255, 0.25)' : (this.state.status === FocusState.RUNNING ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.2)'))
+                .backgroundColor(this.state.status === FocusState.FLOW_DRIFT ? $r('app.color.timeisland_overlay_capsule_active') : (this.state.status === FocusState.RUNNING ? $r('app.color.timeisland_overlay_capsule_running') : $r('app.color.timeisland_overlay_capsule_idle')))
 
               Image(this.state.status === FocusState.FLOW_DRIFT ? $r('app.media.ic_check') : (this.state.status === FocusState.RUNNING ? $r('app.media.ic_pause') : $r('app.media.ic_explore')))
                 .width(18)
@@ -1085,7 +1085,7 @@ struct TimeIslandHomePage {
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.state.status === FocusState.RUNNING ? this.theme.primaryAccent : this.theme.textInverse)
                   .padding({ left: 4, right: 4, top: 1, bottom: 1 })
-                  .backgroundColor(this.state.status === FocusState.RUNNING ? this.theme.surfaceLowest : 'rgba(0, 0, 0, 0.2)')
+                  .backgroundColor(this.state.status === FocusState.RUNNING ? this.theme.surfaceLowest : $r('app.color.timeisland_overlay_capsule_idle'))
                   .borderRadius(4)
               }
 
@@ -1170,7 +1170,7 @@ struct TimeIslandHomePage {
                 .width(5)
                 .height(5)
                 .borderRadius(2.5)
-                .backgroundColor(this.zenFlipState === ZenFlipState.ARMED ? this.theme.primaryAccent : '#475569')
+                .backgroundColor(this.zenFlipState === ZenFlipState.ARMED ? this.theme.primaryAccent : $r('app.color.timeisland_toggle_track_off'))
                 .shadow(this.zenFlipState === ZenFlipState.ARMED ? { radius: 6, color: this.theme.primaryGlow, offsetY: 0 } : { radius: 0, color: Color.Transparent })
                 .margin({ top: 5 })
 
@@ -1220,7 +1220,6 @@ struct TimeIslandHomePage {
   @Builder
   private buildWhiteNoiseDrawer() {
     Row({ space: 10 }) {
-      // 1. 海潮晚风
       // 1. 海潮晚风艺术卡片
       Button({ type: ButtonType.Normal, stateEffect: true }) {
         Stack({ alignContent: Alignment.Center }) {
@@ -1235,18 +1234,18 @@ struct TimeIslandHomePage {
             .width('100%')
             .height(68)
             .borderRadius(14)
-            .backgroundColor(this.currentSoundId === 'tide' ? 'rgba(10, 25, 47, 0.50)' : 'rgba(15, 19, 28, 0.72)')
+            .backgroundColor(this.currentSoundId === 'tide' ? $r('app.color.timeisland_sound_tide_bg') : $r('app.color.timeisland_sound_card_dark_mask'))
 
           Column({ space: 4 }) {
             Image($r('app.media.ic_water_drop'))
               .width(20)
               .height(20)
-              .fillColor(this.currentSoundId === 'tide' ? '#4EDEA3' : '#F8FAFC')
+              .fillColor(this.currentSoundId === 'tide' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_text_primary'))
             Text($r('app.string.timeisland_sound_tide'))
               .fontSize(11)
-              .fontColor('#F8FAFC')
+              .fontColor($r('app.color.timeisland_text_primary'))
               .fontWeight(this.currentSoundId === 'tide' ? FontWeight.Bold : FontWeight.Medium)
-              .shadow({ radius: 4, color: 'rgba(0,0,0,0.8)', offsetY: 1 })
+              .shadow({ radius: 4, color: $r('app.color.timeisland_sound_text_shadow'), offsetY: 1 })
           }
         }
       }
@@ -1255,11 +1254,11 @@ struct TimeIslandHomePage {
       .borderRadius(14)
       .border({
         width: this.currentSoundId === 'tide' ? 2 : 1,
-        color: this.currentSoundId === 'tide' ? '#4EDEA3' : 'rgba(255, 255, 255, 0.12)'
+        color: this.currentSoundId === 'tide' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_sound_border_idle')
       })
       .shadow(this.currentSoundId === 'tide' ? {
         radius: 12,
-        color: 'rgba(78, 222, 163, 0.45)',
+        color: $r('app.color.timeisland_sound_glow_active'),
         offsetY: 2
       } : { radius: 0, color: Color.Transparent })
       .onClick(() => {
@@ -1285,18 +1284,18 @@ struct TimeIslandHomePage {
             .width('100%')
             .height(68)
             .borderRadius(14)
-            .backgroundColor(this.currentSoundId === 'moss_rain' ? 'rgba(6, 40, 30, 0.50)' : 'rgba(15, 19, 28, 0.72)')
+            .backgroundColor(this.currentSoundId === 'moss_rain' ? $r('app.color.timeisland_sound_rain_bg') : $r('app.color.timeisland_sound_card_dark_mask'))
 
           Column({ space: 4 }) {
             Image($r('app.media.ic_rain'))
               .width(20)
               .height(20)
-              .fillColor(this.currentSoundId === 'moss_rain' ? '#4EDEA3' : '#F8FAFC')
+              .fillColor(this.currentSoundId === 'moss_rain' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_text_primary'))
             Text($r('app.string.timeisland_sound_moss_rain'))
               .fontSize(11)
-              .fontColor('#F8FAFC')
+              .fontColor($r('app.color.timeisland_text_primary'))
               .fontWeight(this.currentSoundId === 'moss_rain' ? FontWeight.Bold : FontWeight.Medium)
-              .shadow({ radius: 4, color: 'rgba(0,0,0,0.8)', offsetY: 1 })
+              .shadow({ radius: 4, color: $r('app.color.timeisland_sound_text_shadow'), offsetY: 1 })
           }
         }
       }
@@ -1305,11 +1304,11 @@ struct TimeIslandHomePage {
       .borderRadius(14)
       .border({
         width: this.currentSoundId === 'moss_rain' ? 2 : 1,
-        color: this.currentSoundId === 'moss_rain' ? '#4EDEA3' : 'rgba(255, 255, 255, 0.12)'
+        color: this.currentSoundId === 'moss_rain' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_sound_border_idle')
       })
       .shadow(this.currentSoundId === 'moss_rain' ? {
         radius: 12,
-        color: 'rgba(78, 222, 163, 0.45)',
+        color: $r('app.color.timeisland_sound_glow_active'),
         offsetY: 2
       } : { radius: 0, color: Color.Transparent })
       .onClick(() => {
@@ -1335,18 +1334,18 @@ struct TimeIslandHomePage {
             .width('100%')
             .height(68)
             .borderRadius(14)
-            .backgroundColor(this.currentSoundId === 'forest_spring' ? 'rgba(10, 35, 25, 0.50)' : 'rgba(15, 19, 28, 0.72)')
+            .backgroundColor(this.currentSoundId === 'forest_spring' ? $r('app.color.timeisland_sound_spring_bg') : $r('app.color.timeisland_sound_card_dark_mask'))
 
           Column({ space: 4 }) {
             Image($r('app.media.ic_forest'))
               .width(20)
               .height(20)
-              .fillColor(this.currentSoundId === 'forest_spring' ? '#4EDEA3' : '#F8FAFC')
+              .fillColor(this.currentSoundId === 'forest_spring' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_text_primary'))
             Text($r('app.string.timeisland_sound_forest_spring'))
               .fontSize(11)
-              .fontColor('#F8FAFC')
+              .fontColor($r('app.color.timeisland_text_primary'))
               .fontWeight(this.currentSoundId === 'forest_spring' ? FontWeight.Bold : FontWeight.Normal)
-              .shadow({ radius: 4, color: 'rgba(0,0,0,0.8)', offsetY: 1 })
+              .shadow({ radius: 4, color: $r('app.color.timeisland_sound_text_shadow'), offsetY: 1 })
           }
         }
       }
@@ -1355,11 +1354,11 @@ struct TimeIslandHomePage {
       .borderRadius(14)
       .border({
         width: this.currentSoundId === 'forest_spring' ? 2 : 1,
-        color: this.currentSoundId === 'forest_spring' ? '#4EDEA3' : 'rgba(255, 255, 255, 0.12)'
+        color: this.currentSoundId === 'forest_spring' ? $r('app.color.timeisland_emerald') : $r('app.color.timeisland_sound_border_idle')
       })
       .shadow(this.currentSoundId === 'forest_spring' ? {
         radius: 12,
-        color: 'rgba(78, 222, 163, 0.45)',
+        color: $r('app.color.timeisland_sound_glow_active'),
         offsetY: 2
       } : { radius: 0, color: Color.Transparent })
       .onClick(() => {
@@ -1377,7 +1376,6 @@ struct TimeIslandHomePage {
     .borderRadius(16)
     .border({ width: 1, color: $r('app.color.timeisland_border_drawer') })
   }
-
 
   /**
    * 底部四大禅意导航栏 (专注 / 生态 / 气韵 / 星闪) - 1:1 还原设计稿图标与胶囊底座
@@ -1399,7 +1397,7 @@ struct TimeIslandHomePage {
         }
         .padding({ left: 16, right: 16, top: 6, bottom: 6 })
       }
-      .backgroundColor(this.activeTab === 'focus' ? $r('app.color.timeisland_tab_active_bg') : '#00000000')
+      .backgroundColor(this.activeTab === 'focus' ? $r('app.color.timeisland_tab_active_bg') : Color.Transparent)
       .borderRadius(18)
       .onClick(() => {
         soundEffectManager.play(SoundEffectType.BUBBLE);
@@ -1420,7 +1418,7 @@ struct TimeIslandHomePage {
         }
         .padding({ left: 16, right: 16, top: 6, bottom: 6 })
       }
-      .backgroundColor(this.activeTab === 'biome' ? $r('app.color.timeisland_tab_active_bg') : '#00000000')
+      .backgroundColor(this.activeTab === 'biome' ? $r('app.color.timeisland_tab_active_bg') : Color.Transparent)
       .borderRadius(18)
       .onClick(() => {
         soundEffectManager.play(SoundEffectType.BUBBLE);
@@ -1441,7 +1439,7 @@ struct TimeIslandHomePage {
         }
         .padding({ left: 16, right: 16, top: 6, bottom: 6 })
       }
-      .backgroundColor(this.activeTab === 'stats' ? $r('app.color.timeisland_tab_active_bg') : '#00000000')
+      .backgroundColor(this.activeTab === 'stats' ? $r('app.color.timeisland_tab_active_bg') : Color.Transparent)
       .borderRadius(18)
       .onClick(() => {
         soundEffectManager.play(SoundEffectType.BUBBLE);
@@ -1463,7 +1461,7 @@ struct TimeIslandHomePage {
           }
           .padding({ left: 16, right: 16, top: 6, bottom: 6 })
         }
-        .backgroundColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_tab_active_bg') : '#00000000')
+        .backgroundColor(this.activeTab === 'nearlink' ? $r('app.color.timeisland_tab_active_bg') : Color.Transparent)
         .borderRadius(18)
         .onClick(() => {
           soundEffectManager.play(SoundEffectType.BUBBLE);

@@ -8,7 +8,7 @@ export interface SolarTermItem {
   poemRes: Resource;
   month: number;
   dayApprox: number;
-  seasonColor: string;
+  seasonColor: Resource;
 }
 
 /**
@@ -33,33 +33,33 @@ export interface BiomeRealmInfo {
 export class SolarTermHelper {
   private static readonly TERMS: SolarTermItem[] = [
     // 春季 (青绿生发)
-    { id: 1, nameRes: $r('app.string.solar_term_1_name'), sealRes: $r('app.string.solar_term_1_seal'), poemRes: $r('app.string.solar_term_1_poem'), month: 2, dayApprox: 4, seasonColor: '#10B981' },
-    { id: 2, nameRes: $r('app.string.solar_term_2_name'), sealRes: $r('app.string.solar_term_2_seal'), poemRes: $r('app.string.solar_term_2_poem'), month: 2, dayApprox: 19, seasonColor: '#10B981' },
-    { id: 3, nameRes: $r('app.string.solar_term_3_name'), sealRes: $r('app.string.solar_term_3_seal'), poemRes: $r('app.string.solar_term_3_poem'), month: 3, dayApprox: 5, seasonColor: '#10B981' },
-    { id: 4, nameRes: $r('app.string.solar_term_4_name'), sealRes: $r('app.string.solar_term_4_seal'), poemRes: $r('app.string.solar_term_4_poem'), month: 3, dayApprox: 20, seasonColor: '#10B981' },
-    { id: 5, nameRes: $r('app.string.solar_term_5_name'), sealRes: $r('app.string.solar_term_5_seal'), poemRes: $r('app.string.solar_term_5_poem'), month: 4, dayApprox: 4, seasonColor: '#10B981' },
-    { id: 6, nameRes: $r('app.string.solar_term_6_name'), sealRes: $r('app.string.solar_term_6_seal'), poemRes: $r('app.string.solar_term_6_poem'), month: 4, dayApprox: 20, seasonColor: '#10B981' },
+    { id: 1, nameRes: $r('app.string.solar_term_1_name'), sealRes: $r('app.string.solar_term_1_seal'), poemRes: $r('app.string.solar_term_1_poem'), month: 2, dayApprox: 4, seasonColor: $r('app.color.timeisland_season_spring') },
+    { id: 2, nameRes: $r('app.string.solar_term_2_name'), sealRes: $r('app.string.solar_term_2_seal'), poemRes: $r('app.string.solar_term_2_poem'), month: 2, dayApprox: 19, seasonColor: $r('app.color.timeisland_season_spring') },
+    { id: 3, nameRes: $r('app.string.solar_term_3_name'), sealRes: $r('app.string.solar_term_3_seal'), poemRes: $r('app.string.solar_term_3_poem'), month: 3, dayApprox: 5, seasonColor: $r('app.color.timeisland_season_spring') },
+    { id: 4, nameRes: $r('app.string.solar_term_4_name'), sealRes: $r('app.string.solar_term_4_seal'), poemRes: $r('app.string.solar_term_4_poem'), month: 3, dayApprox: 20, seasonColor: $r('app.color.timeisland_season_spring') },
+    { id: 5, nameRes: $r('app.string.solar_term_5_name'), sealRes: $r('app.string.solar_term_5_seal'), poemRes: $r('app.string.solar_term_5_poem'), month: 4, dayApprox: 4, seasonColor: $r('app.color.timeisland_season_spring') },
+    { id: 6, nameRes: $r('app.string.solar_term_6_name'), sealRes: $r('app.string.solar_term_6_seal'), poemRes: $r('app.string.solar_term_6_poem'), month: 4, dayApprox: 20, seasonColor: $r('app.color.timeisland_season_spring') },
     // 夏季 (朱火纯茂)
-    { id: 7, nameRes: $r('app.string.solar_term_7_name'), sealRes: $r('app.string.solar_term_7_seal'), poemRes: $r('app.string.solar_term_7_poem'), month: 5, dayApprox: 5, seasonColor: '#EF4444' },
-    { id: 8, nameRes: $r('app.string.solar_term_8_name'), sealRes: $r('app.string.solar_term_8_seal'), poemRes: $r('app.string.solar_term_8_poem'), month: 5, dayApprox: 21, seasonColor: '#EF4444' },
-    { id: 9, nameRes: $r('app.string.solar_term_9_name'), sealRes: $r('app.string.solar_term_9_seal'), poemRes: $r('app.string.solar_term_9_poem'), month: 6, dayApprox: 5, seasonColor: '#EF4444' },
-    { id: 10, nameRes: $r('app.string.solar_term_10_name'), sealRes: $r('app.string.solar_term_10_seal'), poemRes: $r('app.string.solar_term_10_poem'), month: 6, dayApprox: 21, seasonColor: '#EF4444' },
-    { id: 11, nameRes: $r('app.string.solar_term_11_name'), sealRes: $r('app.string.solar_term_11_seal'), poemRes: $r('app.string.solar_term_11_poem'), month: 7, dayApprox: 7, seasonColor: '#EF4444' },
-    { id: 12, nameRes: $r('app.string.solar_term_12_name'), sealRes: $r('app.string.solar_term_12_seal'), poemRes: $r('app.string.solar_term_12_poem'), month: 7, dayApprox: 22, seasonColor: '#EF4444' },
+    { id: 7, nameRes: $r('app.string.solar_term_7_name'), sealRes: $r('app.string.solar_term_7_seal'), poemRes: $r('app.string.solar_term_7_poem'), month: 5, dayApprox: 5, seasonColor: $r('app.color.timeisland_season_summer') },
+    { id: 8, nameRes: $r('app.string.solar_term_8_name'), sealRes: $r('app.string.solar_term_8_seal'), poemRes: $r('app.string.solar_term_8_poem'), month: 5, dayApprox: 21, seasonColor: $r('app.color.timeisland_season_summer') },
+    { id: 9, nameRes: $r('app.string.solar_term_9_name'), sealRes: $r('app.string.solar_term_9_seal'), poemRes: $r('app.string.solar_term_9_poem'), month: 6, dayApprox: 5, seasonColor: $r('app.color.timeisland_season_summer') },
+    { id: 10, nameRes: $r('app.string.solar_term_10_name'), sealRes: $r('app.string.solar_term_10_seal'), poemRes: $r('app.string.solar_term_10_poem'), month: 6, dayApprox: 21, seasonColor: $r('app.color.timeisland_season_summer') },
+    { id: 11, nameRes: $r('app.string.solar_term_11_name'), sealRes: $r('app.string.solar_term_11_seal'), poemRes: $r('app.string.solar_term_11_poem'), month: 7, dayApprox: 7, seasonColor: $r('app.color.timeisland_season_summer') },
+    { id: 12, nameRes: $r('app.string.solar_term_12_name'), sealRes: $r('app.string.solar_term_12_seal'), poemRes: $r('app.string.solar_term_12_poem'), month: 7, dayApprox: 22, seasonColor: $r('app.color.timeisland_season_summer') },
     // 秋季 (金风玉露)
-    { id: 13, nameRes: $r('app.string.solar_term_13_name'), sealRes: $r('app.string.solar_term_13_seal'), poemRes: $r('app.string.solar_term_13_poem'), month: 8, dayApprox: 7, seasonColor: '#F59E0B' },
-    { id: 14, nameRes: $r('app.string.solar_term_14_name'), sealRes: $r('app.string.solar_term_14_seal'), poemRes: $r('app.string.solar_term_14_poem'), month: 8, dayApprox: 23, seasonColor: '#F59E0B' },
-    { id: 15, nameRes: $r('app.string.solar_term_15_name'), sealRes: $r('app.string.solar_term_15_seal'), poemRes: $r('app.string.solar_term_15_poem'), month: 9, dayApprox: 7, seasonColor: '#F59E0B' },
-    { id: 16, nameRes: $r('app.string.solar_term_16_name'), sealRes: $r('app.string.solar_term_16_seal'), poemRes: $r('app.string.solar_term_16_poem'), month: 9, dayApprox: 23, seasonColor: '#F59E0B' },
-    { id: 17, nameRes: $r('app.string.solar_term_17_name'), sealRes: $r('app.string.solar_term_17_seal'), poemRes: $r('app.string.solar_term_17_poem'), month: 10, dayApprox: 8, seasonColor: '#F59E0B' },
-    { id: 18, nameRes: $r('app.string.solar_term_18_name'), sealRes: $r('app.string.solar_term_18_seal'), poemRes: $r('app.string.solar_term_18_poem'), month: 10, dayApprox: 23, seasonColor: '#F59E0B' },
+    { id: 13, nameRes: $r('app.string.solar_term_13_name'), sealRes: $r('app.string.solar_term_13_seal'), poemRes: $r('app.string.solar_term_13_poem'), month: 8, dayApprox: 7, seasonColor: $r('app.color.timeisland_season_autumn') },
+    { id: 14, nameRes: $r('app.string.solar_term_14_name'), sealRes: $r('app.string.solar_term_14_seal'), poemRes: $r('app.string.solar_term_14_poem'), month: 8, dayApprox: 23, seasonColor: $r('app.color.timeisland_season_autumn') },
+    { id: 15, nameRes: $r('app.string.solar_term_15_name'), sealRes: $r('app.string.solar_term_15_seal'), poemRes: $r('app.string.solar_term_15_poem'), month: 9, dayApprox: 7, seasonColor: $r('app.color.timeisland_season_autumn') },
+    { id: 16, nameRes: $r('app.string.solar_term_16_name'), sealRes: $r('app.string.solar_term_16_seal'), poemRes: $r('app.string.solar_term_16_poem'), month: 9, dayApprox: 23, seasonColor: $r('app.color.timeisland_season_autumn') },
+    { id: 17, nameRes: $r('app.string.solar_term_17_name'), sealRes: $r('app.string.solar_term_17_seal'), poemRes: $r('app.string.solar_term_17_poem'), month: 10, dayApprox: 8, seasonColor: $r('app.color.timeisland_season_autumn') },
+    { id: 18, nameRes: $r('app.string.solar_term_18_name'), sealRes: $r('app.string.solar_term_18_seal'), poemRes: $r('app.string.solar_term_18_poem'), month: 10, dayApprox: 23, seasonColor: $r('app.color.timeisland_season_autumn') },
     // 冬季 (玄冰积素)
-    { id: 19, nameRes: $r('app.string.solar_term_19_name'), sealRes: $r('app.string.solar_term_19_seal'), poemRes: $r('app.string.solar_term_19_poem'), month: 11, dayApprox: 7, seasonColor: '#60A5FA' },
-    { id: 20, nameRes: $r('app.string.solar_term_20_name'), sealRes: $r('app.string.solar_term_20_seal'), poemRes: $r('app.string.solar_term_20_poem'), month: 11, dayApprox: 22, seasonColor: '#60A5FA' },
-    { id: 21, nameRes: $r('app.string.solar_term_21_name'), sealRes: $r('app.string.solar_term_21_seal'), poemRes: $r('app.string.solar_term_21_poem'), month: 12, dayApprox: 7, seasonColor: '#60A5FA' },
-    { id: 22, nameRes: $r('app.string.solar_term_22_name'), sealRes: $r('app.string.solar_term_22_seal'), poemRes: $r('app.string.solar_term_22_poem'), month: 12, dayApprox: 21, seasonColor: '#60A5FA' },
-    { id: 23, nameRes: $r('app.string.solar_term_23_name'), sealRes: $r('app.string.solar_term_23_seal'), poemRes: $r('app.string.solar_term_23_poem'), month: 1, dayApprox: 5, seasonColor: '#60A5FA' },
-    { id: 24, nameRes: $r('app.string.solar_term_24_name'), sealRes: $r('app.string.solar_term_24_seal'), poemRes: $r('app.string.solar_term_24_poem'), month: 1, dayApprox: 20, seasonColor: '#60A5FA' }
+    { id: 19, nameRes: $r('app.string.solar_term_19_name'), sealRes: $r('app.string.solar_term_19_seal'), poemRes: $r('app.string.solar_term_19_poem'), month: 11, dayApprox: 7, seasonColor: $r('app.color.timeisland_season_winter') },
+    { id: 20, nameRes: $r('app.string.solar_term_20_name'), sealRes: $r('app.string.solar_term_20_seal'), poemRes: $r('app.string.solar_term_20_poem'), month: 11, dayApprox: 22, seasonColor: $r('app.color.timeisland_season_winter') },
+    { id: 21, nameRes: $r('app.string.solar_term_21_name'), sealRes: $r('app.string.solar_term_21_seal'), poemRes: $r('app.string.solar_term_21_poem'), month: 12, dayApprox: 7, seasonColor: $r('app.color.timeisland_season_winter') },
+    { id: 22, nameRes: $r('app.string.solar_term_22_name'), sealRes: $r('app.string.solar_term_22_seal'), poemRes: $r('app.string.solar_term_22_poem'), month: 12, dayApprox: 21, seasonColor: $r('app.color.timeisland_season_winter') },
+    { id: 23, nameRes: $r('app.string.solar_term_23_name'), sealRes: $r('app.string.solar_term_23_seal'), poemRes: $r('app.string.solar_term_23_poem'), month: 1, dayApprox: 5, seasonColor: $r('app.color.timeisland_season_winter') },
+    { id: 24, nameRes: $r('app.string.solar_term_24_name'), sealRes: $r('app.string.solar_term_24_seal'), poemRes: $r('app.string.solar_term_24_poem'), month: 1, dayApprox: 20, seasonColor: $r('app.color.timeisland_season_winter') }
   ];
 
   /**

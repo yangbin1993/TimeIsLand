@@ -1,6 +1,14 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BaseViewModel } from '@app/common';
-import { FocusOverviewStat, FocusRecordEntity, DayFocusSummary, TagFocusSummary, FocusState } from '../model/FocusTypes';
+import {
+  FocusOverviewStat,
+  FocusRecordEntity,
+  DayFocusSummary,
+  TagFocusSummary,
+  FocusState,
+  TAG_COLOR_WORK,
+  TAG_COLOR_CUSTOM
+} from '../model/FocusTypes';
 import { timeIslandRepository, TimeIslandRepository } from '../data/TimeIslandRepository';
 
 const TAG = 'FocusStatsViewModel';
@@ -50,8 +58,8 @@ export class FocusStatsViewModel extends BaseViewModel {
         { dateString: '2026-10-12', totalMinutes: 50, completedSessions: 2 }
       ];
       const defaultTags: TagFocusSummary[] = [
-        { tagId: 1, tagName: '工作', colorHex: '#4EDEA3', totalMinutes: 150, percentage: 62 },
-        { tagId: 2, tagName: '阅读', colorHex: '#60A5FA', totalMinutes: 90, percentage: 38 }
+        { tagId: 1, tagName: '工作', colorHex: TAG_COLOR_WORK, totalMinutes: 150, percentage: 62 },
+        { tagId: 2, tagName: '阅读', colorHex: TAG_COLOR_CUSTOM, totalMinutes: 90, percentage: 38 }
       ];
       this.state.stats = {
         todayMinutes: 50,

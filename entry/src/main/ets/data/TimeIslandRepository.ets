@@ -1,6 +1,6 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BaseRepository, TaskDispatcher, RdbManager } from '@app/common';
-import { FocusTag, FocusRecordEntity, FocusOverviewStat, DayFocusSummary, TagFocusSummary, FocusState } from '../model/FocusTypes';
+import { FocusTag, FocusRecordEntity, FocusOverviewStat, DayFocusSummary, TagFocusSummary, FocusState, TAG_COLOR_CUSTOM } from '../model/FocusTypes';
 import { GUEST_USER_ID } from '../model/UserModel';
 import { focusTagDao, FocusTagDao } from './FocusTagDao';
 import { focusRecordDao, FocusRecordDao } from './FocusRecordDao';
@@ -382,7 +382,7 @@ export class TimeIslandRepository extends BaseRepository {
       const tagName = item.tag || 'Flow';
       let tagId = tagMapByName.get(tagName);
       if (!tagId) {
-        tagId = await this.addTag(tagName, '#60A5FA', 'tag_custom');
+        tagId = await this.addTag(tagName, TAG_COLOR_CUSTOM, 'tag_custom');
         tagMapByName.set(tagName, tagId);
       }
 

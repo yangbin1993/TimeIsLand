@@ -1,6 +1,16 @@
 import { relationalStore } from '@kit.ArkData';
 import { BaseDao, TableSchema, ColumnType } from '@app/common';
-import { FocusTag } from '../model/FocusTypes';
+import {
+  FocusTag,
+  TAG_COLOR_DEFAULT,
+  TAG_COLOR_WORK,
+  TAG_COLOR_STUDY,
+  TAG_COLOR_READING,
+  TAG_COLOR_THINKING,
+  TAG_COLOR_SPORT,
+  TAG_COLOR_MEDITATION,
+  TAG_COLOR_CREATIVE
+} from '../model/FocusTypes';
 import { GUEST_USER_ID } from '../model/UserModel';
 
 /**
@@ -12,8 +22,8 @@ const FOCUS_TAG_TABLE_SCHEMA: TableSchema = {
     { name: 'id', type: ColumnType.INTEGER, primaryKey: true },
     { name: 'user_id', type: ColumnType.TEXT, nullable: false, defaultValue: "'guest_local'", indexed: true },
     { name: 'name', type: ColumnType.TEXT, nullable: false, defaultValue: "''" },
-    { name: 'color_hex', type: ColumnType.TEXT, nullable: false, defaultValue: "'#4A90E2'" },
-    { name: 'icon_name', type: ColumnType.TEXT, nullable: false, defaultValue: "'app.media.ic_tag'" },
+    { name: 'color_hex', type: ColumnType.TEXT, nullable: false, defaultValue: `'${TAG_COLOR_DEFAULT}'` },
+    { name: 'icon_name', type: ColumnType.TEXT, nullable: false, defaultValue: "'ic_tag'" },
     { name: 'is_system', type: ColumnType.INTEGER, nullable: false, defaultValue: '0' }
   ]
 };
@@ -40,8 +50,8 @@ export class FocusTagDao extends BaseDao<FocusTag> {
         id: idColIndex !== -1 ? rs.getLong(idColIndex) : 0,
         userId: userColIndex !== -1 && !rs.isColumnNull(userColIndex) ? rs.getString(userColIndex) : GUEST_USER_ID,
         name: nameColIndex !== -1 ? rs.getString(nameColIndex) : '',
-        colorHex: colorColIndex !== -1 ? rs.getString(colorColIndex) : '#4A90E2',
-        iconName: iconColIndex !== -1 ? rs.getString(iconColIndex) : 'app.media.ic_tag',
+        colorHex: colorColIndex !== -1 ? rs.getString(colorColIndex) : TAG_COLOR_DEFAULT,
+        iconName: iconColIndex !== -1 ? rs.getString(iconColIndex) : 'ic_tag',
         isSystem: isSystemVal === 1
       };
       return item;
@@ -50,8 +60,8 @@ export class FocusTagDao extends BaseDao<FocusTag> {
         id: 0,
         userId: GUEST_USER_ID,
         name: '',
-        colorHex: '#4A90E2',
-        iconName: 'app.media.ic_tag',
+        colorHex: TAG_COLOR_DEFAULT,
+        iconName: 'ic_tag',
         isSystem: false
       };
       return fallbackTag;
@@ -85,13 +95,13 @@ export class FocusTagDao extends BaseDao<FocusTag> {
     };
 
     const defaultTags: FocusTag[] = [
-      { id: 1, userId: 'system_global', name: '工作', colorHex: '#4A90E2', iconName: 'briefcase', isSystem: true },
-      { id: 2, userId: 'system_global', name: '学习', colorHex: '#50E3C2', iconName: 'book', isSystem: true },
-      { id: 3, userId: 'system_global', name: '阅读', colorHex: '#F5A623', iconName: 'reader', isSystem: true },
-      { id: 4, userId: 'system_global', name: '思考', colorHex: '#9013FE', iconName: 'brain', isSystem: true },
-      { id: 5, userId: 'system_global', name: '运动', colorHex: '#7ED321', iconName: 'sport', isSystem: true },
-      { id: 6, userId: 'system_global', name: '冥想', colorHex: '#FBBF24', iconName: 'spa', isSystem: true },
-      { id: 7, userId: 'system_global', name: '创作', colorHex: '#ACC7FF', iconName: 'brush', isSystem: true }
+      { id: 1, userId: 'system_global', name: '工作', colorHex: TAG_COLOR_WORK, iconName: 'briefcase', isSystem: true },
+      { id: 2, userId: 'system_global', name: '学习', colorHex: TAG_COLOR_STUDY, iconName: 'book', isSystem: true },
+      { id: 3, userId: 'system_global', name: '阅读', colorHex: TAG_COLOR_READING, iconName: 'reader', isSystem: true },
+      { id: 4, userId: 'system_global', name: '思考', colorHex: TAG_COLOR_THINKING, iconName: 'brain', isSystem: true },
+      { id: 5, userId: 'system_global', name: '运动', colorHex: TAG_COLOR_SPORT, iconName: 'sport', isSystem: true },
+      { id: 6, userId: 'system_global', name: '冥想', colorHex: TAG_COLOR_MEDITATION, iconName: 'spa', isSystem: true },
+      { id: 7, userId: 'system_global', name: '创作', colorHex: TAG_COLOR_CREATIVE, iconName: 'brush', isSystem: true }
     ];
 
     const existing = await this.findAll();

@@ -1,4 +1,4 @@
-import { FocusTag } from '../model/FocusTypes';
+import { FocusTag, TAG_COLOR_EMERALD, TAG_COLOR_CUSTOM, TAG_COLOR_MEDITATION } from '../model/FocusTypes';
 import { ThemePalette, ThemeMode } from '../theme/ThemeTypes';
 import { themeManager } from '../theme/ThemeManager';
 import { soundEffectManager, SoundEffectType } from '../utils/SoundEffectManager';
@@ -88,9 +88,9 @@ struct TagSelectorViewPreview {
     Column() {
       TagSelectorView({
         tags: [
-          { id: 1, name: '💻 工作', colorHex: '#4EDEA3', iconName: 'laptop', isSystem: true },
-          { id: 2, name: '📖 阅读', colorHex: '#60A5FA', iconName: 'book', isSystem: true },
-          { id: 3, name: '🧘 冥想', colorHex: '#FBBF24', iconName: 'self_improvement', isSystem: true }
+          { id: 1, name: '💻 工作', colorHex: TAG_COLOR_EMERALD, iconName: 'laptop', isSystem: true },
+          { id: 2, name: '📖 阅读', colorHex: TAG_COLOR_CUSTOM, iconName: 'book', isSystem: true },
+          { id: 3, name: '🧘 冥想', colorHex: TAG_COLOR_MEDITATION, iconName: 'self_improvement', isSystem: true }
         ],
         selectedTagId: 1
       })

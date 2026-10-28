@@ -215,3 +215,17 @@ export interface FocusOverviewStat {
    */
   tagDistributions: TagFocusSummary[];
 }
+
+/**
+ * 心流气韵预置标签标准色彩池设计令牌 (HEX 集中统一管理)
+ */
+export const TAG_COLOR_WORK = '#4A90E2';
+export const TAG_COLOR_STUDY = '#50E3C2';
+export const TAG_COLOR_READING = '#F5A623';
+export const TAG_COLOR_THINKING = '#9013FE';
+export const TAG_COLOR_SPORT = '#7ED321';
+export const TAG_COLOR_MEDITATION = '#FBBF24';
+export const TAG_COLOR_CREATIVE = '#ACC7FF';
+export const TAG_COLOR_DEFAULT = '#4A90E2';
+export const TAG_COLOR_CUSTOM = '#60A5FA';
+export const TAG_COLOR_EMERALD = '#4EDEA3';

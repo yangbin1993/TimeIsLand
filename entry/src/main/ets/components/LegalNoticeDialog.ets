@@ -53,7 +53,7 @@ export struct LegalNoticeDialog {
         Column()
           .width('100%')
           .height('100%')
-          .backgroundColor(this.currentMode === ThemeMode.LIGHT ? 'rgba(15, 23, 42, 0.45)' : 'rgba(0, 0, 0, 0.72)')
+          .backgroundColor(this.currentMode === ThemeMode.LIGHT ? $r('app.color.timeisland_dialog_mask_light') : $r('app.color.timeisland_dialog_mask_dark'))
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
           .onClick(() => {
             soundEffectManager.play(SoundEffectType.PEN_CLICK);
